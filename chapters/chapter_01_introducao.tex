@@ -96,20 +96,19 @@ Desenvolver o \biorempp{} (\textit{Bioremediation Potential Profiling}), um ecos
 
 \subsection{Objetivos específicos}
 
-\nota{Reformulados em relação ao draft anterior para refletir os quatro componentes na nova organização. Um objetivo por componente + objetivos transversais.}
 
 \begin{enumerate}
-    \item Construir uma base de dados curada e integrada que consolide compostos regulados por sete frameworks internacionais e regionais, mapeados sobre vias canônicas de metabolismo de xenobióticos do \gls{kegg}, complementadas por evidências de degradação especializada (\gls{hadeg}) e predições toxicológicas (\gls{toxcsm}), suportada por pipeline reprodutível em Snakemake com camada dupla de validação (integrada KEGG-anchored e release-level \gls{gx}).
+    \item Construir uma base de dados curada suportada por pipeline reprodutível em Snakemake que consolide compostos regulados por nove frameworks regulatórios, mapeados sobre todas as vias do \gls{kegg} e as 20 vias canônicas específicas do metabolismo e degradação de xenobióticos, integrada a bases externas complementadas por evidências de degradação especializada (\gls{hadeg}) e predições toxicológicas (\gls{toxcsm}).
 
-    \item Desenvolver o \gls{dbx}, uma interface web \gls{spa} de acesso aberto para navegação read-only da base integrada, organizada em módulos compound-centric e complementada por recipes reproduzíveis de análise guiada.
+    \item Desenvolver o \gls{dbx}, uma interface web de acesso aberto para navegação read-only da base integrada, organizada em entidades (Compostos, Classes, Genes, Vias e Toxicidade) e análise guiadas.
 
-    \item Implementar o \gls{bws}, um serviço web baseado em upload de perfis \gls{ko} do usuário, oferecendo módulos analíticos que operam contra a mesma base integrada, com métricas ecológico-funcionais e algoritmos de suporte à decisão para consórcios microbianos.
+    \item Implementar o \gls{bws}, um serviço web baseado em upload de arquivos de anotação funcional de \gls{ko}, oferecendo módulos analíticos e casos de uso que operam utilizando a  base integrada, fornecendo uma camada de análsie de dados \textit{in sillico} para suporte a tomada de decisão e inferência.
 
     \item Implementar o \gls{cli} distribuído via \gls{pypi} para integração do processamento em pipelines bioinformáticos automatizados, com quatro modos operacionais cobrindo entradas genômicas, transcriptômicas, metabolômicas e enzimáticas.
 
     \item Garantir a conformidade do ecossistema com os princípios \gls{fair} através do uso consistente de identificadores interoperáveis (\gls{ko}, \gls{cpd}, KEGG Reaction, \gls{ec}, \gls{chebi}, \gls{smiles}), arquivamento com \gls{doi} estável e licenciamento aberto (código Apache~2.0, dados CC~BY~4.0).
 
-    \item Demonstrar a aplicabilidade do ecossistema retrospectivamente através de três estudos peer-reviewed do grupo que utilizaram a evidência integrada em contextos de caracterização de novas espécies, integração transcriptômica e metatranscriptômica, e desenvolvimento de consórcio industrial patenteado.
+    \item Demonstrar a aplicabilidade do ecossistema retrospectivamente através de três estudos peer-reviewed que utilizaram a base integrada em contextos de caracterização de novas espécies, subespécie, integração transcriptômica e metatranscriptômica
 \end{enumerate}
 
 % -----------------------------------------------------------------------------
