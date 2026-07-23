@@ -1,0 +1,160 @@
+% =============================================================================
+% =============================================================================
+% CAPÍTULO 2 --- FUNDAMENTAÇÃO TEÓRICA
+% =============================================================================
+% =============================================================================
+\chapter{Fundamentação teórica}
+\label{cap:fundamentacao}
+
+\nota{Capítulo enxuto conforme decisão. Foco em referencial que sustenta diretamente o trabalho, sem excursos. Meta: 15--20 páginas. Cada seção deve responder a pergunta ``por que esta base teórica é necessária para entender a contribuição do BioRemPP?''.}
+
+% -----------------------------------------------------------------------------
+\section{Biorremediação e escopo multi-aplicação}
+\label{sec:fund-biorremediacao}
+% -----------------------------------------------------------------------------
+
+\reaproveitar{Trazer parte do conteúdo original sobre princípios de biorremediação, microrganismos, classes de poluentes e consórcios (Seções 2.1.1 a 2.1.4 do draft anterior), mas COMPACTAR significativamente.}
+
+\subsection{Princípios e mecanismos}
+
+\escrever{Definição funcional de biorremediação e classificação (in situ vs ex situ, intrínseca vs aumentada, biotransformação vs mineralização). Manter compacto (1-2 parágrafos).}
+
+\subsection{Sistemas biológicos envolvidos}
+
+\escrever{Panorama compacto de bactérias, fungos, plantas e consórcios. Mencionar espécies-modelo (\textit{Pseudomonas}, \textit{Rhodococcus}, \textit{Acinetobacter}, \textit{Ochrobactrum}) sem detalhar --- as duas últimas são relevantes para conectar aos papers do grupo citados no Capítulo~\ref{cap:conclusao}.}
+
+\subsection{Escopo de aplicação além da descontaminação ambiental}
+
+\escrever{Referenciar o argumento estabelecido na Seção~\ref{sec:biorremediacao-multidominio} e aprofundar aqui em 2-3 parágrafos os principais domínios já citados, com literatura de apoio.}
+
+\todo{Citar revisões-chave sobre biorremediação de hidrocarbonetos, biocatálise industrial e degradação de plásticos}
+
+% -----------------------------------------------------------------------------
+\section{Genômica funcional aplicada à biorremediação}
+\label{sec:fund-genomica}
+% -----------------------------------------------------------------------------
+
+\subsection{Sequenciamento de nova geração e metagenômica}
+
+\escrever{Panorama compacto de \gls{ngs}, abordagens shotgun vs amplicon, obtenção de \glspl{mag}. Foco na aplicabilidade a estudos ambientais e industriais.}
+
+\subsection{Anotação funcional e o papel dos identificadores ortólogos}
+
+\escrever{Discussão do sistema \gls{ko} como padrão de anotação funcional, com breve comparação com Pfam, EggNOG. Justificar a escolha de \gls{ko} como eixo central de integração do banco BioRemPP.}
+
+\subsection{Convergência multi-ômica na análise de comunidades}
+
+\escrever{Como transcriptômica, proteômica e metabolômica complementam a genômica na caracterização do potencial biodegradativo real (não apenas potencial genético).}
+
+\todo{Citar Silva-Portela et al. 2024 aqui como exemplo de integração transcriptômica-metatranscriptômica relevante ao grupo}
+
+% -----------------------------------------------------------------------------
+\section{Recursos de dados especializados}
+\label{sec:fund-databases}
+% -----------------------------------------------------------------------------
+
+\nota{Seção compacta. Uma subseção curta por recurso, focando no que o BioRemPP consome de cada um.}
+
+\subsection{Bases de vias metabólicas: KEGG e MetaCyc}
+
+\escrever{\gls{kegg} como padrão de referência para pathways de metabolismo de xenobióticos. Estrutura da branch \textit{xenobiotics biodegradation and metabolism}. Menção breve a MetaCyc.}
+
+\todo{Referência principal: Kanehisa et al. 2025 (NAR 53:D672)}
+
+\subsection{Recursos químicos: ChEBI, SMILES e KEGG Compound}
+
+\escrever{\gls{chebi} como ontologia química de referência. \gls{smiles} como notação estrutural machine-readable. \gls{cpd} como identificador de compostos no ecossistema KEGG. Justificativa da adoção conjunta como base de interoperabilidade química no BioRemPP.}
+
+\todo{Referência: Malik et al. 2026 (NAR 54:D1768) para ChEBI}
+
+\subsection{Bases especializadas em degradação: HADEG}
+
+\escrever{\gls{hadeg} como curadoria especializada em enzimas e genes de degradação aeróbica de hidrocarbonetos. Estrutura (867 registros, 337 KOs, 71 pathways, 5 classes químicas). Justificativa da inclusão como fonte complementar ao KEGG.}
+
+\todo{Referência: Rojas-Vargas et al. 2023 (Comput Biol Chem)}
+
+\subsection{Predição toxicológica computacional: ToxCSM}
+
+\escrever{Fundamentos de \gls{qsar}. \gls{toxcsm} como plataforma de predição multi-endpoint (31 endpoints em cinco categorias). Discussão sobre natureza preditiva vs medida (predições são para screening, não substitutos de ensaios).}
+
+\todo{Referência: de Sá et al. 2022 (Brief Bioinform)}
+
+\subsection{Frameworks regulatórios internacionais e regionais}
+
+\escrever{Panorama compacto dos sete frameworks integrados no BioRemPP:}
+\begin{itemize}
+    \item \gls{iarc}: classificação de carcinogenicidade (grupos 1, 2A, 2B).
+    \item \gls{epa}: US Environmental Protection Agency (Priority Pollutants).
+    \item \gls{atsdr}: Substance Priority List.
+    \item \gls{wfd}: European Water Framework Directive.
+    \item \gls{psl}: Canadian Priority Substances List.
+    \item \gls{epc}: European Priority Chemicals.
+    \item \gls{conama}: classificações brasileiras.
+\end{itemize}
+
+\todo{Citar documentos oficiais de cada agência (URL e data de acesso)}
+
+% -----------------------------------------------------------------------------
+\section{Ferramentas computacionais existentes e lacunas}
+\label{sec:fund-ferramentas}
+% -----------------------------------------------------------------------------
+
+\reaproveitar{Base do conteúdo da Seção 2.4 do draft anterior (Sistemas de Predição de Pathways, Bases de Dados de Enzimas Biorremediadoras, Plataformas de Análise Funcional Geral) mas COMPACTAR e reorganizar.}
+
+\subsection{Panorama comparativo}
+
+\escrever{Apresentação compacta das ferramentas relevantes:}
+\begin{itemize}
+    \item \textbf{enviPath} (Hafner et al. 2024): sucessor moderno de UM-BBD/EAWAG-BBD, foco em predição de vias de biotransformação.
+    \item \textbf{PlasticDB} (Gambarini et al. 2022): base especializada em degradação de plásticos.
+    \item \textbf{mibPOPdb} (Ngara et al. 2022): base de biodegradação microbiana de \glspl{pop}.
+    \item \textbf{RemeDB}: ferramenta para predição de enzimas envolvidas em biorremediação a partir de metagenomas.
+    \item \textbf{DRAM, METABOLIC, MicrobiomeAnalyst}: plataformas genéricas de anotação funcional.
+\end{itemize}
+
+\subsection{Tabela comparativa e posicionamento do BioRemPP}
+
+\escrever{Construir tabela comparativa com colunas: ferramenta, escopo, tipo de acesso (web/CLI/ambos), integra frameworks regulatórios? (sim/não), integra toxicologia? (sim/não), arquitetura compound-centric? (sim/não), última atualização.}
+
+\begin{table}[h]
+\centering
+\caption{\todo{Comparação entre ferramentas de biorremediação computacional --- expandir}}
+\label{tab:comparacao-ferramentas}
+\begin{tabular}{@{}lllcccl@{}}
+\toprule
+\textbf{Ferramenta} & \textbf{Escopo} & \textbf{Acesso} & \textbf{Reg.} & \textbf{Tox.} & \textbf{CC} & \textbf{Ref.} \\
+\midrule
+enviPath        & \todo{...} & Web        & Não & Não & Não & \todo{cite} \\
+PlasticDB       & \todo{...} & Web        & Não & Não & Sim & \todo{cite} \\
+mibPOPdb        & \todo{...} & Web        & Parc. & Não & Sim & \todo{cite} \\
+RemeDB          & \todo{...} & CLI        & Não & Não & Não & \todo{cite} \\
+\biorempp{}     & Multi & Web+CLI    & Sim & Sim & Sim & Este trabalho \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\escrever{Parágrafo de conclusão da seção:} identificar o nicho específico do BioRemPP: única plataforma que combina (a) integração multi-fonte com curadoria compound-centric, (b) ancoragem em prioridade regulatória multi-jurisdicional, (c) camada toxicológica integrada, (d) triplo canal de acesso (browsing web, upload web, CLI), (e) validação dupla auditável.
+
+% -----------------------------------------------------------------------------
+\section{Princípios FAIR e reprodutibilidade computacional}
+\label{sec:fund-fair}
+% -----------------------------------------------------------------------------
+
+\reaproveitar{Trazer da Seção 2.5 do draft anterior conteúdo sobre FAIR e reprodutibilidade, mas focar no que sustenta as escolhas de design do BioRemPP.}
+
+\subsection{Princípios FAIR aplicados a recursos de bioinformática}
+
+\escrever{Definir \gls{fair} (Wilkinson et al. 2016). Discutir aplicação a bancos de dados curados: findable (\gls{doi} estável), accessible (protocolo HTTP aberto, sem barreira de login), interoperable (identificadores de autoridade externa), reusable (licenciamento explícito, metadata rica).}
+
+\todo{Referência: Wilkinson et al. 2016 (Sci Data 3:160018)}
+
+\subsection{Reprodutibilidade computacional em pipelines de dados}
+
+\escrever{Snakemake como padrão emergente para workflows reproducíveis. Vantagens da representação como \gls{dag}. Papel de containerização (Docker) e versionamento de dependências.}
+
+\todo{Referência: Mölder et al. 2025 (F1000Research v3)}
+
+\subsection{Validação de dados como parte do release}
+
+\escrever{Emergência de validadores automatizados de qualidade de dados (Great Expectations, Pandera, dbt) como parte da cultura moderna de engenharia de dados. Justificativa da aplicação a recursos científicos: releases hashiados, expectativas versionadas, baselines commitados.}
+

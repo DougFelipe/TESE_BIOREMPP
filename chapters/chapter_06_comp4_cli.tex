@@ -1,0 +1,176 @@
+% =============================================================================
+% =============================================================================
+% CAPÍTULO 6 --- COMPONENTE 4: BIOREMPP CLI
+% =============================================================================
+% =============================================================================
+\chapter{Componente 4: BioRemPP CLI}
+\label{cap:comp4}
+
+% -----------------------------------------------------------------------------
+\section{Motivação do componente}
+\label{sec:c4-motivacao}
+% -----------------------------------------------------------------------------
+
+O quarto componente do ecossistema \biorempp{} atende ao perfil de usuário que opera em ambientes de linha de comando ou containers automatizados. Esse perfil --- tipicamente bioinformatas e engenheiros de dados científicos --- precisa não de uma interface amigável, mas de um cliente com contrato estrito de entrada e saída, rastreabilidade completa da execução e códigos de saída padronizados que permitam encadeamento em pipelines Snakemake, Nextflow ou similares.
+
+O \gls{cli} preenche exatamente esse papel: um cliente Python distribuído via \gls{pypi} que expõe operações de anotação e relatório contra o banco integrado, com o mesmo rigor de reprodutibilidade que o pipeline de geração do banco (Capítulo~\ref{cap:comp1}) impõe à construção do artefato.
+
+% -----------------------------------------------------------------------------
+\section{Arquitetura do cliente}
+\label{sec:c4-arquitetura}
+% -----------------------------------------------------------------------------
+
+O \gls{cli} organiza sua funcionalidade em seis comandos raiz: \texttt{annotate}, \texttt{report}, \texttt{database}, \texttt{config}, \texttt{info} e \texttt{completion}. O comando \texttt{annotate} executa o merge de perfis de entrada contra as bases integradas; \texttt{report} produz relatórios a partir de outputs prévios; \texttt{database} lida com operações de gerenciamento do artefato local; \texttt{config}, \texttt{info} e \texttt{completion} oferecem introspecção da configuração ativa, metadata do cliente e suporte a shell completion.
+
+Opções globais uniformes complementam os comandos: níveis de verbosidade (\texttt{-v}, \texttt{-vv}, \texttt{-vvv}), modo silencioso (\texttt{-q}), configuração por arquivo (\texttt{--config}), controle de paralelismo (\texttt{--threads}), semente reproduzível (\texttt{--seed}), consulta de versão (\texttt{--version}) e citação (\texttt{--cite}). Esse conjunto de opções segue convenções bem estabelecidas em ferramentas bioinformáticas de linha de comando, reduzindo a curva de aprendizado para usuários habituados a operar em ambientes shell.
+
+\subsection{Contrato estrito de parser}
+
+O parser de entrada implementa contrato rígido para reduzir ambiguidade e evitar erros silenciosos. Metadata declarativa aparece em cabeçalho antes da primeira linha \texttt{>sample}, com prefixos convencionados \texttt{@dataset:*} e \texttt{@mode.*:*}. Comentários \texttt{\#} são permitidos apenas em cabeçalho. Whitespace inicial em linhas de dados é inválido. Linhas de dados sem cabeçalho \texttt{>sample} prévio falham. Pares duplicados \texttt{(sample, key)} falham. Essa disciplina garante que ambiguidades sejam sinalizadas ao usuário no momento da execução, em vez de propagarem-se para outputs silenciosamente incorretos.
+
+% -----------------------------------------------------------------------------
+\section{Quatro modos operacionais}
+\label{sec:c4-modos}
+% -----------------------------------------------------------------------------
+
+O \gls{cli} implementa quatro modos operacionais que cobrem tipos distintos de dados ômicos que podem ser confrontados com o banco integrado (Tabela~\ref{tab:c4-modos}). Cada modo tem sua gramática de linha de dados, seu conjunto de metadata específica e suas regras próprias de validação.
+
+\begin{table*}[htbp]
+\centering
+\caption{Modos operacionais do \gls{cli} \biorempp{}.}
+\label{tab:c4-modos}
+\small
+\begin{tabular}{@{}lllp{5cm}@{}}
+\toprule
+\textbf{Modo} & \textbf{Chave} & \textbf{Gramática de linha} & \textbf{Metadata específica} \\
+\midrule
+\texttt{genomic}     & \texttt{ko}       & \texttt{K\textbackslash d\{5\}}          & (nenhuma) \\
+\texttt{expression}  & \texttt{ko}       & \texttt{K\textbackslash d\{5\};value}    & \texttt{value\_type}, \texttt{missing\_value\_policy} \\
+\texttt{reaction}    & \texttt{reaction} & \texttt{R\textbackslash d\{5\}}          & \texttt{analysis\_type}, \texttt{id\_namespace} \\
+\texttt{enzymatic}   & \texttt{ec}       & \texttt{n.n.n.n} & \texttt{analysis\_type}, \texttt{id\_namespace} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+O modo \texttt{genomic} aceita perfis de presença/ausência de \glspl{ko} agrupados por amostra, formato natural para saídas de KofamScan, KEGG BlastKOALA ou pipelines de anotação equivalentes sobre genomas ou \glspl{mag}. O modo \texttt{expression} estende essa gramática adicionando um valor numérico por \gls{ko}, apropriado para dados de expressão gênica (TPM, FPKM, contagens normalizadas) derivados de RNA-Seq. O modo \texttt{reaction} opera sobre identificadores de reação KEGG, servindo análises com viés metabolômico. O modo \texttt{enzymatic} opera sobre números EC, servindo análises com dados de anotação proteômica ou catalítica.
+
+Essa cobertura de quatro modos torna o \gls{cli} genuinamente multi-ômico: um único cliente serve pesquisadores trabalhando com genômica, transcriptômica, metabolômica e informação enzimática, sempre confrontando-os contra o mesmo banco integrado.
+
+\subsection{Estratégia de fan-out para o modo reaction}
+
+O modo \texttt{reaction} implementa uma estratégia de fan-out sobre as bases integradas, executando o merge contra o subconjunto relevante de bases (BioRemPP, HADEG, KEGG) numa única invocação com \texttt{--database all}. Esse comportamento reduz o número de invocações necessárias em pipelines típicos e mantém a coerência de resultados através das bases.
+
+% -----------------------------------------------------------------------------
+\section{Sidecars e rastreabilidade}
+\label{sec:c4-sidecars}
+% -----------------------------------------------------------------------------
+
+Para cada arquivo de output, o \gls{cli} gera um sidecar \texttt{<output\_file>.meta.json} contendo campos que documentam o contexto de execução completo (Tabela~\ref{tab:c4-sidecar}).
+
+\begin{table}[htbp]
+\centering
+\caption{Campos principais do sidecar JSON gerado pelo \gls{cli} \biorempp{} para cada output.}
+\label{tab:c4-sidecar}
+\small
+\begin{tabular}{@{}lp{7cm}@{}}
+\toprule
+\textbf{Campo} & \textbf{Conteúdo} \\
+\midrule
+\texttt{input\_mode}            & Modo operacional utilizado (genomic/expression/reaction/enzymatic) \\
+\texttt{input\_metadata}        & Metadata declarativa do arquivo de entrada \\
+\texttt{parse\_policy}          & Política de parsing aplicada \\
+\texttt{parser\_contract\_version}     & Versão do contrato de parser \\
+\texttt{metadata\_schema\_version}     & Versão do schema de metadata \\
+\texttt{rows\_input}            & Número de linhas na entrada \\
+\texttt{rows\_db}               & Número de linhas na base consultada \\
+\texttt{rows\_merged}           & Número de linhas no output merged \\
+\texttt{input\_sha256}          & Hash \gls{sha}-256 do arquivo de entrada \\
+\texttt{database\_sha256}       & Hash \gls{sha}-256 da base consultada \\
+\texttt{resolved\_paths}        & Caminhos absolutos resolvidos \\
+\texttt{effective\_config}      & Configuração efetivamente aplicada \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+O uso de hashes \gls{sha}-256 tanto do input quanto do banco garante que qualquer output pode ser reproduzido de forma bit-for-bit por um terceiro que disponha dos mesmos arquivos. Essa disciplina de rastreabilidade replica no nível do cliente o modelo de release imutável adotado no pipeline de geração do banco (Seção~\ref{sec:c1-snakemake}).
+
+\begin{figure}[htbp]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering \todo{Figura 6.1 --- Fluxo de rastreabilidade do CLI. Input file $\rightarrow$ SHA-256 $\rightarrow$ merge $\rightarrow$ Output file + sidecar contendo hashes de input, database e output. Anotar como um terceiro pode reexecutar exatamente a mesma operação a partir do sidecar.}\vspace{2em}}}
+\caption{Fluxo de rastreabilidade do \gls{cli} \biorempp{}: cada execução deixa um sidecar JSON com hashes \gls{sha}-256 que permitem reprodução bit-for-bit.}
+\label{fig:c4-sidecars}
+\end{figure}
+
+% -----------------------------------------------------------------------------
+\section{Exit codes e integração em pipelines}
+\label{sec:c4-exitcodes}
+% -----------------------------------------------------------------------------
+
+Códigos de saída padronizados permitem que ferramentas de orquestração (Snakemake, Nextflow, Make, scripts shell) distingam categorias de falha e ajam apropriadamente sobre elas (Tabela~\ref{tab:c4-exitcodes}).
+
+\begin{table}[htbp]
+\centering
+\caption{Códigos de saída do \gls{cli} \biorempp{}.}
+\label{tab:c4-exitcodes}
+\small
+\begin{tabular}{@{}rl@{}}
+\toprule
+\textbf{Código} & \textbf{Significado} \\
+\midrule
+0   & Sucesso \\
+1   & Erro geral \\
+2   & Uso inválido (linha de comando) \\
+3   & Erro de entrada \\
+4   & Erro de saída \\
+5   & Erro de base de dados \\
+6   & Erro de validação \\
+7   & Erro de configuração \\
+8   & Erro de dependência \\
+130 & Interrompido pelo usuário (SIGINT) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Essa categorização permite estratégias diferenciadas de retry, logging e alerta em pipelines: erros de entrada (código 3) podem ser tratados diferentemente de erros de base (código 5) ou de erros de configuração (código 7). O padrão segue convenções amplamente adotadas em ferramentas bioinformáticas mainstream.
+
+\subsection{Modo dry-run}
+
+Todas as operações \texttt{annotate} suportam a flag \texttt{--dry-run}, que executa apenas a validação de contrato sem produzir outputs. Isso permite verificar preventivamente a integridade de metadata e linha de comando antes de iniciar processamento potencialmente longo.
+
+\subsection{HTML reporting unificado}
+
+Quando o output solicitado é HTML (\texttt{--format html}), o \gls{cli} gera uma pasta unificada \texttt{runs/<run\_id>/} contendo o relatório principal (\texttt{report.html}), sumário JSON (\texttt{report\_summary.json}), auditoria (\texttt{report\_audit.json}) e manifesto de execução (\texttt{run\_manifest.json}). Essa estrutura permite compartilhar um único artefato consolidado que inclui tanto o relatório visualmente navegável quanto os metadados que documentam sua produção.
+
+\subsection{Compressão}
+
+Outputs tabulares (\texttt{csv}, \texttt{tsv}) e JSON suportam compressão gzip via flag \texttt{--compress}, produzindo arquivos \texttt{.gz}. A combinação \texttt{--format html --compress} é intencionalmente inválida (código de saída 2), evitando a produção de arquivos HTML comprimidos que não seriam diretamente renderizáveis por browsers.
+
+% -----------------------------------------------------------------------------
+\section{Distribuição e requisitos}
+\label{sec:c4-distribuicao}
+% -----------------------------------------------------------------------------
+
+O \gls{cli} é distribuído via \gls{pypi} sob o nome \texttt{biorempp}, instalável via \texttt{pip install biorempp}. A versão atual (v0.14.0) implementa os quatro modos com validação completa. Requisitos de runtime incluem Python 3.10, 3.11 ou 3.12, com \texttt{pandas} 2.x como dependência tabular principal. Geração de relatórios HTML requer \texttt{plotly} como dependência do runtime.
+
+\todo{Atualizar a versão citada aqui conforme o release estável for publicado. A v0.14.0-beta-mvp mencionada no README interno pode ser substituída por versão sem sufixo beta antes da defesa da tese.}
+
+% -----------------------------------------------------------------------------
+\section{Resultados do componente}
+\label{sec:c4-resultados}
+% -----------------------------------------------------------------------------
+
+\escrever{Reunir aqui: (i) exemplos de execução para cada um dos quatro modos com entradas mínimas válidas (baseados nos exemplos do README); (ii) exemplo de sidecar gerado, mostrando os campos populados; (iii) benchmark de performance sobre entradas de tamanho variável (opcional se não houver dados sistemáticos); (iv) cobertura de testes automatizados atual.}
+
+\reaproveitar{Trazer da Seção 4.3 do draft anterior o conteúdo sobre performance e escalabilidade do CLI, se aplicável.}
+
+% -----------------------------------------------------------------------------
+\section{Discussão específica do componente}
+\label{sec:c4-discussao}
+% -----------------------------------------------------------------------------
+
+O \gls{cli} completa o triplo canal de acesso ao banco integrado (\gls{dbx}, \gls{bws}, \gls{cli}), atendendo o perfil de usuário mais técnico. Sua contribuição diferencial não está na análise em si --- que pode ser executada equivalentemente via \gls{bws} --- mas em três propriedades operacionais que a interface web não pode oferecer: integrabilidade em pipelines automatizados, rastreabilidade bit-for-bit via sidecars com hashes e execução em ambientes onde interfaces gráficas não estão disponíveis (containers, clusters HPC, notebooks Jupyter em ambientes remotos).
+
+A disciplina de contrato estrito de parser e a padronização de exit codes refletem uma decisão de posicionar o \gls{cli} como membro de primeira classe do ecossistema bioinformático mainstream, não como afterthought de linha de comando anexado ao BWS. Ferramentas amplamente adotadas na comunidade --- \texttt{samtools}, \texttt{bcftools}, \texttt{bedtools}, \texttt{seqkit} --- seguem convenções similares, e a adoção dessas convenções pelo \gls{cli} \biorempp{} facilita sua incorporação em pipelines existentes sem fricção conceitual para os usuários.
+
+O status atual do \gls{cli} como release v0.14 (pré-estável) reflete o estágio de maturação do componente. Elementos ainda em consolidação (por exemplo, a finalização formal do modo enzimático via decision gate D20 e o empacotamento de documentação de release-readiness) estão documentados no repositório e devem ser resolvidos antes da versão estável 1.0.
+

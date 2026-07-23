@@ -1,0 +1,131 @@
+% =============================================================================
+% =============================================================================
+% CAPÍTULO 1 --- INTRODUÇÃO GERAL
+% =============================================================================
+% =============================================================================
+\chapter{Introdução geral}
+\label{cap:introducao}
+
+% -----------------------------------------------------------------------------
+\section{Contextualização}
+\label{sec:contextualizacao}
+% -----------------------------------------------------------------------------
+
+\reaproveitar{Trazer do draft anterior os parágrafos sobre poluição ambiental, limitações de abordagens convencionais e avanço da era genômica (Seção 1.1 original).}
+
+\escrever{Parágrafo 1 --- Escala global da contaminação química:}
+\begin{itemize}
+    \item Poluentes prioritários (\glspl{pop}, hidrocarbonetos, pesticidas, metais pesados, contaminantes emergentes como PFAS e microplásticos).
+    \item Impactos ecológicos e sanitários documentados.
+    \item Citações de referência: relatórios da OMS, UNEP, EPA; artigos de revisão recentes sobre carga global de poluição.
+    \todo{Inserir estatística atualizada sobre carga global de contaminação e citação}
+\end{itemize}
+
+\escrever{Parágrafo 2 --- Limitações das abordagens físico-químicas convencionais:}
+\begin{itemize}
+    \item Custo, geração de resíduos secundários, insustentabilidade a longo prazo.
+    \item Biorremediação como alternativa: uso de microrganismos, plantas e produtos metabólicos.
+    \todo{Citação para justificar biorremediação como estratégia}
+\end{itemize}
+
+\escrever{Parágrafo 3 --- Emergência das abordagens ômicas:}
+\begin{itemize}
+    \item \gls{ngs}, metagenômica, \glspl{mag}.
+    \item Anotação funcional via identificadores ortólogos (\gls{ko}) permite inferir capacidades metabólicas sem cultivo.
+    \item Convergência das ômicas (genômica, transcriptômica, metabolômica, proteômica) na caracterização do potencial biodegradativo.
+    \todo{Citações sobre metagenômica ambiental e uso de KO em análises funcionais}
+\end{itemize}
+
+\escrever{Parágrafo 4 --- Frameworks regulatórios como resposta institucional:}
+\begin{itemize}
+    \item Listagem de agências: \gls{iarc}, \gls{epa}, \gls{atsdr}, \gls{wfd}, \gls{psl}, \gls{epc}, \gls{conama}.
+    \item Papel das listas prioritárias na definição de alvos de investigação e mitigação.
+\end{itemize}
+
+% -----------------------------------------------------------------------------
+\section{Biorremediação como resposta multi-domínio}
+\label{sec:biorremediacao-multidominio}
+% -----------------------------------------------------------------------------
+
+\nota{Esta seção é fundamental para a defesa do argumento de audiência ampla do trabalho. A biorremediação NÃO é nicho ambiental estrito; é família de aplicações que atravessa múltiplos setores. Redação sóbria e sem exagero, mas explicitando os domínios.}
+
+\escrever{Parágrafo introdutório:} Definir biorremediação em sentido funcional (transformação biológica de compostos químicos por sistemas vivos), não restrita a descontaminação ambiental.
+
+\escrever{Parágrafo(s) sobre domínios de aplicação --- cobrir de forma compacta:}
+\begin{itemize}
+    \item \textbf{Indústria de petróleo e gás}: recuperação avançada de óleo por microrganismos, biotratamento de águas produzidas e borras oleosas, biocorrosão.
+    \item \textbf{Biocatálise farmacêutica e metabolismo de fármacos}: famílias enzimáticas (P450, monooxigenases, dehidrogenases, hidrolases) que mediam biotransformação tanto de poluentes quanto de fármacos; tratamento de efluentes farmacêuticos.
+    \item \textbf{Degradação enzimática de plásticos}: PETase, MHETase; interseção com economia circular.
+    \item \textbf{Fitorremediação e agronomia}: rizoremediação, recuperação de solos agrícolas.
+    \item \textbf{Saúde pública, epidemiologia ambiental e regulação}: avaliação de risco ocupacional, cosmetovigilância, vigilância de contaminantes emergentes em água potável.
+\end{itemize}
+
+\escrever{Parágrafo de fechamento:} A infraestrutura científica compartilhada entre estas comunidades (genes de degradação, rotas metabólicas, predição toxicológica, classificação regulatória) justifica uma plataforma unificada de análise.
+
+\todo{Citar 2-3 revisões recentes por domínio para embasar cada aplicação}
+
+% -----------------------------------------------------------------------------
+\section{Problema de pesquisa}
+\label{sec:problema}
+% -----------------------------------------------------------------------------
+
+\reaproveitar{Trazer do draft anterior a formulação do gap (Seção 1.2 original), mas ajustar para refletir que o gap é sobre unificação regulatório-funcional, não apenas sobre integração de bases.}
+
+\escrever{Parágrafo 1 --- Formulação do gap:}
+Não existe atualmente plataforma computacional que unifique, em arquitetura \textit{compound-centric}, anotação funcional (KEGG, HADEG), predição toxicológica (ToxCSM) e prioridade regulatória multi-jurisdicional, oferecendo interfaces complementares para diferentes perfis técnicos de usuário e cobertura efetiva de análises multi-ômicas.
+
+\escrever{Parágrafo 2 --- Consequências práticas do gap:}
+\begin{itemize}
+    \item Reconciliação manual de identificadores entre fontes heterogêneas.
+    \item Desconexão entre análise funcional e relevância regulatória.
+    \item Ausência de suporte à decisão para priorização baseada em risco.
+    \item Dificuldade de reprodutibilidade quando a evidência é reconstruída caso a caso.
+\end{itemize}
+
+\escrever{Parágrafo 3 --- Pergunta de pesquisa (frase única):}
+Como projetar e implementar um ecossistema de bioinformática que integre evidência funcional, toxicológica e regulatória em torno de compostos prioritários, atendendo simultaneamente pesquisadores que operam por interfaces web e por pipelines programáticos?
+
+% -----------------------------------------------------------------------------
+\section{Objetivos}
+\label{sec:objetivos}
+% -----------------------------------------------------------------------------
+
+\subsection{Objetivo geral}
+
+Desenvolver o \biorempp{} (\textit{Bioremediation Potential Profiling}), um ecossistema integrado de bioinformática para análise funcional e integração multi-ômica orientada a compostos prioritários para biorremediação, composto por quatro componentes interoperáveis: banco de dados integrado com pipeline reprodutível de geração e validação; interface web de navegação (\gls{dbx}); serviço web de análise por upload (\gls{bws}); e cliente de linha de comando (\gls{cli}).
+
+\subsection{Objetivos específicos}
+
+\nota{Reformulados em relação ao draft anterior para refletir os quatro componentes na nova organização. Um objetivo por componente + objetivos transversais.}
+
+\begin{enumerate}
+    \item Construir uma base de dados curada e integrada que consolide compostos regulados por sete frameworks internacionais e regionais, mapeados sobre vias canônicas de metabolismo de xenobióticos do \gls{kegg}, complementadas por evidências de degradação especializada (\gls{hadeg}) e predições toxicológicas (\gls{toxcsm}), suportada por pipeline reprodutível em Snakemake com camada dupla de validação (integrada KEGG-anchored e release-level \gls{gx}).
+
+    \item Desenvolver o \gls{dbx}, uma interface web \gls{spa} de acesso aberto para navegação read-only da base integrada, organizada em módulos compound-centric e complementada por recipes reproduzíveis de análise guiada.
+
+    \item Implementar o \gls{bws}, um serviço web baseado em upload de perfis \gls{ko} do usuário, oferecendo módulos analíticos que operam contra a mesma base integrada, com métricas ecológico-funcionais e algoritmos de suporte à decisão para consórcios microbianos.
+
+    \item Implementar o \gls{cli} distribuído via \gls{pypi} para integração do processamento em pipelines bioinformáticos automatizados, com quatro modos operacionais cobrindo entradas genômicas, transcriptômicas, metabolômicas e enzimáticas.
+
+    \item Garantir a conformidade do ecossistema com os princípios \gls{fair} através do uso consistente de identificadores interoperáveis (\gls{ko}, \gls{cpd}, KEGG Reaction, \gls{ec}, \gls{chebi}, \gls{smiles}), arquivamento com \gls{doi} estável e licenciamento aberto (código Apache~2.0, dados CC~BY~4.0).
+
+    \item Demonstrar a aplicabilidade do ecossistema retrospectivamente através de três estudos peer-reviewed do grupo que utilizaram a evidência integrada em contextos de caracterização de novas espécies, integração transcriptômica e metatranscriptômica, e desenvolvimento de consórcio industrial patenteado.
+\end{enumerate}
+
+% -----------------------------------------------------------------------------
+\section{Organização da tese}
+\label{sec:organizacao}
+% -----------------------------------------------------------------------------
+
+\escrever{Nota metodológica sobre estrutura orientada a componentes:} Esta tese adota estrutura em sete capítulos organizada em torno dos componentes do ecossistema \biorempp{}, em alternativa à estrutura tradicional Métodos--Resultados--Discussão. Cada componente é apresentado integralmente em um capítulo dedicado (motivação, arquitetura, resultados, discussão específica), evitando fragmentação de descrição entre capítulos temáticos. Um capítulo final integra as contribuições e discute o ecossistema como unidade coerente.
+
+\escrever{Descrição breve de cada capítulo:}
+\begin{description}
+    \item[Capítulo~\ref{cap:fundamentacao}] Fundamentação teórica sobre biorremediação, genômica funcional, bases de dados especializadas, ferramentas computacionais existentes e princípios \gls{fair}.
+    \item[Capítulo~\ref{cap:comp1}] Componente~1: banco de dados integrado, pipeline de geração e camadas de validação.
+    \item[Capítulo~\ref{cap:comp2}] Componente~2: \gls{dbx} para navegação read-only.
+    \item[Capítulo~\ref{cap:comp3}] Componente~3: \gls{bws} para análise por upload.
+    \item[Capítulo~\ref{cap:comp4}] Componente~4: \gls{cli} para integração em pipelines.
+    \item[Capítulo~\ref{cap:conclusao}] Discussão integrada, aplicações retrospectivas publicadas, limitações e perspectivas.
+\end{description}
+

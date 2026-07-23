@@ -1,0 +1,31 @@
+\chapter{Código-fonte e disponibilidade}
+\label{ape:codigo-fonte}
+% -----------------------------------------------------------------------------
+
+Todos os artefatos que compõem o ecossistema \biorempp{} são publicamente disponíveis nos seguintes canais:
+
+\begin{description}
+    \item[Organização GitHub] \url{https://github.com/BioRemPP}
+    \item[Repositório do banco e pipeline] \todo{URL do repositório específico}
+    \item[Repositório do \gls{dbx}] \todo{URL do repositório específico}
+    \item[Repositório do \gls{bws}] \todo{URL do repositório específico}
+    \item[Repositório do \gls{cli}] \todo{URL do repositório específico}
+    \item[Repositório do validador Great Expectations] \todo{URL do repositório específico}
+    \item[Zenodo (banco integrado v1.1.0)] \url{https://doi.org/10.5281/zenodo.18905195}
+    \item[PyPI (\gls{cli})] \todo{URL específica do PyPI package}
+    \item[\gls{dbx} em produção] \todo{URL institucional confirmada}
+    \item[\gls{bws} em produção] \todo{URL institucional confirmada}
+\end{description}
+
+\textbf{Licenças:} código-fonte de todos os componentes sob Apache License 2.0; dados curados do banco integrado sob Creative Commons Attribution 4.0 International (CC BY 4.0).
+
+\textbf{Instalação do \gls{cli}:}
+\begin{lstlisting}[language=bash]
+pip install biorempp
+biorempp --version
+biorempp --cite
+\end{lstlisting}
+
+\textbf{Requisitos de runtime do \gls{cli}:} Python 3.10, 3.11 ou 3.12; pandas 2.x; plotly (opcional, requerido apenas para geração de relatórios HTML).
+
+% -----------------------------------------------------------------------------

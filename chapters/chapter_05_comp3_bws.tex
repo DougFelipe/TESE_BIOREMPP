@@ -1,0 +1,128 @@
+% =============================================================================
+% =============================================================================
+% CAPÍTULO 5 --- COMPONENTE 3: BIOREMPP WEB SERVICE (BWS)
+% =============================================================================
+% =============================================================================
+\chapter{Componente 3: BioRemPP Web Service (BWS)}
+\label{cap:comp3}
+
+% -----------------------------------------------------------------------------
+\section{Motivação do componente}
+\label{sec:c3-motivacao}
+% -----------------------------------------------------------------------------
+
+O \gls{bws} responde a uma necessidade que o \gls{dbx} não atende: análise ativa contra dados do próprio usuário. Pesquisadores em biotecnologia ambiental frequentemente dispõem de perfis de anotação funcional derivados de sequenciamento (genoma, metagenoma, transcriptoma) e querem confrontá-los com o banco curado para inferir potencial de biorremediação, priorizar candidatos e projetar consórcios. Escrever código para essas análises impõe uma barreira que muitos pesquisadores de bancada não estão dispostos ou preparados a atravessar.
+
+O \gls{bws} elimina essa barreira aceitando \gls{ko} profiles submetidos pelo usuário e processando-os através de oito módulos analíticos totalizando 56 casos de uso predefinidos, todos operando contra a mesma evidência integrada exposta pelo \gls{dbx}. O público-alvo é o pesquisador com dados próprios que quer aproveitar a curadoria \biorempp{} sem necessidade de programar.
+
+% -----------------------------------------------------------------------------
+\section{Arquitetura upload-based}
+\label{sec:c3-arquitetura}
+% -----------------------------------------------------------------------------
+
+\escrever{Descrever a arquitetura em prosa técnica compacta: fluxo de submissão (upload de arquivo tabular contendo perfis KO por amostra), validação de entrada (mesma disciplina de contrato de parser do CLI, discutida no Cap 6), processamento server-side contra o banco integrado, apresentação de resultados. Mencionar que a arquitetura server-side permite computação mais intensiva que o browser sozinho poderia suportar (por exemplo, algoritmos combinatórios do módulo de assembly de consórcios).}
+
+\begin{figure}[htbp]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering \todo{Figura 5.1 --- Diagrama de fluxo do BWS. Usuário $\rightarrow$ upload de arquivo KO $\rightarrow$ validação de contrato $\rightarrow$ merge contra banco integrado $\rightarrow$ processamento pelos módulos analíticos $\rightarrow$ apresentação de resultados. Anotar entradas e saídas de cada etapa.}\vspace{2em}}}
+\caption{Arquitetura upload-based do \gls{bws}. Perfis \gls{ko} submetidos pelo usuário são validados, integrados contra o banco curado e processados através de oito módulos analíticos.}
+\label{fig:c3-arquitetura}
+\end{figure}
+
+% -----------------------------------------------------------------------------
+\section{Oito módulos analíticos e 56 casos de uso}
+\label{sec:c3-modulos}
+% -----------------------------------------------------------------------------
+
+\reaproveitar{Trazer do draft anterior a descrição dos oito módulos analíticos (Seções 3.3.3 e 4.2 do original), atualizando terminologia para consistência com esta versão da tese e removendo qualquer conteúdo que se refira ao web browsing (que agora pertence ao \gls{dbx}, Capítulo~\ref{cap:comp2}).}
+
+\escrever{Estruturar como oito subseções (5.3.1 a 5.3.8), uma por módulo, cada uma cobrindo: nome do módulo, pergunta que ele responde, tipos de entrada esperados, principais casos de uso oferecidos, tipo de output. Ao final, incluir tabela resumo.}
+
+\subsection{Panorama geral}
+
+\begin{table*}[htbp]
+\centering
+\caption{Panorama dos oito módulos analíticos do \gls{bws} totalizando 56 casos de uso.}
+\label{tab:c3-modulos}
+\small
+\begin{tabular}{@{}rlrp{6cm}@{}}
+\toprule
+\textbf{\#} & \textbf{Módulo} & \textbf{UCs} & \textbf{Escopo analítico} \\
+\midrule
+1 & \todo{Nome do módulo 1}                     & \todo{n} & \todo{Escopo} \\
+2 & \todo{Nome do módulo 2}                     & \todo{n} & \todo{Escopo} \\
+3 & \todo{Nome do módulo 3}                     & \todo{n} & \todo{Escopo} \\
+4 & \todo{Nome do módulo 4}                     & \todo{n} & \todo{Escopo} \\
+5 & \todo{Nome do módulo 5}                     & \todo{n} & \todo{Escopo} \\
+6 & \todo{Nome do módulo 6}                     & \todo{n} & \todo{Escopo} \\
+7 & \todo{Nome do módulo 7}                     & \todo{n} & \todo{Escopo} \\
+8 & \todo{Nome do módulo 8}                     & \todo{n} & \todo{Escopo} \\
+\midrule
+\textbf{Total} & & \textbf{56} & \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\todo{Preencher a tabela com os nomes reais dos oito módulos e a distribuição dos 56 casos de uso entre eles. Como esses módulos são o coração diferencial do BWS, vale a pena dedicar prosa técnica robusta a cada um.}
+
+% -----------------------------------------------------------------------------
+\section{Métricas ecológico-funcionais}
+\label{sec:c3-metricas}
+% -----------------------------------------------------------------------------
+
+\reaproveitar{Migrar da Seção 2.6 do draft original (que estava em Fundamentação Teórica) o conteúdo sobre métricas ecológicas aplicadas a dados funcionais. Reformular para descrever como cada métrica é implementada no BWS e para qual pergunta analítica ela responde.}
+
+\subsection{Riqueza funcional}
+
+\escrever{Definir riqueza funcional como contagem de KOs únicos anotados em uma amostra ou conjunto de amostras. Discutir sua interpretação como proxy para amplitude do repertório metabólico. Explicitar limitações (não considera abundância, não considera função ativa versus potencial genético).}
+
+\subsection{Cobertura de compostos}
+
+\escrever{Definir cobertura de compostos como fração de compostos prioritários endereçados pelos KOs anotados na amostra, ponderada ou não por número de vias/reações associadas. Discutir uso como score de potencial biodegradativo aplicado.}
+
+\subsection{Completude de pathway}
+
+\escrever{Definir completude como proporção de KOs esperados numa via específica que estão presentes na amostra. Discutir como isso permite distinguir vias parcialmente representadas de vias funcionalmente completas.}
+
+\subsection{Guildas metabólicas}
+
+\escrever{Discutir a atribuição de amostras a guildas metabólicas com base em padrões de riqueza funcional e cobertura. Utilidade para caracterização comparativa e para triagem de consórcios.}
+
+\subsection{Otimização combinatória para design de consórcios}
+
+\escrever{Descrever o algoritmo greedy set-cover implementado, sua complexidade, justificativa da abordagem greedy em vez de programação linear inteira (custo computacional vs qualidade da solução). Referenciar o módulo de assembly de consórcios do BWS.}
+
+% -----------------------------------------------------------------------------
+\section{Interoperabilidade com o banco integrado}
+\label{sec:c3-interop}
+% -----------------------------------------------------------------------------
+
+O \gls{bws} consome a mesma release do banco integrado que o \gls{dbx}, garantindo consistência entre resultados obtidos nas duas ferramentas. A cada release do banco corresponde uma release do \gls{bws} que a incorpora; upgrades de versão do banco propagam-se para o \gls{bws} através do mesmo pipeline de deploy.
+
+Essa consistência é auditável: perguntas exploratórias respondidas por navegação no \gls{dbx} produzem os mesmos números que perguntas analíticas equivalentes rodadas no \gls{bws}. Isso torna as duas ferramentas complementares em fluxo de trabalho: um pesquisador tipicamente começa pela navegação exploratória no \gls{dbx} para escolher escopo, e depois submete seus próprios dados ao \gls{bws} para análise dirigida.
+
+% -----------------------------------------------------------------------------
+\section{Resultados do componente}
+\label{sec:c3-resultados}
+% -----------------------------------------------------------------------------
+
+\escrever{Reunir aqui: (i) screenshot da interface principal do BWS mostrando o fluxo de submissão; (ii) exemplo de output para pelo menos dois módulos representativos; (iii) discussão de escalabilidade (tamanho máximo de upload aceito, tempo típico de execução).}
+
+% -----------------------------------------------------------------------------
+\section{Status editorial}
+\label{sec:c3-editorial}
+% -----------------------------------------------------------------------------
+
+Um manuscrito companheiro dedicado exclusivamente ao \gls{bws} está atualmente em revisão editorial no \gls{nar} Web Server Issue (referência de manuscrito NAR-00839-Web-S-2026.R1, Executive Editor Dr.~Dominik Seelow). Esse manuscrito complementa a descrição apresentada nesta tese, aprofundando aspectos que aqui recebem tratamento sintético.
+
+% -----------------------------------------------------------------------------
+\section{Discussão específica do componente}
+\label{sec:c3-discussao}
+% -----------------------------------------------------------------------------
+
+O \gls{bws} atende a um perfil de usuário distinto tanto do \gls{dbx} quanto do \gls{cli} (Capítulo~\ref{cap:comp4}). Enquanto o \gls{dbx} serve pesquisadores que querem explorar o banco curado sem submeter dados próprios, e o \gls{cli} serve bioinformatas que operam em pipelines automatizados, o \gls{bws} atende o meio-termo: pesquisadores com dados próprios que preferem interface web a linha de comando.
+
+A cobertura dos oito módulos totalizando 56 casos de uso é notável em amplitude, mas deve ser avaliada em relação ao público. Uma limitação a reconhecer é que a granularidade fina de opções pode representar barreira cognitiva para usuários novos: o próprio módulo de Guided Analysis do \gls{dbx} (Seção~\ref{sec:c2-guided}) foi projetado em parte para oferecer entrada mais gentil quando o pesquisador ainda não sabe qual dos 56 casos de uso do \gls{bws} melhor responde à sua pergunta.
+
+\escrever{Adicionar parágrafo comparando o BWS com plataformas correlatas de análise funcional em bioinformática (MicrobiomeAnalyst, EnviPath, RemeDB) em termos de escopo analítico, complexidade de uso e integração com evidência regulatória.}
+

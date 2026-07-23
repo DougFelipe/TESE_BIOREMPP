@@ -1,0 +1,52 @@
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.glg
+*.glo
+*.gls
+*.glsdefs
+*.idx
+*.ilg
+*.ind
+*.ist
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+*.xdy
+
+# Glossaries / acronyms
+*.acn
+*.acr
+*.alg
+
+# Generated PDFs and temp outputs
+*.pdf
+*.dvi
+*.ps
+
+# Latexmk / MakeIndex temp files
+*.nav
+*.snm
+*.vrb
+
+# Local editor / OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+.planing/
+.archive/
+
+# Python cache if helper scripts are added later
+__pycache__/
+*.pyc

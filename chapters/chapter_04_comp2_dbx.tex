@@ -1,0 +1,153 @@
+% =============================================================================
+% =============================================================================
+% CAPÍTULO 4 --- COMPONENTE 2: BIOREMPP DATABASE EXPLORER (DBX)
+% =============================================================================
+% =============================================================================
+\chapter{Componente 2: BioRemPP Database Explorer (DBX)}
+\label{cap:comp2}
+
+% -----------------------------------------------------------------------------
+\section{Motivação do componente}
+\label{sec:c2-motivacao}
+% -----------------------------------------------------------------------------
+
+O banco integrado descrito no Capítulo~\ref{cap:comp1} é publicado como conjunto de arquivos CSV/XLSX no Zenodo, formato adequado para consumo programático mas insuficiente para pesquisadores que desejam explorar a evidência sem escrever código. O \gls{dbx} responde a essa lacuna oferecendo uma interface web read-only para navegação da mesma evidência curada, organizada em torno das perspectivas de exploração mais frequentes no domínio de biorremediação: compostos, orthologs, vias, toxicidade e classes químicas.
+
+O \gls{dbx} é intencionalmente distinto do \gls{bws} (Capítulo~\ref{cap:comp3}): enquanto o \gls{bws} processa dados submetidos pelo usuário, o \gls{dbx} nunca aceita entrada; sua função é permitir que qualquer pesquisador acesse rapidamente a evidência integrada a partir de qualquer ponto de entrada científico, sem cadastro e sem qualquer barreira operacional.
+
+% -----------------------------------------------------------------------------
+\section{Arquitetura da aplicação}
+\label{sec:c2-arquitetura}
+% -----------------------------------------------------------------------------
+
+O \gls{dbx} é implementado como \gls{spa} servida por uma stack Node/Express, com entrega de dados em duas camadas complementares organizadas em torno de padrões de uso distintos.
+
+\subsection{Runtime SQLite para a aplicação}
+
+A aplicação carrega uma imagem SQLite read-only compacta, construída a partir dos mesmos arquivos CSV validados que compõem a release do banco. Esse runtime é organizado em tabelas summary e lookup alinhadas com os padrões de acesso da interface, notavelmente a tabela \texttt{compound\_summary} que sustenta as detail views compound-centric. O SQLite oferece acesso indexado para as combinações de filtros que os módulos requerem, sem necessidade de re-parsing dos CSVs a cada interação. Como se trata de um único artefato de release, o SQLite é também trivial de fixar imutavelmente em deploy, alinhando-se ao modelo de snapshot versionado do banco.
+
+\subsection{CSV/XLSX para reuso analítico externo}
+
+Para uso analítico fora do \gls{dbx} (notebooks, joins customizados, filtragem em massa, pipelines multi-ômicos), o artefato recomendado permanece o CSV/XLSX distribuído no Zenodo. A dupla entrega preserva as forças de cada formato: SQLite fornece à aplicação interativa performance indexada e reprodutibilidade em artefato único; CSV/XLSX fornecem aos analistas downstream representação portável e inspecionável.
+
+\begin{figure}[htbp]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering \todo{Figura 4.1 --- Diagrama da arquitetura de delivery dupla. Painel esquerdo: aplicação DBX carregando SQLite runtime. Painel direito: usuário externo baixando CSV/XLSX do Zenodo para análise em pandas/R. Ambos derivam do mesmo pipeline de validação (referenciar Figura 3.5 quando existir).}\vspace{2em}}}
+\caption{Arquitetura de entrega dupla do banco \biorempp{}: runtime SQLite para o \gls{dbx} interativo; CSV/XLSX arquivado no Zenodo para reuso analítico externo.}
+\label{fig:c2-arquitetura}
+\end{figure}
+
+\subsection{Política de acesso}
+
+O \gls{dbx} é servido sem autenticação, sem cadastro e sem \textit{upload} de dados. Estado de filtro e paginação são expostos transparentemente na interface para inspeção do usuário, e conjuntos filtrados de resultados podem ser exportados para processamento downstream. O modelo de interação é intencionalmente read-only: o banco é a fonte de evidência, e o \gls{dbx} é uma lente sobre ele.
+
+% -----------------------------------------------------------------------------
+\section{Cinco módulos entity-centric}
+\label{sec:c2-modulos}
+% -----------------------------------------------------------------------------
+
+A interface expõe cinco módulos que oferecem perspectivas distintas sobre a mesma evidência integrada (Tabela~\ref{tab:c2-modulos}). Cada módulo compartilha um padrão de interação consistente (search $\rightarrow$ filter $\rightarrow$ rank $\rightarrow$ inspect) e se diferencia pela entidade que expõe como linha da tabela principal.
+
+\begin{table*}[htbp]
+\centering
+\caption{Módulos entity-centric do \gls{dbx} e seus pontos de entrada principais.}
+\label{tab:c2-modulos}
+\small
+\begin{tabular}{@{}p{2.5cm}p{3cm}p{7cm}@{}}
+\toprule
+\textbf{Módulo} & \textbf{Entidade} & \textbf{Filtros primários} \\
+\midrule
+Compounds        & Composto                    & classe, via, gene, agência, faixas numéricas de KO/gene \\
+Compound Classes & Classe química              & rótulo de classe \\
+Genes / KO       & KO ou gene                  & texto (gene/KO), faixa de contagem de compostos \\
+Pathways         & Via                         & fonte (KEGG/HADEG), nome de via \\
+Toxicity         & Composto $\times$ endpoint  & endpoint, label, classe, valor numérico \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+O módulo \textbf{Compounds} é o ponto de entrada primário para perguntas centradas em poluente. Linhas correspondem a compostos individuais e são ranqueadas ao longo de três eixos ortogonais: contagem de \glspl{ko} associados, contagem de genes associados e contexto de toxicidade derivado das predições \gls{toxcsm}. Filtros faceteados incluem classe química, fonte de via, via específica, seletor de gene, agência regulatória e faixas numéricas sobre contagens de \gls{ko} e gene.
+
+O módulo \textbf{Compound Classes} expõe os mesmos dados agregados no nível de classe química, apoiando comparações entre famílias de compostos antes do drill-down para registros individuais. Usa-se tipicamente em fases iniciais de escopo, quando o pesquisador ainda não está comprometido com um composto específico mas quer entender qual família tem representação coletiva mais forte.
+
+O módulo \textbf{Genes / KO} inverte o ponto de entrada: linhas correspondem a \glspl{ko} ou genes nomeados, e as colunas de resultado reportam o número de compostos e vias associados a cada entrada. É o módulo natural para pesquisadores que chegam com um ortholog candidato recuperado de metagenoma ou montagem de genoma e precisam recuperar o conjunto de compostos que aquele ortholog tem sido associado a degradar.
+
+O módulo \textbf{Pathways} é o único que impõe separação explícita por fonte. Misturar convenções de vias KEGG e HADEG numa única visão ranqueada conflaria critérios de curadoria que não são diretamente comparáveis; o seletor de fonte mantém as comparações coerentes internamente e torna a convenção subjacente explícita ao usuário.
+
+O módulo \textbf{Toxicity} endereça o ponto de entrada endpoint-first. O filtro dependente endpoint-para-label é, em nossa experiência, a decisão de design mais importante deste módulo: valores de toxicidade previstos só são significativos dentro do contexto de um único endpoint, e o filtro em cascata torna essa restrição estrutural em vez de dependente de disciplina do usuário.
+
+\begin{figure}[htbp]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering \todo{Figura 4.2 --- Screenshot do módulo Compounds do DBX, mostrando barra de busca, painel de filtros faceteados à esquerda, tabela ranqueada à direita. Anotar as três colunas de ranking (KO count, gene count, toxicity context).}\vspace{2em}}}
+\caption{Interface do módulo Compounds do \gls{dbx} em operação, exemplificando o padrão search-filter-rank-inspect compartilhado pelos cinco módulos entity-centric.}
+\label{fig:c2-compounds}
+\end{figure}
+
+% -----------------------------------------------------------------------------
+\section{Módulo Guided Analysis}
+\label{sec:c2-guided}
+% -----------------------------------------------------------------------------
+
+Os cinco módulos anteriores expõem o banco para exploração aberta, apropriada quando o pesquisador já enquadrou a pergunta mas ainda não sabe como traduzi-la em combinações de filtros. Para perguntas já estruturadas --- como \textit{quais compostos ocupam as posições superiores em amplitude de anotação funcional?} ou \textit{quais genes estão mais densamente conectados a compostos acima de um limiar de toxicidade escolhido?} --- o módulo \textbf{Guided Analysis} oferece oito \textit{query recipes} pré-configuradas (UC1--UC8), catalogadas declarativamente em YAML (Tabela~\ref{tab:c2-guided}).
+
+\begin{table*}[htbp]
+\centering
+\caption{Recipes reproduzíveis de Guided Analysis (UC1--UC8) do \gls{dbx}.}
+\label{tab:c2-guided}
+\small
+\begin{tabular}{@{}llp{8cm}@{}}
+\toprule
+\textbf{ID} & \textbf{Categoria} & \textbf{Pergunta} \\
+\midrule
+UC1 & compound  & Top compostos por cobertura de anotação funcional (KO) \\
+UC2 & compound  & Compostos com maior risco toxicológico predito \\
+UC3 & compound  & Risco vs potencial de biorremediação (scatter) \\
+UC4 & compound  & Compostos classificados por agência regulatória selecionada \\
+UC5 & pathway   & Vias com maior cobertura funcional (contagem de KOs) \\
+UC6 & pathway   & Vias associadas a compostos tóxicos acima de threshold \\
+UC7 & gene\_ko  & Genes/KOs mais conectados a compostos regulados \\
+UC8 & gene\_ko  & Genes/KOs associados a compostos acima de threshold toxicológico \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Cada recipe especifica declarativamente uma categoria, uma pergunta em linguagem natural, o dataset sobre o qual opera, a função executora que produz o resultado, os parâmetros de filtro expostos ao usuário e o tipo de visualização retornada. A execução de um recipe retorna uma tabela paginada de resultados juntamente com metadata de execução --- timing, estado de filtros ativos, escopo de dataset --- que documenta o que foi computado e em qual versão do banco, tornando qualquer resultado reproduzível por um terceiro com os mesmos inputs.
+
+\begin{figure}[htbp]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering \todo{Figura 4.3 --- Screenshot do módulo Guided Analysis mostrando: catálogo de recipes à esquerda, painel de filtros do recipe selecionado no meio, visualização de output (por exemplo, o scatter do UC3) à direita.}\vspace{2em}}}
+\caption{Interface do módulo Guided Analysis do \gls{dbx} exemplificando a execução de UC3 (Risco vs Potencial de Biorremediação).}
+\label{fig:c2-guided}
+\end{figure}
+
+% -----------------------------------------------------------------------------
+\section{Navegação cross-module e detail views}
+\label{sec:c2-navegacao}
+% -----------------------------------------------------------------------------
+
+Cada linha em qualquer módulo é um handle navegável: selecionar uma linha de composto abre uma detail view com o contexto completo de anotação do composto (genes, vias, perfil de toxicidade, status regulatório); selecionar uma linha de \gls{ko} abre o contexto do gene correspondente com sua vizinhança de compostos; selecionar uma linha de via expõe genes e compostos cobertos por essa via sob a fonte selecionada. Essa navegação record-to-detail consistente é o que integra os módulos numa única superfície analítica, em vez de cinco tabelas desconectadas.
+
+Na prática, os módulos são mais úteis quando combinados. Um composto ranqueado no módulo Compounds tipicamente é inspecionado em sua vizinhança de vias e genes; um \gls{ko} destacado no UC7 do Guided Analysis é tipicamente aberto na detail view do módulo Genes para recuperar os compostos específicos aos quais se conecta; uma classe identificada como amplamente coberta em Compound Classes tipicamente é seguida por inspeção individual dos compostos de maior cobertura.
+
+% -----------------------------------------------------------------------------
+\section{Resultados do componente}
+\label{sec:c2-resultados}
+% -----------------------------------------------------------------------------
+
+\escrever{Reunir aqui: (i) screenshots dos cinco módulos em operação (uma figura consolidada ou uma por módulo); (ii) exemplo de execução de pelo menos dois recipes de Guided Analysis (UC3 e UC7 são bons candidatos porque exercitam eixos analíticos complementares); (iii) tabela de métricas operacionais (contagens de cliques ou sessões, se coletadas), ou nota indicando que a plataforma não coleta métricas de uso por design de privacidade.}
+
+\todo{Confirmar se há coleta de métricas de uso e, em caso positivo, incluir. Em caso negativo, mencionar explicitamente que a decisão foi arquitetural (privacy by design), o que reforça o argumento de FAIR compliance.}
+
+% -----------------------------------------------------------------------------
+\section{Discussão específica do componente}
+\label{sec:c2-discussao}
+% -----------------------------------------------------------------------------
+
+O \gls{dbx} concretiza, do lado da interface, a mesma decisão editorial de compound-centricidade que estrutura o banco (Capítulo~\ref{cap:comp1}). Os cinco módulos oferecem cinco pontos de entrada para o mesmo grafo integrado, mas todos convergem para o composto como locus onde as evidências se reúnem.
+
+A separação explícita entre \gls{dbx} e \gls{bws} (Capítulo~\ref{cap:comp3}) responde a uma preocupação editorial recorrente em recursos web de bioinformática: um único artefato que tenta fazer navegação de banco e análise de dados de usuário tipicamente acaba fazendo mal ambos. O \gls{dbx} é read-only por decisão; o \gls{bws} é upload-only por decisão. Cada um tem contrato limpo e implementação otimizada para seu contrato.
+
+O módulo Guided Analysis também tem valor pedagógico além do valor analítico: expõe padrões de consulta que a comunidade de pesquisa considera úteis, servindo como documentação executável de como o banco pode ser interrogado. Um pesquisador que nunca escreveu SQL consegue extrair valor científico real das UC1--UC8; um pesquisador que domina SQL usa os recipes como referência para consultas mais elaboradas contra o CSV baixado.
+
+Comparado a interfaces equivalentes de recursos correlatos --- KEGG browser, ChEBI browser, EnviPath UI, PlasticDB browser --- o \gls{dbx} não busca profundidade em nenhuma dimensão individual. Sua contribuição é a linkagem consistente das quatro dimensões (função, via, toxicidade e prioridade regulatória) sob um modelo de navegação flexível por entidade.
+

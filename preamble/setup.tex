@@ -1,0 +1,85 @@
+% =============================================================================
+% PREÂMBULO REVISADO
+% =============================================================================
+
+% ----- Codificação e Idioma -----
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+
+% ----- Tipografia -----
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{setspace}
+\onehalfspacing
+
+% ----- Margens e Layout -----
+\usepackage[top=3cm,bottom=2cm,left=3cm,right=2cm]{geometry}
+\usepackage{indentfirst}
+\usepackage{parskip}
+
+% ----- Recursos Gráficos -----
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,fit,backgrounds,calc}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% ----- Tabelas -----
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx}
+
+% ----- Matemática -----
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% ----- Código-fonte e listagens -----
+\usepackage{listings}
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray!50},
+    keywordstyle=\color{blue!70!black},
+    commentstyle=\color{green!40!black},
+    stringstyle=\color{orange!70!black},
+    tabsize=2,
+    showstringspaces=false,
+    captionpos=b
+}
+
+% ----- Listas e Citações -----
+\usepackage{enumitem}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{csquotes}
+
+% ----- URLs e Hyperlinks -----
+\usepackage[
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=blue!50!black,
+    urlcolor=blue!50!black,
+    pdftitle={BioRemPP - Tese de Doutorado},
+    pdfauthor={Douglas Felipe de Lima Silva},
+    pdfsubject={Bioinformatica - Biorremediacao},
+    pdfkeywords={bioinformatica, biorremediacao, genomica funcional, multiomica, ecossistema de ferramentas}
+]{hyperref}
+\usepackage{url}
+
+% ----- Cabeçalhos -----
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE]{\nouppercase{\leftmark}}
+\fancyhead[LO]{\nouppercase{\rightmark}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ----- Glossário de Acrônimos -----
+\usepackage[acronym,toc,nonumberlist]{glossaries}
+\makeglossaries

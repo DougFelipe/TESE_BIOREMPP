@@ -1,0 +1,138 @@
+% =============================================================================
+% =============================================================================
+% CAPÍTULO 7 --- DISCUSSÃO INTEGRADA E CONCLUSÕES
+% =============================================================================
+% =============================================================================
+\chapter{Discussão integrada e conclusões}
+\label{cap:conclusao}
+
+% -----------------------------------------------------------------------------
+\section{O ecossistema como unidade coerente}
+\label{sec:c7-ecossistema}
+% -----------------------------------------------------------------------------
+
+Os quatro componentes apresentados nos Capítulos~\ref{cap:comp1} a~\ref{cap:comp4} não são artefatos independentes que compartilham uma marca; são um ecossistema integrado que compartilha uma decisão editorial (compound-centricidade orientada a prioridade regulatória) e uma base de evidência (o banco integrado). Um mesmo pesquisador transita naturalmente entre eles conforme a natureza da pergunta muda: começa navegando o \gls{dbx} para escolher escopo de compostos e classes químicas relevantes; submete seus perfis \gls{ko} ao \gls{bws} para análise dirigida contra os compostos priorizados; integra o \gls{cli} no pipeline de análise batch para automação; e retorna eventualmente ao \gls{dbx} para inspeção de detalhes específicos surgidos das análises anteriores.
+
+Essa fluidez de transição é resultado do compartilhamento explícito de artefatos e identificadores. Resultados obtidos no \gls{bws} usam os mesmos identificadores \gls{ko}, \gls{cpd}, \gls{ec} que aparecem no \gls{dbx}; sidecars produzidos pelo \gls{cli} referenciam a mesma release do banco que o \gls{dbx} carrega no SQLite runtime. Não há tradução de identificadores entre componentes, e não há inconsistências entre resultados obtidos por caminhos diferentes.
+
+% -----------------------------------------------------------------------------
+\section{Contribuições consolidadas}
+\label{sec:c7-contribuicoes}
+% -----------------------------------------------------------------------------
+
+As contribuições do trabalho podem ser organizadas em três eixos.
+
+\subsection{Contribuição científica}
+
+A unificação entre priorização regulatória e evidência funcional multi-fonte em torno de compostos ambientalmente prioritários, apresentada como decisão editorial deliberada e não como agregação exaustiva, é a contribuição científica central do trabalho. Nenhum recurso público disponível até o momento oferece essa combinação em arquitetura compound-centric, e a demanda por ela é sustentada pela crescente pressão regulatória sobre poluentes prioritários combinada à ausência de infraestrutura de monitoramento no nível de ômicas funcionais que caracterize os mecanismos moleculares relevantes para mitigação.
+
+\subsection{Contribuição metodológica}
+
+A arquitetura dual de validação (KEGG-anchored embutida no DAG Snakemake mais Great Expectations release-level em projeto separado) é uma contribuição metodológica autônoma ao campo de engenharia de dados científicos. A separação clara entre fidelidade de conteúdo (validação KEGG-anchored) e conformidade estrutural com estabilidade histórica (validação Great Expectations) resolve, em nossa leitura, uma tensão que fica frequentemente implícita em pipelines de bancos curados. A publicação da arquitetura completa, incluindo a suite pytest que testa o próprio validador, oferece à comunidade um padrão de referência replicável.
+
+\subsection{Contribuição tecnológica}
+
+O modelo de ecossistema modular composto por quatro componentes interoperáveis, atendendo perfis de usuário distintos com o mesmo banco integrado, contrasta com o padrão predominante em bioinformática de biorremediação de recursos monolíticos (ou banco baixável, ou interface web fechada, ou CLI standalone). A demonstração de que os três canais de acesso podem coexistir consistentemente, cada um otimizado para seu perfil de uso, oferece um padrão de arquitetura aplicável a outros domínios de curadoria.
+
+% -----------------------------------------------------------------------------
+\section{Posicionamento no estado da arte}
+\label{sec:c7-posicionamento}
+% -----------------------------------------------------------------------------
+
+Comparado a plataformas correlatas (enviPath, PlasticDB, mibPOPdb, RemeDB, EAWAG-BBD, MicrobiomeAnalyst, DRAM, METABOLIC), o ecossistema \biorempp{} ocupa um nicho específico caracterizado por cinco propriedades cuja combinação, até onde temos conhecimento, não é oferecida por nenhum recurso individual (Tabela~\ref{tab:c7-comparacao}).
+
+\begin{table*}[htbp]
+\centering
+\caption{Posicionamento do ecossistema \biorempp{} frente a recursos correlatos em bioinformática de biorremediação.}
+\label{tab:c7-comparacao}
+\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Recurso} & \textbf{Comp-centric} & \textbf{Multi-fonte} & \textbf{Regulatório} & \textbf{Toxicológico} & \textbf{Multi-canal} \\
+\midrule
+enviPath        & Não & Parcial & Não & Não & Web \\
+PlasticDB       & Sim & Parcial & Não & Não & Web \\
+mibPOPdb        & Sim & Não     & Parc. & Não & Web \\
+RemeDB          & Não & Não     & Não & Não & CLI \\
+EAWAG-BBD/PPS   & Não & Não     & Não & Não & Web \\
+MicrobiomeAnalyst & Não & N/A   & Não & Não & Web \\
+DRAM            & Não & N/A     & Não & Não & CLI \\
+\biorempp{}     & Sim & Sim     & Sim & Sim & Web+Web+CLI \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+A leitura da tabela não é de superioridade absoluta, mas de complementaridade estrutural: cada recurso listado cumpre bem seu propósito de projeto, e o \biorempp{} não substitui nenhum deles. A contribuição do ecossistema \biorempp{} é ocupar um vazio metodológico deixado pela ausência de plataforma que combinasse simultaneamente as cinco propriedades listadas.
+
+% -----------------------------------------------------------------------------
+\section{Aplicações retrospectivas do ecossistema}
+\label{sec:c7-aplicacoes}
+% -----------------------------------------------------------------------------
+
+O grupo de pesquisa responsável pelo \biorempp{} produziu três estudos peer-reviewed que utilizaram a evidência integrada que o ecossistema hoje expõe, demonstrando retrospectivamente o valor prático da infraestrutura para pesquisa aplicada em biorremediação industrial. Os três estudos são apresentados aqui como demonstração da utilidade do ecossistema, não como resultados originais da tese.
+
+\subsection{Caracterização de nova subespécie hidrocarbonoclástica}
+
+\citet{freitas2023acinetobacter} caracterizaram uma nova subespécie de \textit{Acinetobacter baumannii} isolada de reservatórios de petróleo brasileiros com especialização em degradação de hidrocarbonetos perigosos. A caracterização genômica e fenotípica beneficiou-se da consolidação de anotações funcionais e classificações regulatórias sobre os substratos-alvo, exatamente o tipo de análise que o \biorempp{} organiza sistematicamente.
+
+\subsection{Integração transcriptômica e metatranscriptômica de consórcio industrial}
+
+\citet{silvaportela2024consortium} integraram perfis transcriptômicos e metatranscriptômicos de um consórcio bacteriano degradador de resíduos oleosos. O consórcio caracterizado teve sua composição protegida por patente e encontra-se em uso operacional, ilustrando trajetória translacional que o ecossistema \biorempp{} apoia com evidência de referência.
+
+\todo{Se o número da patente estiver publicamente disponível, incluir a referência aqui em nota de rodapé para reforçar a maturidade tecnológica do trabalho.}
+
+\subsection{Descrição de novas espécies de \textit{Ochrobactrum}}
+
+\citet{freitas2025ochrobactrum} reportaram a caracterização genômica e fenotípica de novas espécies de \textit{Ochrobactrum} isoladas de reservatórios brasileiros de petróleo. Como no caso anterior, a análise de potencial biodegradativo dessas espécies apoiou-se em confrontação de anotações funcionais com evidência integrada organizada por classes químicas ambientalmente relevantes.
+
+\subsection{Síntese das aplicações retrospectivas}
+
+Em conjunto, os três estudos cobrem três eixos analíticos distintos que o ecossistema \biorempp{} agora sistematiza publicamente: caracterização genômica de novas espécies e subespécies, integração multi-ômica funcional, e translação industrial com proteção de propriedade intelectual. Essa cobertura empírica sustenta a viabilidade de aplicação do ecossistema em contextos reais de pesquisa e desenvolvimento.
+
+% -----------------------------------------------------------------------------
+\section{Limitações}
+\label{sec:c7-limitacoes}
+% -----------------------------------------------------------------------------
+
+Cinco limitações merecem menção explícita.
+
+\textbf{Limitações inerentes a análises \textit{in silico}.} O ecossistema oferece triagem computacional que não substitui validação experimental. Predições de potencial biodegradativo devem ser tratadas como hipóteses a serem testadas em bancada, não como conclusões de eficácia.
+
+\textbf{Dependência da qualidade da anotação upstream.} A análise no \gls{bws} e no \gls{cli} opera sobre anotações \gls{ko} produzidas por ferramentas externas (KofamScan, BlastKOALA, eggNOG-mapper). A qualidade das inferências de biorremediação é limitada pela qualidade dessa anotação upstream.
+
+\textbf{Cobertura limitada de compostos.} O foco em compostos formalmente regulados por sete frameworks internacionais é decisão editorial deliberada (Seção~\ref{sec:c1-motivacao}), mas exclui compostos ambientalmente relevantes que ainda não foram objeto de listagem regulatória. Contaminantes emergentes cuja regulamentação está em processo de definição podem estar sub-representados até que sejam incorporados formalmente.
+
+\textbf{Predições toxicológicas como screening.} As predições \gls{toxcsm} são \textit{screening tools}, não substitutos de medidas experimentais de toxicidade. Priorização baseada nessas predições deve ser validada experimentalmente antes de conclusões regulatórias ou de saúde pública.
+
+\textbf{Status pré-estável do \gls{cli}.} A versão atual do \gls{cli} é rotulada v0.14 e permanecerá pré-estável até a conclusão de elementos de hardening documentados no repositório. Usuários que integram o \gls{cli} em pipelines produtivos devem pinar a versão utilizada.
+
+% -----------------------------------------------------------------------------
+\section{Perspectivas}
+\label{sec:c7-perspectivas}
+% -----------------------------------------------------------------------------
+
+\subsection{Expansão da base}
+
+Frameworks regulatórios adicionais (Ecolabel, REACH SVHC, listas nacionais adicionais) podem ser incorporados sem alteração arquitetural, apenas por expansão do vocabulário controlado \texttt{referenceAG}. Novos endpoints toxicológicos podem ser integrados por atualização da fonte ToxCSM ou por adição de fontes complementares (T3DB, ProTox-II).
+
+\subsection{Integração multi-ômica expandida}
+
+Suporte formal para dados proteômicos e metabolômicos ampliaria a cobertura do \gls{cli} para além dos quatro modos atuais. Integração com padrões emergentes de dados metagenômicos (Anvi'o, GTDB-Tk) reduziria fricção para pesquisadores em microbiomas ambientais.
+
+\subsection{Modelos preditivos}
+
+Modelos de aprendizado de máquina treinados sobre a evidência integrada poderiam prever capacidade biodegradativa a partir de perfis genômicos parciais, oferecendo alternativa quantitativa às métricas ecológicas do \gls{bws}.
+
+\subsection{Sustentabilidade a longo prazo}
+
+Assegurar manutenção continuada por período de cinco anos requer estratégia explícita para atualização periódica das fontes upstream, resposta a mudanças em contratos regulatórios e evolução das dependências de software. O uso de containers Docker versionados, workflows Snakemake reproducíveis e testes automatizados fornecem base técnica sólida, mas exigem alocação continuada de recursos humanos.
+
+% -----------------------------------------------------------------------------
+\section{Considerações finais}
+\label{sec:c7-final}
+% -----------------------------------------------------------------------------
+
+Esta tese apresentou o \biorempp{} como ecossistema integrado de bioinformática para análise funcional e integração multi-ômica orientada a compostos prioritários para biorremediação. Os quatro componentes documentados (banco integrado com pipeline reprodutível e validação dupla; \gls{dbx} para navegação read-only; \gls{bws} para análise upload-based; \gls{cli} para integração em pipelines automatizados) formam um recurso publicamente disponível, licenciado abertamente e alinhado aos princípios \gls{fair}, oferecendo à comunidade científica uma plataforma que unifica evidências até então dispersas em torno da unidade analítica que a política ambiental e a saúde pública tratam como central: o composto regulado.
+
+A contribuição principal do trabalho não está no aumento de escopo de qualquer das fontes constituintes, e sim na organização coerente dessa evidência em torno de uma decisão editorial compound-centric orientada a prioridade regulatória, servida através de canais complementares desenhados para os diferentes perfis técnicos da comunidade que faz uso desses dados. As três aplicações retrospectivas discutidas na Seção~\ref{sec:c7-aplicacoes} sustentam empiricamente a utilidade prática do ecossistema em pesquisa aplicada industrial, e as perspectivas apresentadas na Seção~\ref{sec:c7-perspectivas} indicam trajetória de evolução coerente com a sustentabilidade a longo prazo exigida de recursos de bioinformática.
+
