@@ -1,68 +1,136 @@
 % =============================================================================
-% =============================================================================
-% CAPÍTULOS 3, 4, 5, 6, 7 --- ETAPA 2 (a produzir após validação da Etapa 1)
-% =============================================================================
-% =============================================================================
-
-% =============================================================================
-% TESE DE DOUTORADO — BioRemPP — ETAPA 2
-% Bioremediation Potential Profiling
-% Programa de Pós-Graduação em Bioinformática — UFRN
-%
-% =============================================================================
-% INSTRUÇÕES DE INTEGRAÇÃO NO ARQUIVO PRINCIPAL (tese_biorempp_etapa1.tex):
-%
-% 1. Abrir o arquivo tese_biorempp_etapa1.tex.
-% 2. Localizar a linha que começa com "\chapter{Componente 1: Banco de dados"
-%    (aproximadamente linha 660 do arquivo original).
-% 3. DELETAR do início dessa linha até imediatamente ANTES da linha
-%    "\end{document}" (a última linha do arquivo).
-% 4. COLAR o conteúdo deste arquivo (tudo abaixo desta caixa de instruções)
-%    exatamente no ponto onde a linha "\chapter{Componente 1: ..." estava.
-% 5. A linha "\end{document}" deve permanecer no arquivo principal, sem
-%    duplicação.
-%
-% RESULTADO: o arquivo principal fica com preâmbulo + pré-textuais + Cap 1 +
-% Cap 2 (Etapa 1) + Cap 3–7 + referências + apêndices (Etapa 2) + \end{document}.
-% =============================================================================
-
-
-% =============================================================================
-% =============================================================================
 % CAPÍTULO 3 --- COMPONENTE 1: BANCO DE DADOS INTEGRADO E PIPELINE DE GERAÇÃO
+% Versão revisada segundo o guideline editorial da tese BioRemPP
 % =============================================================================
-% =============================================================================
-\chapter{Componente 1: Banco de dados integrado e pipeline de geração}
+
+\chapter{Componente 1: banco de dados integrado e pipeline de geração}
 \label{cap:comp1}
 
 % -----------------------------------------------------------------------------
-\section{Motivação do componente}
+\section{Motivação e escopo do componente}
 \label{sec:c1-motivacao}
 % -----------------------------------------------------------------------------
 
-O primeiro componente do ecossistema \biorempp{} é o substrato de evidência sobre o qual os demais operam. Enquanto \gls{kegg}, \gls{hadeg}, \gls{toxcsm} e as listas regulatórias oferecem, cada um, coberturas específicas de conhecimento relevantes para biorremediação, nenhuma dessas fontes por si só suporta a análise \textit{compound-centric} orientada a prioridade regulatória que motivou este trabalho. A construção do banco integrado responde a essa lacuna consolidando, em um único artefato curado e versionado, as evidências funcionais, toxicológicas e regulatórias associadas aos compostos ambientalmente prioritários.
+O banco integrado fornece a base de dados usada pelos demais componentes do ecossistema \biorempp{}. As fontes consideradas neste trabalho organizam dimensões distintas da evidência relevante para biorremediação. O \gls{kegg} descreve relações entre compostos, ortólogos, enzimas e reações; o \gls{hadeg} reúne anotações especializadas em degradação aeróbica de hidrocarbonetos; o \gls{toxcsm} fornece predições toxicológicas indexadas por composto; e as fontes institucionais identificam substâncias submetidas a priorização, regulamentação ou classificação. Como essas fontes usam unidades de observação e identificadores diferentes, nenhuma delas permite recuperar isoladamente o conjunto de evidências associado a um composto prioritário.
 
-A decisão editorial central deste componente é restritiva por desígnio: em vez de acumular a totalidade dos compostos disponíveis em cada fonte, o banco projeta as evidências das quatro fontes sobre o universo de compostos formalmente listados por sete frameworks regulatórios internacionais e regionais. Essa restrição faz do banco não uma agregação exaustiva, mas uma curadoria com propósito, cuja utilidade emerge exatamente do recorte adotado.
+O \biorempp{} organiza essas informações a partir de uma perspectiva \textit{compound-centric}. O ponto inicial da integração é o conjunto de compostos presentes em sete fontes institucionais, representadas por nove códigos no campo \texttt{referenceAG}. Esse recorte delimita o escopo do banco e evita a incorporação indiscriminada de todos os compostos disponíveis nas fontes funcionais e toxicológicas. Cada composto permanece associado à referência institucional que justificou sua inclusão, o que permite distinguir a evidência biológica da proveniência regulatória ou classificatória.
 
-O pipeline que gera o banco e as camadas de validação que o auditam são apresentados neste mesmo capítulo porque, do ponto de vista da contribuição científica, formam uma unidade indissociável do artefato de dados: a reprodutibilidade e a auditabilidade do release são propriedades técnicas do banco, não externalidades operacionais.
+A tabela core, o pipeline de geração e as camadas de validação compõem o mesmo componente científico. Cada release depende dos arquivos curados de entrada, do snapshot de relações recuperadas do KEGG, do schema público e dos relatórios que verificam a consistência do conteúdo. Esses artefatos registram como o banco foi produzido, permitem reproduzir etapas intermediárias e tornam explícitas as diferenças entre versões.
 
 % -----------------------------------------------------------------------------
-\section{Fontes de dados consolidadas}
+\section{Fontes de dados e proveniência}
 \label{sec:c1-fontes}
 % -----------------------------------------------------------------------------
 
-O banco integrado consolida quatro fontes primárias, cada uma contribuindo com um tipo específico de evidência (Tabela~\ref{tab:c1-fontes}).
+A construção do componente envolve três níveis de dados. O primeiro define o universo regulatório de compostos prioritários. O segundo reúne os arquivos locais e as relações recuperadas programaticamente para produzir a tabela core BioRemPP. O terceiro corresponde aos conjuntos funcionais e toxicológicos ligados à tabela core pelos identificadores \gls{ko} e \gls{cpd}. Essa separação evita tratar o banco produzido pelo pipeline como uma de suas próprias fontes.
+
+\subsection{Universo regulatório de compostos prioritários}
+
+O universo inicial foi definido por sete fontes institucionais de priorização, regulamentação ou classificação de substâncias. A \gls{iarc} foi desdobrada em três categorias de carcinogenicidade, resultando em nove valores controlados no campo \texttt{referenceAG} (Tabela~\ref{tab:c1-regulatory-sources}). Cada ocorrência de um composto em uma dessas fontes foi preservada como associação independente, de modo que a mesma substância pode manter múltiplas referências institucionais.
+
+A curadoria da identidade química considerou nomes, números \gls{cas} e sinônimos empregados nas listas de origem. Os registros foram mantidos quando a identidade química pôde ser resolvida de forma inequívoca e convertida para o identificador usado no pipeline. Na release v1.1.0, a proveniência institucional é representada principalmente pelos pares \texttt{cpd}--\texttt{referenceAG} armazenados em \texttt{curated\_regulated\_compounds.xlsx}.
 
 \begin{table}[htbp]
 \centering
-\caption{Fontes primárias consolidadas no banco integrado \biorempp{} (release v1.1.0). As chaves de integração indicam por quais identificadores cada fonte é ligada ao núcleo relacional.}
+\caption{Fontes institucionais usadas para definir o universo de compostos prioritários do \biorempp{}. Os nove códigos de \texttt{referenceAG} correspondem a sete fontes, com a IARC representada por três categorias de carcinogenicidade.}
+\label{tab:c1-regulatory-sources}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}lXlX@{}}
+\toprule
+\textbf{Código} & \textbf{Fonte institucional} & \textbf{Escopo} & \textbf{Função no recorte} \\
+\midrule
+ATSDR & Agency for Toxic Substances and Disease Registry & EUA & Lista substâncias associadas a riscos para a saúde pública e a locais contaminados. \\
+EPA & U.S. Environmental Protection Agency & EUA & Inclui contaminantes considerados em programas e referências ambientais dos Estados Unidos. \\
+CONAMA & Conselho Nacional do Meio Ambiente & Brasil & Inclui contaminantes contemplados por normas ambientais brasileiras. \\
+WFD & Water Framework Directive & União Europeia & Inclui substâncias prioritárias relacionadas à qualidade das águas. \\
+EPC & Environmental Priority Chemicals & Europa & Inclui substâncias priorizadas em avaliações ambientais europeias. \\
+PSL & Priority Substances List, sob a CEPA & Canadá & Inclui substâncias submetidas à priorização no contexto canadense. \\
+IARC1 & IARC Group 1, Carcinogenic to humans & Internacional & Identifica compostos classificados como carcinogênicos para humanos. \\
+IARC2A & IARC Group 2A, Probably carcinogenic to humans & Internacional & Identifica compostos classificados como provavelmente carcinogênicos para humanos. \\
+IARC2B & IARC Group 2B, Possibly carcinogenic to humans & Internacional & Identifica compostos classificados como possivelmente carcinogênicos para humanos. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+O recorte regulatório não representa uma união exaustiva das fontes consultadas. Ele funciona como filtro de inclusão para a evidência funcional e toxicológica. Essa decisão concentra o banco em compostos com relevância ambiental ou sanitária formalmente documentada e preserva as sobreposições entre jurisdições como parte do próprio modelo de dados.
+
+\subsection{Entradas do pipeline de geração}
+
+O pipeline consome seis arquivos locais, cujas funções estão resumidas na Tabela~\ref{tab:c1-local-inputs}. Os nomes são apresentados conforme registrados no contrato executável da release v1.1.0.
+
+\begin{table}[htbp]
+\centering
+\caption{Arquivos locais consumidos pelo pipeline de geração do banco BioRemPP v1.1.0.}
+\label{tab:c1-local-inputs}
+\small
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Arquivo} & \textbf{Função no pipeline} \\
+\midrule
+\texttt{kegglistcompounds.xlsx}
+& Integra o bundle local de compostos e permanece no contrato obrigatório de entrada. Na implementação da release v1.1.0, os valores públicos de \texttt{compoundname} são obtidos da lista de compostos recuperada do KEGG. \\
+
+\texttt{curated\_regulated\_compounds.xlsx}
+& Armazena as associações normalizadas entre \texttt{cpd} e \texttt{referenceAG} que definem o universo regulatório principal. \\
+
+\texttt{curated\_programatic\_missing\_compounds.xlsx}
+& Acrescenta pares curados \texttt{cpd}--\texttt{ko} que não foram recuperados integralmente pelas relações programáticas. A referência institucional é incorporada posteriormente por junção com o universo regulatório. \\
+
+\texttt{curated\_compound\_classes.xlsx}
+& Associa os compostos ao vocabulário controlado usado no campo \texttt{compoundclass}. \\
+
+\texttt{kegglistko.txt}
+& Fornece os valores empregados no preenchimento de \texttt{genesymbol} e \texttt{genename}. \\
+
+\texttt{curated\_enzyem\_names\_extracted.txt}
+& Fornece os termos curados usados para classificar o campo \texttt{enzyme\_activity}. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+O preflight verifica a presença dos seis arquivos antes de qualquer transformação. Em seguida, o conteúdo é carregado em \texttt{work/local\_data.rds}, que preserva as tabelas de compostos regulados, os pares curados composto--KO, as classes químicas, a lista de KOs e o vocabulário de atividades enzimáticas. A serialização em um único bundle reduz leituras repetidas e estabelece uma fronteira explícita entre os dados locais e as relações recuperadas do KEGG.
+
+As relações programáticas são obtidas pelo KEGG REST a partir de sete endpoints (Tabela~\ref{tab:c1-kegg-endpoints}). Cinco endpoints descrevem associações entre KO, composto, número EC e reação. Os endpoints \texttt{list/reaction} e \texttt{list/cpd/} fornecem, respectivamente, descrições de reações e nomes de compostos. A versão do KEGG é registrada separadamente por \texttt{info/kegg}.
+
+\begin{table}[htbp]
+\centering
+\caption{Endpoints do KEGG REST usados na geração da tabela core BioRemPP v1.1.0.}
+\label{tab:c1-kegg-endpoints}
+\small
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Endpoint} & \textbf{Informação recuperada} \\
+\midrule
+\texttt{link/ko/ec} & Relações entre identificadores KO e números EC. \\
+\texttt{link/ko/reaction} & Relações entre identificadores KO e reações KEGG. \\
+\texttt{link/compound/ec} & Relações entre compostos KEGG e números EC. \\
+\texttt{link/compound/reaction} & Relações entre compostos KEGG e reações KEGG. \\
+\texttt{link/enzyme/reaction} & Relações entre números EC e reações KEGG. \\
+\texttt{list/reaction} & Identificadores e descrições textuais das reações KEGG. \\
+\texttt{list/cpd/} & Identificadores e nomes de compostos KEGG. \\
+\texttt{info/kegg} & Versão da base KEGG e data associada ao release consultado. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+O cliente de aquisição valida a orientação e o conteúdo das colunas retornadas. Os prefixos \texttt{ko:}, \texttt{cpd:}, \texttt{ec:} e \texttt{rn:} são removidos durante a normalização, e os identificadores são verificados por expressões regulares. As requisições usam timeout configurável, até seis tentativas por padrão e espera exponencial com jitter. Respostas HTTP 429 e erros de servidor são repetidos; erros não recuperáveis interrompem a regra. O bundle normalizado é persistido em \texttt{work/kegg\_data.rds}.
+
+O snapshot usado na release v1.1.0 corresponde ao KEGG Release 118.0+, recuperado em 18 de maio de 2026. A versão, a data em UTC, a URL de origem e a resposta bruta do endpoint de informação foram armazenadas em \texttt{results/metadata/kegg\_release.json}.
+
+\subsection{Conjuntos de dados integrados ao ecossistema}
+
+A camada de dados do ecossistema reúne a tabela core BioRemPP e três conjuntos complementares: HADEG, KEGG Degradation e ToxCSM (Tabela~\ref{tab:c1-fontes}). Esses conjuntos permanecem estruturalmente separados e são relacionados por identificadores compartilhados. As fontes funcionais usam \gls{ko}, enquanto o ToxCSM usa \gls{cpd}.
+
+\begin{table}[htbp]
+\centering
+\caption{Conjuntos de dados disponíveis na camada integrada do \biorempp{} v1.1.0 e identificadores usados para ligação.}
 \label{tab:c1-fontes}
 \small
 \begin{tabular}{@{}lrrl@{}}
 \toprule
-\textbf{Fonte} & \textbf{Linhas} & \textbf{Colunas} & \textbf{Chave} \\
+\textbf{Conjunto de dados} & \textbf{Linhas} & \textbf{Colunas} & \textbf{Chave de ligação} \\
 \midrule
-BioRemPP core        & 123.762 & 11 & \gls{ko}, \gls{cpd} \\
+BioRemPP core        & 123.543 & 11 & \gls{ko}, \gls{cpd} \\
 HADEG                &    867 &  4 & \gls{ko} \\
 KEGG Degradation     &    855 &  3 & \gls{ko} \\
 ToxCSM               &    370 & 66 & \gls{cpd} \\
@@ -70,252 +138,360 @@ ToxCSM               &    370 & 66 & \gls{cpd} \\
 \end{tabular}
 \end{table}
 
-A \textbf{tabela core BioRemPP} é o esqueleto relacional que carrega as associações entre compostos, orthologs, enzimas, reações e agências regulatórias. Cada registro conecta um composto (\texttt{cpd}, \texttt{compoundname}, \texttt{compoundclass}) a uma unidade funcional (\texttt{ko}, \texttt{genesymbol}, \texttt{genename}, \texttt{enzyme\_activity}) através de uma transformação enzimática específica (\texttt{ec}, \texttt{reaction}, \texttt{reaction\_description}), com âncora regulatória no campo \texttt{referenceAG}.
+A tabela core representa associações entre compostos prioritários, unidades funcionais e referências institucionais. Cada linha contém uma combinação de \texttt{cpd}, \texttt{ko} e \texttt{referenceAG}, acrescida da classe e do nome do composto, das informações gênicas e da atividade enzimática. Quando sustentadas pelas relações recuperadas do KEGG, as colunas \texttt{ec}, \texttt{reaction} e \texttt{reaction\_description} registram a transformação enzimática associada. A ausência dessas relações é representada por \texttt{NA}.
 
-A \textbf{HADEG}~\citep{rojas2023hadeg} contribui com evidência especializada em degradação aeróbica de hidrocarbonetos: 323 símbolos gênicos únicos, 337 \glspl{ko} e 71 vias metabólicas distribuídas em cinco classes de hidrocarbonetos (Alcanos, Aromáticos, Alcenos, Cicloalcanos e BTEX). A profundidade de resolução por via alcançada pela HADEG em seu domínio-alvo não é replicada pelas anotações genéricas de xenobióticos do KEGG.
+A \textbf{HADEG}~\citep{rojas2023hadeg} acrescenta anotações especializadas em degradação aeróbica de hidrocarbonetos. O conjunto contém 323 símbolos gênicos únicos, 337 \glspl{ko} e 71 vias metabólicas, distribuídas entre alcanos, aromáticos, alcenos, cicloalcanos e BTEX. A ligação com a tabela core ocorre pelo identificador \gls{ko}.
 
-O \textbf{KEGG Degradation}~\citep{kanehisa2022kegg} é uma extração focada da branch de metabolismo de xenobióticos do KEGG, contendo 517 \glspl{ko} distribuídos em 20 vias canônicas (Naftaleno, Benzoato, Aminobenzoato, Cloroalcano, Atrazina, Bisfenol, Aromáticos policíclicos, entre outras). Esta fonte fornece o esqueleto canônico de metabolismo xenobiótico do recurso integrado.
+O \textbf{KEGG Degradation}~\citep{kanehisa2022kegg} contém 517 \glspl{ko} associados a 20 vias selecionadas do metabolismo de xenobióticos. O conjunto inclui vias relacionadas à degradação de naftaleno, benzoato, aminobenzoato, cloroalcanos, atrazina, bisfenol e hidrocarbonetos aromáticos policíclicos. A ligação com a tabela core também ocorre por \gls{ko}.
 
-O \textbf{ToxCSM}~\citep{desa2022toxCSM} fornece perfis toxicológicos preditos por modelos \gls{qsar} para 370 dos 384 compostos do banco (96,4\% de cobertura). Cada composto carrega 31 predições de endpoint, cada uma desdobrada em uma etiqueta categórica (\textit{Safety}, \textit{Moderate Risk}, \textit{High Risk}) e um escore contínuo no intervalo $[0, 1]$. Os endpoints estão organizados em cinco categorias: ambiental (6 endpoints, incluindo aviária, crustáceos, peixes, polinizadores, protozoários e biodegradação predita), genômica (3, incluindo mutagênese AMES, carcinogênese e formação de micronúcleos), toxicidade orgânica (8, incluindo hepatotoxicidade, cardiotoxicidade via hERG e efeitos oculares e dérmicos), ligação a receptores nucleares (9, cobrindo AhR, AR, AR-LBD, ER, ER-LBD, aromatase, GR, PPAR-$\gamma$ e TR) e ativação de resposta ao estresse (5, incluindo ARE, ATAD5, HSE, MMP e p53).
+O \textbf{ToxCSM}~\citep{desa2022toxCSM} fornece predições \gls{qsar} para 370 dos 384 compostos presentes no banco, correspondendo a 96,4\% de cobertura. Cada composto possui 31 endpoints, representados por uma categoria de risco (\textit{Safety}, \textit{Moderate Risk} ou \textit{High Risk}) e por um escore contínuo entre 0 e 1. Os endpoints abrangem toxicidade ambiental, genotoxicidade, toxicidade em órgãos, interação com receptores nucleares e ativação de respostas ao estresse.
 
-\nota{O endpoint \textit{Biodegradation} do ToxCSM prediz persistência ambiental por QSAR e é conceitualmente distinto da evidência de biodegradação biológica curada nas outras fontes. Vale mencionar isso explicitamente para evitar confusão editorial em uma leitura crítica.}
+A categoria ambiental contém seis endpoints relacionados a aves, crustáceos, peixes, polinizadores, protozoários e biodegradação predita. A categoria genômica contém mutagênese AMES, carcinogênese e formação de micronúcleos. O grupo de toxicidade em órgãos reúne oito endpoints, incluindo hepatotoxicidade, cardiotoxicidade mediada por hERG e efeitos oculares e dérmicos. Nove endpoints descrevem ligação ou modulação de receptores nucleares, entre eles AhR, AR, AR-LBD, ER, ER-LBD, aromatase, GR, PPAR-$\gamma$ e TR. Os cinco endpoints restantes representam ativação de ARE, ATAD5, HSE, MMP e p53.
+
+O endpoint \textit{Biodegradation} do ToxCSM corresponde a uma predição de persistência baseada em propriedades moleculares. Essa medida não equivale às associações entre compostos, genes, enzimas e reações presentes nas camadas funcionais do \biorempp{}.
 
 % -----------------------------------------------------------------------------
-\section{Modelo de integração dual-axis}
+\section{Modelo de integração em dois eixos}
 \label{sec:c1-dualaxis}
 % -----------------------------------------------------------------------------
 
-As quatro fontes são conectadas por meio de duas chaves de integração complementares que operam simultaneamente sobre o banco core (Figura~\ref{fig:c1-dualaxis}). O eixo \textbf{funcional} usa o identificador \gls{ko} para ligar a tabela core BioRemPP, o HADEG e o KEGG Degradation, permitindo que um único ortholog acumule evidência proveniente de metabolismo xenobiótico canônico, vias específicas de hidrocarbonetos e associações composto-gene-enzima da curadoria interna. O eixo \textbf{químico} usa o identificador \gls{cpd} (KEGG Compound) para ligar a tabela core ao ToxCSM, anexando as predições toxicológicas aos registros de compostos.
+A camada integrada usa duas chaves complementares (Figura~\ref{fig:c1-dualaxis}). O eixo funcional usa \gls{ko} para ligar a tabela core ao HADEG e ao KEGG Degradation. Essa dimensão reúne as associações composto--KO do banco, as vias de degradação de hidrocarbonetos do HADEG e o subconjunto de metabolismo de xenobióticos do KEGG. O eixo químico usa \gls{cpd} para ligar a tabela core ao ToxCSM, preservando a indexação das predições toxicológicas por composto.
 
 \begin{figure}[htbp]
 \centering
-\fbox{\parbox{0.85\textwidth}{\centering \todo{Figura 3.1 --- Diagrama do modelo de integração dual-axis. Painel esquerdo: eixo funcional conectando core BioRemPP, HADEG e KEGG Degradation via KO. Painel direito: eixo químico conectando core BioRemPP e ToxCSM via CPD. Setas indicam direção de contribuição de evidência. Anotar cardinalidades por fonte.}\vspace{2em}}}
-\caption{Modelo de integração dual-axis do banco \biorempp{}. O eixo funcional (\gls{ko}) e o eixo químico (\gls{cpd}) operam como superfícies de junção de primeira classe, permitindo que consultas entrem no grafo integrado por qualquer uma das duas dimensões.}
+\includegraphics[width=\textwidth]{figures/chapter_03/fig_03_01_dual_axis.png}
+\caption{Modelo de integração em dois eixos do banco \biorempp{}. O identificador \gls{ko} conecta a evidência funcional, enquanto o identificador \gls{cpd} conecta a evidência química e toxicológica.}
 \label{fig:c1-dualaxis}
 \end{figure}
 
-A adoção de duas chaves de integração paralelas, em vez de uma única, reflete uma assimetria estrutural na biologia subjacente: a atividade enzimática é naturalmente indexada por ortholog, enquanto a predição de toxicidade é naturalmente indexada por estrutura molecular. Forçar todas as fontes através de um único identificador ou obscureceria a riqueza funcional das fontes indexadas por \gls{ko}, ou exigiria um mapeamento ontológico entre \gls{ko} e \gls{cpd} que não existe na taxonomia KEGG. O modelo dual-axis trata ambas as dimensões como superfícies de junção de primeira classe e permite que consultas entrem no grafo integrado a partir de qualquer um dos dois lados sem ambiguidade.
+A adoção de duas chaves decorre da estrutura dos dados. A evidência enzimática é indexada por ortólogos, números EC e reações, enquanto a toxicidade predita é indexada por estrutura molecular. A conversão de toda a evidência para uma única chave exigiria relações que não estão disponíveis para todos os registros e reduziria a informação preservada por cada fonte. O modelo mantém KO e CPD como pontos de entrada equivalentes para consulta, sem assumir uma correspondência unívoca entre gene e composto.
+
+\subsection{Modelos de suporte relacional}
+
+A construção da tabela core começa pela formação do universo de chaves \texttt{cpd}--\texttt{ko}--\texttt{referenceAG}. Essas chaves são obtidas de três origens: relações composto--EC--KO, relações composto--reação--KO e pares composto--KO adicionados por curadoria. Cada chave é expandida de acordo com as relações disponíveis no snapshot do KEGG.
+
+O algoritmo aplica seis estados de suporte em ordem decrescente de completude (Tabela~\ref{tab:c1-support-stages}). O primeiro exige consistência simultânea entre KO, EC e reação. O segundo preserva combinações de EC e reação associadas ao mesmo KO quando não existe uma tupla completa confirmada pela ligação EC--reação. O terceiro usa as relações do composto como ponte para confirmar a combinação. Os dois estados seguintes representam suporte parcial por EC ou por reação. O estado final preserva a chave curada sem preencher os dois campos.
+
+\begin{table}[htbp]
+\centering
+\caption{Estados de suporte usados na expansão das chaves \texttt{cpd}--\texttt{ko}--\texttt{referenceAG}.}
+\label{tab:c1-support-stages}
+\small
+\begin{tabularx}{\textwidth}{@{}lXll@{}}
+\toprule
+\textbf{Estado} & \textbf{Critério de construção} & \textbf{EC} & \textbf{Reação} \\
+\midrule
+\texttt{dense} & O KO possui EC e reação conectados por uma relação EC--reação consistente. & Preenchido & Preenchida \\
+\texttt{fallback\_dense} & O KO possui EC e reação, mas a tupla não foi recuperada no conjunto completo EC--reação. & Preenchido & Preenchida \\
+\texttt{compound\_bridge} & As relações do composto com EC ou reação confirmam a combinação funcional do KO. & Preenchido & Preenchida \\
+\texttt{ec\_only} & Existe suporte do KO por número EC, sem reação compatível. & Preenchido & \texttt{NA} \\
+\texttt{reaction\_only} & Existe suporte do KO por reação, sem número EC compatível. & \texttt{NA} & Preenchida \\
+\texttt{unsupported} & A chave curada não possui suporte nos conjuntos de links consultados. & \texttt{NA} & \texttt{NA} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+A nulabilidade de \texttt{ec}, \texttt{reaction} e \texttt{reaction\_description} faz parte do modelo de evidência. O pipeline não infere valores para preencher relações ausentes. Uma linha parcial indica que o KO mantém associação funcional com o composto, mas o snapshot consultado não sustentou a resolução completa da transformação enzimática.
 
 % -----------------------------------------------------------------------------
 \section{Schema e identificadores interoperáveis}
 \label{sec:c1-schema}
 % -----------------------------------------------------------------------------
 
-A tabela core BioRemPP é organizada em 11 campos semânticos ordenados (Tabela~\ref{tab:c1-schema}), armazenados em CSV com codificação UTF-8, delimitador ponto-e-vírgula e qualificador de texto por aspas duplas. Todos os identificadores utilizados são herdados de autoridades externas públicas, com validação de formato aplicada em tempo de construção.
+A tabela core BioRemPP possui 11 campos ordenados (Tabela~\ref{tab:c1-schema}). O contrato público é exportado em CSV com codificação UTF-8, delimitador ponto e vírgula, campos textuais entre aspas duplas e sentinela \texttt{NA} para valores ausentes. A release v1.1.0 contém 123.543 linhas.
 
 \begin{table}[htbp]
 \centering
-\caption{Schema da tabela core BioRemPP (v1.1.0). Campos com nulabilidade explícita usam sentinelas \texttt{NA} em vez de \textit{silent backfill}.}
+\caption{Schema da tabela core BioRemPP v1.1.0.}
 \label{tab:c1-schema}
 \small
 \begin{tabularx}{\textwidth}{@{}llX@{}}
 \toprule
 \textbf{Campo} & \textbf{Tipo} & \textbf{Descrição} \\
 \midrule
-\texttt{cpd}                  & Caractere & KEGG Compound identifier (\texttt{\^{}C\textbackslash d\{5\}\$}) \\
-\texttt{compoundclass}        & Caractere & Classe química (12 valores controlados) \\
-\texttt{ko}                   & Caractere & KEGG Orthology identifier (\texttt{\^{}K\textbackslash d\{5\}\$}) \\
-\texttt{ec}                   & Caractere & Enzyme Commission number (nulável) \\
-\texttt{reaction}             & Caractere & KEGG Reaction identifier (\texttt{\^{}R\textbackslash d\{5\}\$}, nulável) \\
-\texttt{reaction\_description}& Caractere & Descrição textual da reação (nulável) \\
-\texttt{referenceAG}          & Caractere & Código da agência regulatória (9 valores) \\
-\texttt{compoundname}         & Caractere & Nome do composto \\
-\texttt{genesymbol}           & Caractere & Símbolo gênico \\
-\texttt{genename}             & Caractere & Nome do gene \\
-\texttt{enzyme\_activity}     & Caractere & Família de atividade enzimática (206 valores) \\
+\texttt{cpd}                   & Caractere & Identificador KEGG Compound, no padrão \texttt{\^{}C\textbackslash d\{5\}\$}. \\
+\texttt{compoundclass}         & Caractere & Classe química, com 12 valores controlados. \\
+\texttt{ko}                    & Caractere & Identificador KEGG Orthology, no padrão \texttt{\^{}K\textbackslash d\{5\}\$}. \\
+\texttt{ec}                    & Caractere & Número Enzyme Commission; campo nulável. \\
+\texttt{reaction}              & Caractere & Identificador KEGG Reaction, no padrão \texttt{\^{}R\textbackslash d\{5\}\$}; campo nulável. \\
+\texttt{reaction\_description} & Caractere & Descrição textual da reação; campo nulável quando \texttt{reaction} é \texttt{NA}. \\
+\texttt{referenceAG}           & Caractere & Código da referência institucional, com nove valores controlados. \\
+\texttt{compoundname}          & Caractere & Nome do composto recuperado da lista KEGG Compound. \\
+\texttt{genesymbol}            & Caractere & Símbolo gênico associado ao KO. \\
+\texttt{genename}              & Caractere & Nome do gene associado ao KO. \\
+\texttt{enzyme\_activity}      & Caractere & Família de atividade enzimática, com 206 valores na release v1.1.0. \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-A adoção de identificadores externos como chaves primárias é uma decisão de design consciente que assegura interoperabilidade sem custo adicional. Nenhum identificador é específico do BioRemPP: \texttt{cpd} resolve para KEGG Compound, \texttt{ko} para KEGG Orthology, \texttt{reaction} para KEGG Reaction, \texttt{ec} para IUBMB Enzyme Commission, e a coluna análoga \texttt{ChEBI} do subconjunto ToxCSM resolve para EMBL-EBI ChEBI. As estruturas moleculares (\gls{smiles}) são armazenadas verbatim como representações machine-readable diretamente consumíveis por toolkits de quimioinformática. Essa escolha assegura conformidade com os princípios \gls{fair} (Seção~\ref{sec:fund-fair}) e portabilidade para pipelines multi-ômicos externos.
+Os identificadores funcionais e químicos provêm de autoridades externas. O campo \texttt{cpd} resolve para KEGG Compound, \texttt{ko} para KEGG Orthology, \texttt{reaction} para KEGG Reaction e \texttt{ec} para a nomenclatura da \gls{ec}. No conjunto ToxCSM, identificadores ChEBI e representações \gls{smiles} preservam a ligação com recursos de quimioinformática. As estruturas são armazenadas como representações legíveis por máquina e podem ser consumidas diretamente por toolkits externos. Essa escolha permite relacionar o banco a outras ferramentas sem criar uma camada adicional de identificadores específicos do BioRemPP.
 
-\subsection{Denormalização e evolução do row count entre releases}
+Essas propriedades contribuem para os princípios \gls{fair} discutidos na Seção~\ref{sec:fund-fair}. A interoperabilidade também depende da validação do formato. O pipeline verifica os padrões de KO, composto, reação e EC durante a aquisição e a normalização. A camada Great Expectations repete verificações de schema e expressões regulares sobre o arquivo exportado. O contrato é, portanto, aplicado antes e depois da construção da release.
 
-A tabela core adota schema plano e denormalizado. Essa decisão prioriza usabilidade em ferramentas tabulares (R \texttt{readr}, Python \texttt{pandas}, planilhas) sobre eficiência de armazenamento, e tem como consequência que o número de linhas reflete a superfície relacional expandida em vez do inventário de entidades subjacente. Entre as releases v1.0.0 (10.869 linhas, dezembro de 2025) e v1.1.0 (123.762 linhas, abril de 2026) houve expansão de aproximadamente doze vezes, decorrente exclusivamente da introdução das colunas \texttt{ec}, \texttt{reaction} e \texttt{reaction\_description} via expansão cartesiana KEGG: um único par composto-KO em v1.0.0 passa a gerar uma linha por par (EC, reação) distinto em v1.1.0. As cardinalidades entity-level (384 compostos, 1.543 \glspl{ko} únicos, 994 números EC, 1.939 identificadores de reação KEGG) permanecem sendo as métricas científicas significativas.
+\subsection{Nulabilidade e descrição de reações}
+
+Os campos \texttt{ec}, \texttt{reaction} e \texttt{reaction\_description} são semanticamente nuláveis. Quando uma reação está presente, sua descrição é recuperada de \texttt{list/reaction}. Quando \texttt{reaction} é \texttt{NA}, o campo descritivo também permanece \texttt{NA}. Essa regra impede a associação de descrições a identificadores ausentes e permite diferenciar ausência de suporte de falha de serialização.
+
+Na release v1.1.0, 961 linhas apresentam \texttt{ec} ausente, 2.223 apresentam \texttt{reaction} ausente e as mesmas 2.223 linhas apresentam \texttt{reaction\_description} ausente. Entre as 121.320 linhas com reação preenchida, todas possuem descrição correspondente, resultando em cobertura de 100\% para os identificadores de reação resolvidos.
+
+\subsection{Denormalização e evolução entre releases}
+
+A tabela core adota schema plano e denormalizado. O número de linhas representa combinações entre compostos, classes químicas, referências institucionais, KOs, números EC e reações. Por isso, a contagem de linhas não equivale ao número de entidades únicas. Consultas sobre compostos, KOs ou reações devem usar cardinalidades distintas.
+
+A release v1.0.0, publicada em dezembro de 2023, continha 10.871 linhas e oito colunas. A release v1.1.0 contém 123.543 linhas e 11 colunas. O número de linhas aumentou cerca de 11,4 vezes. A expansão decorreu principalmente da introdução de \texttt{ec}, \texttt{reaction} e \texttt{reaction\_description}, seguida da enumeração das combinações EC--reação sustentadas pelo KEGG. Um par composto--KO que ocupava uma linha no contrato anterior pode originar várias linhas no contrato atual.
+
+As cardinalidades de entidades descrevem melhor o conteúdo científico da release: 384 compostos, 1.543 KOs, 994 números EC e 1.939 identificadores de reação. A denormalização aumenta o tamanho do arquivo, mas permite uso direto em R, Python e planilhas sem reconstrução prévia das relações em um banco relacional.
 
 % -----------------------------------------------------------------------------
 \section{Pipeline Snakemake}
 \label{sec:c1-snakemake}
 % -----------------------------------------------------------------------------
 
-O banco integrado é produzido por um workflow Snakemake~\citep{molder2025snakemake} organizado em torno de um \gls{dag} explícito, cujo contrato de release e dependências entre estágios são declarados e versionados junto com os dados que gera.
+O banco é produzido por um workflow Snakemake~\citep{molder2025snakemake} organizado como um \gls{dag}. O grafo declara os artefatos de entrada e saída de cada regra, registra as dependências entre etapas e permite executar novamente apenas os estágios afetados por uma alteração.
 
-\subsection{Arquitetura em quatro camadas}
+\subsection{Arquitetura do workflow}
 
-O workflow separa deliberadamente quatro responsabilidades em camadas distintas:
+A implementação separa quatro responsabilidades:
 
 \begin{description}
-    \item[Camada de orquestração:] \texttt{Snakefile} e cinco módulos de \textit{rules} (\texttt{00\_preflight}, \texttt{10\_generation}, \texttt{20\_analysis}, \texttt{30\_validation}, \texttt{90\_reporting}) declaram quais artefatos pertencem a uma release completa e quais dependências devem estar satisfeitas antes de cada regra executar. A camada de orquestração não contém lógica de transformação.
-    \item[Camada de contrato:] \texttt{config/config.yaml} armazena valores de runtime (versão, caminhos, formato CSV, endpoints KEGG, thresholds de validação); \texttt{workflow/lib/io\_contracts.R} armazena o contrato estrutural (nomes obrigatórios de arquivos curados, vetor ordenado de 11 colunas do schema exportado, padrões regex de identificadores, endpoints KEGG usados pela geração).
-    \item[Camada de scripts:] transformações efetivas implementadas em \texttt{workflow/scripts/}, agrupadas por estágio, com scripts que leem inputs declarados e escrevem outputs declarados sem orquestrarem uns aos outros diretamente.
-    \item[Camada de utilidades:] \texttt{workflow/lib/utils.R} concentra funções compartilhadas (I/O CSV/JSON, normalização de sentinelas NA, logging, parsing de argumentos de linha de comando).
+    \item[Orquestração:] o \texttt{Snakefile} e os módulos \texttt{00\_preflight}, \texttt{10\_generation}, \texttt{20\_analysis}, \texttt{30\_validation} e \texttt{90\_reporting} declaram regras, dependências e artefatos de uma release completa. A lógica de transformação permanece fora desses arquivos.
+
+    \item[Contrato:] o arquivo \texttt{config/config.yaml} armazena versão, caminhos, formato de exportação, endpoints KEGG e limiar de validação. O arquivo \texttt{workflow/lib/io\_contracts.R} define os nomes obrigatórios dos arquivos locais, a ordem das 11 colunas públicas, os padrões de identificadores e os endpoints usados na geração.
+
+    \item[Transformação:] os scripts em \texttt{workflow/scripts/} leem entradas declaradas e produzem saídas declaradas. Os scripts não chamam diretamente as etapas seguintes.
+
+    \item[Utilidades:] \texttt{workflow/lib/utils.R} concentra funções de leitura e escrita, normalização de \texttt{NA}, registro de execução e processamento dos argumentos de linha de comando.
 \end{description}
 
-Essa separação garante que decisões operacionais que mudam entre releases (caminhos, thresholds) sejam ajustadas via YAML sem alteração de código, enquanto mudanças no que constitui \textit{um release do banco BioRemPP} (schema, regras de identificadores) sejam mudanças de código com histórico auditável em version control.
+Valores que podem mudar entre execuções, como caminhos e limites de validação, permanecem no YAML. Alterações no schema, nos padrões dos identificadores ou no conjunto obrigatório de entradas exigem mudança no contrato versionado. Essa separação permite distinguir configuração operacional de mudança no modelo público do banco.
 
-\subsection{Estágios de execução da release}
+\subsection{Ambiente de execução}
 
-A Tabela~\ref{tab:c1-stages} resume os dez estágios do \gls{dag}. A ordem é lógica, não estritamente sequencial: o Snakemake agenda regras independentes em paralelo sempre que suas dependências declaradas já estão satisfeitas.
+O ambiente principal usa a imagem \texttt{rocker/tidyverse:4.4} fixada por digest. O container instala Snakemake 8.30.0, Pulp 2.7.0 e versões específicas dos pacotes R usados pelo workflow: \texttt{dplyr} 1.1.4, \texttt{httr} 1.4.7, \texttt{readxl} 1.4.3, \texttt{tidyr} 1.3.1, \texttt{stringr} 1.5.1, \texttt{readr} 2.1.5, \texttt{jsonlite} 1.8.8 e \texttt{writexl} 1.5.0. A versão de \texttt{dplyr} mantém o suporte explícito a junções muitos-para-muitos usado na expansão relacional.
+
+O validador Great Expectations usa uma imagem separada baseada em Python 3.11, também fixada por digest. A release analisada foi validada com Great Expectations 1.12.3 e pandas 2.3.3. Os serviços de geração e validação são declarados no mesmo arquivo Docker Compose, mas executam processos independentes e escrevem resultados em diretórios distintos.
+
+\subsection{Estágios de execução}
+
+O \gls{dag} contém dez estágios lógicos (Tabela~\ref{tab:c1-stages}). Regras sem dependência entre si podem ser agendadas em paralelo pelo Snakemake.
 
 \begin{table*}[htbp]
 \centering
-\caption{Estágios do \gls{dag} de release do pipeline \biorempp{}.}
+\caption{Estágios do \gls{dag} de geração, análise e validação da release BioRemPP v1.1.0.}
 \label{tab:c1-stages}
 \small
 \begin{tabular}{@{}rlll@{}}
 \toprule
-\textbf{\#} & \textbf{Estágio} & \textbf{Regra(s) principal(is)} & \textbf{Artefato principal} \\
+\textbf{N.} & \textbf{Estágio} & \textbf{Regra principal} & \textbf{Artefato principal} \\
 \midrule
-1  & Preflight               & \texttt{preflight\_check\_inputs}   & \texttt{work/preflight\_ok.json} \\
-2  & Bundle local curado     & \texttt{load\_local\_data}          & \texttt{work/local\_data.rds} \\
-3  & Aquisição KEGG          & \texttt{fetch\_kegg\_info/data}     & \texttt{results/metadata/kegg\_release.json} \\
-4  & Assembly de relações    & \texttt{merge\_relationships}       & \texttt{work/merged\_compounds.rds} \\
-5  & Classificação           & \texttt{add\_classifications}       & \texttt{work/classified\_compounds.rds} \\
-6  & Enriquecimento gênico   & \texttt{enrich\_gene\_info}         & \texttt{work/enriched\_compounds.rds} \\
-7  & Exportação da release   & \texttt{extract\_enzymes\_export}   & \texttt{biorempp\_database\_v1.1.0.\{csv,xlsx\}} \\
-8  & Análise                 & 9 regras                            & \texttt{results/analysis/*.json} \\
-9  & Validação integrada     & 3 regras                            & \texttt{results/metadata/*\_report.json} \\
-10 & Relatório final         & \texttt{build\_run\_report}         & \texttt{results/reports/workflow\_summary.json} \\
+1  & Verificação das entradas & \texttt{preflight\_check\_inputs} & \texttt{work/preflight\_ok.json} \\
+2  & Carregamento local & \texttt{load\_local\_data} & \texttt{work/local\_data.rds} \\
+3  & Aquisição KEGG & \texttt{fetch\_kegg\_info}, \texttt{fetch\_kegg\_data} & \texttt{kegg\_release.json}, \texttt{kegg\_data.rds} \\
+4  & Integração relacional & \texttt{merge\_relationships} & \texttt{work/merged\_compounds.rds} \\
+5  & Classificação química & \texttt{add\_classifications} & \texttt{work/classified\_compounds.rds} \\
+6  & Enriquecimento gênico & \texttt{enrich\_gene\_info} & \texttt{work/enriched\_compounds.rds} \\
+7  & Exportação da release & \texttt{extract\_enzymes\_export} & \texttt{biorempp\_database\_v1.1.0.\{csv,xlsx\}} \\
+8  & Análise descritiva & nove regras de análise & \texttt{results/analysis/*.json} \\
+9  & Validação integrada & três regras de validação & \texttt{results/metadata/*\_report.json} \\
+10 & Relatório de execução & \texttt{build\_run\_report} & \texttt{workflow\_summary.json} \\
 \bottomrule
 \end{tabular}
 \end{table*}
 
 \begin{figure}[htbp]
 \centering
-\fbox{\parbox{0.85\textwidth}{\centering \todo{Figura 3.2 --- Representação visual do DAG Snakemake do release BioRemPP. Nós representam regras, arestas representam dependências de artefatos. Cores diferentes para os cinco módulos de rules. Indicar as fronteiras entre estágios de generation, analysis, validation e reporting.}\vspace{2em}}}
-\caption{Grafo de dependências do pipeline Snakemake do banco \biorempp{}, agrupado pelos cinco módulos de \textit{rules}. Setas indicam a direção de propagação de artefatos.}
+\fbox{\parbox{0.85\textwidth}{\centering Representação esquemática do \gls{dag} da release BioRemPP, com regras agrupadas nos módulos de verificação, geração, análise, validação e relatório.\vspace{2em}}}
+\caption{Grafo de dependências do pipeline Snakemake do banco \biorempp{}. As arestas representam a propagação dos artefatos entre regras.}
 \label{fig:c1-dag}
 \end{figure}
 
-\escrever{Detalhar em prosa os estágios 4--7 (assembly, classificação, enriquecimento gênico, exportação) que juntos constroem iterativamente a tabela integrada: relacionar como cada estágio serializa seu estado intermediário em bundles \texttt{.rds} para permitir reruns parciais.}
+A regra \texttt{merge\_relationships} combina \texttt{local\_data.rds} e \texttt{kegg\_data.rds}. O script normaliza os identificadores, forma o universo \texttt{cpd}--\texttt{ko}--\texttt{referenceAG} e aplica os seis estados de suporte descritos na Tabela~\ref{tab:c1-support-stages}. Os nomes de compostos são incorporados por junção com a lista recuperada do KEGG. O resultado é salvo em \texttt{merged\_compounds.rds}.
+
+A regra \texttt{add\_classifications} incorpora as classes químicas e expande compostos associados a mais de uma classe. A regra \texttt{enrich\_gene\_info} acrescenta \texttt{genesymbol} e \texttt{genename} com base em \texttt{kegglistko.txt}. O objeto resultante é a última representação intermediária antes da exportação pública.
+
+A regra \texttt{extract\_enzymes\_export} acrescenta \texttt{reaction\_description} a partir da lista de reações do KEGG. O campo \texttt{enzyme\_activity} é obtido pela busca dos termos curados em \texttt{genename}; quando nenhum termo é extraído, o próprio nome do gene é preservado. O script remove trechos de EC incorporados ao nome do gene, normaliza símbolos com múltiplos valores e elimina linhas duplicadas antes de aplicar a ordem final do schema.
+
+Os arquivos intermediários em formato RDS permitem inspecionar as fronteiras entre estágios. Uma alteração nas classes químicas, por exemplo, pode reiniciar a execução a partir de \texttt{add\_classifications} sem repetir a aquisição das relações KEGG, desde que as dependências anteriores permaneçam válidas.
+
+\subsection{Artefatos analíticos}
+
+Após a exportação, nove regras calculam estatísticas básicas, distribuições de compostos, KOs, enzimas e genes, tabelas cruzadas, metadados e um sumário executivo. Os resultados são armazenados em JSON e reunidos em \texttt{complete\_analysis.json}. Essa camada fornece métricas reprodutíveis para a descrição da release e constitui a entrada dos testes de consistência executados pelo validador Great Expectations.
 
 % -----------------------------------------------------------------------------
 \section{Validação KEGG-anchored embutida}
 \label{sec:c1-validacao-kegg}
 % -----------------------------------------------------------------------------
 
-A primeira camada de validação está embutida no \gls{dag} Snakemake (estágio 9) e audita o banco exportado contra o grafo de links do próprio KEGG. Antes de avaliar o banco, o pipeline persiste um cache local dos payloads KEGG relevantes (regra \texttt{fetch\_kegg\_link\_cache} $\rightarrow$ arquivos TSV em \texttt{cache/kegg\_link\_cache/}), assegurando que a validação opere reproduzivelmente contra um snapshot fixo do KEGG em vez de re-consultar a API a cada execução.
+A primeira camada de validação integra o \gls{dag} Snakemake e compara o banco exportado com um cache das relações KEGG usadas como referência operacional. A regra \texttt{fetch\_kegg\_link\_cache} persiste cinco arquivos TSV em \texttt{cache/kegg\_link\_cache/}: KO--EC, KO--reação, composto--EC, composto--reação e EC--reação. O cache impede que os relatórios consultem versões diferentes do KEGG durante a mesma avaliação.
 
-Duas regras de relatório então avaliam o banco exportado contra esse ground truth cacheado:
+A regra \texttt{validate\_keys\_consistency} analisa as linhas com \texttt{NA} em \texttt{ec} ou \texttt{reaction}. Cada ocorrência é classificada como justificada quando os links necessários não existem no cache ou como incorreta quando o cache contém uma relação que deveria ter sido materializada. O relatório registra as contagens, os motivos da classificação e exemplos limitados de inconsistências.
 
-\begin{description}
-    \item[\texttt{validate\_keys\_consistency} $\rightarrow$ \texttt{keys\_consistency\_report.json}] endereça as linhas do banco exportado que carregam sentinela \texttt{NA} em \texttt{ec} ou \texttt{reaction}. Classifica cada linha como \textit{justificada} (nenhum link KEGG existe para o par \texttt{ko}-\texttt{cpd} correspondente, portanto a ausência é correta) ou \textit{incorreta} (um link KEGG existe, portanto o estágio de expansão cartesiana deveria ter materializado uma linha populada). A proporção de linhas \textit{justificadas} versus \textit{incorretas} é o indicador de qualidade principal desse relatório: uma taxa próxima a 100\% de justificadas significa que \texttt{ec} ou \texttt{reaction} vazios refletem lacunas reais do KEGG em vez de erros de build.
+A regra \texttt{validate\_links\_groundtruth\_policy} analisa as linhas com EC e reação preenchidos. A validação verifica as combinações \texttt{(ko, ec, reaction)} contra cinco relações do cache e calcula diferentes políticas de suporte. A métrica \texttt{strict5} exige suporte simultâneo nas cinco relações. A métrica \texttt{policy\_union} aceita suporte por qualquer um dos modelos densos usados na construção: relação completa por KO, fallback por KO ou ponte confirmada pelo composto.
 
-    \item[\texttt{validate\_links\_groundtruth\_policy} $\rightarrow$ \texttt{links\_groundtruth\_policy\_report.json}] endereça as linhas que carregam \texttt{ec} e \texttt{reaction} populados. Mede a concordância pair-level entre as combinações \texttt{(ko, ec, reaction)} no banco exportado e o grafo de links KEGG capturado no cache, quantificando cobertura policy-aware. O threshold \texttt{validation.max\_invalid\_line\_ratio} em \texttt{config/config.yaml} define a taxa máxima aceitável de discordância para o release passar.
-\end{description}
+O parâmetro \texttt{validation.max\_invalid\_line\_ratio}, definido como 0,01 na configuração da release, estabelece a proporção máxima de linhas sem suporte admitida pelo workflow. Falhas de aquisição, arquivos ausentes, problemas de parsing ou violação desse limite interrompem a execução. Os achados em nível de linha são preservados nos relatórios JSON para inspeção.
 
-Essa camada é propositalmente construída para o conteúdo KEGG-ancorado do banco e trata o grafo de links KEGG vivo como verdade absoluta. Falhas de checkpoint bloqueiam o release na etapa de exportação, direcionando remediação para os estágios de geração ou para a etapa de aquisição do KEGG, em vez de serem silenciosamente absorvidas.
-
-\todo{Reportar aqui, se disponível, os números concretos dos relatórios da release v1.1.0: taxa de NAs justificadas e taxa de agreement pair-level. Isso fortalece muito a defensibilidade.}
+Na release v1.1.0, 3.111 linhas apresentaram pelo menos um \texttt{NA} entre \texttt{ec} e \texttt{reaction}. Todas foram classificadas como justificadas. Entre as 120.432 linhas com os dois campos preenchidos, \texttt{policy\_union} alcançou 100\%, sem linhas classificadas como \texttt{no\_policy\_support}. A métrica \texttt{strict5} cobriu 2.914 linhas, correspondendo a 2,42\% do conjunto denso. Esse percentual descreve a política mais restritiva e não representa a cobertura global da validação.
 
 % -----------------------------------------------------------------------------
-\section{Validação Great Expectations release-level}
+\section{Validação Great Expectations em nível de release}
 \label{sec:c1-validacao-gx}
 % -----------------------------------------------------------------------------
 
-A segunda camada de validação, implementada em projeto separado sob \texttt{biorempp\_validation/}, opera com \gls{gx}~\citep{greatexpectations} e consome a árvore de resultados finalizada após o Snakemake concluir. Diferente da camada KEGG-anchored, a validação Great Expectations pergunta questões estruturais e de estabilidade: o banco exportado tem o schema que o contrato declara? Seus identificadores respeitam os padrões regex? Os artefatos de análise concordam com o banco que descrevem? A release atual permanece consistente com o comportamento analítico da baseline commitada?
+A segunda camada é implementada como projeto independente em \texttt{biorempp\_validation/}. O validador usa \gls{gx}~\citep{greatexpectations} e lê a árvore de resultados após o término do Snakemake. O processo é somente leitura em relação aos artefatos do pipeline.
 
-\subsection{Justificativa da arquitetura dual}
+O ponto de entrada \texttt{biorempp-validate} executa cinco etapas. O processo carrega \texttt{validation.yaml}, verifica os arquivos exigidos pelos modos ativos, lê o CSV e os JSONs, materializa \texttt{DataFrames} derivados e executa as suites configuradas. Os resultados são escritos em \texttt{critical\_checkpoint\_result.json}, \texttt{warning\_checkpoint\_result.json}, \texttt{validation\_summary.json} e \texttt{data\_docs/index.html}. Os artefatos são gerados antes da definição do código de saída. Assim, resultados de uma execução reprovada permanecem disponíveis para inspeção. A configuração pode bloquear a release por falha crítica e, quando habilitado, por falha de warning.
 
-Nenhuma das camadas isoladamente é suficiente. Um release que passa apenas na validação KEGG-anchored pode estar silenciosamente quebrado em ordem de colunas, formatos de identificador ou valores de vocabulário controlado; um release que passa apenas na validação Great Expectations pode conter anotações \texttt{ec} ou \texttt{reaction} que discordam do KEGG. A combinação das duas camadas responde afirmativamente, para cada release, a duas perguntas distintas: o conteúdo é fiel às fontes upstream, e o artefato está corretamente estruturado segundo seu próprio contrato.
+\subsection{Complementaridade entre as camadas}
 
-\subsection{Modos ortogonais de validação}
+As duas camadas verificam propriedades diferentes. A validação KEGG-anchored testa se os campos funcionais concordam com o snapshot dos links externos. O Great Expectations testa ordem de colunas, formatos de identificadores, nulabilidade de campos críticos, vocabulários controlados, unicidade de linhas e consistência entre o CSV e os artefatos analíticos. Uma release pode manter schema válido e conter uma relação funcional incompatível com o KEGG; também pode preservar relações corretas e quebrar o contrato de exportação. A aprovação exige as duas verificações.
 
-O validador expõe dois flags de modo controlando quais suites de comparação analítica executam. Os flags são ortogonais: podem ser habilitados juntos ou independentemente, e as suites estruturais e de metadata KEGG executam independentemente dos modos ativos.
+\subsection{Modos de comparação analítica}
 
-\begin{itemize}
-    \item \textbf{Internal-consistency:} compara o CSV da release atual contra seus próprios artefatos de análise. Verifica se as contagens, distribuições e sumários da família JSON (\texttt{basic\_statistics.json}, \texttt{compound\_statistics.json}, etc.) concordam com o que pode ser recomputado a partir do CSV. Endereça o modo de falha em que o estágio de análise reporta métricas que não correspondem ao banco descrito.
+O validador possui dois modos que controlam as comparações dos artefatos analíticos:
 
-    \item \textbf{Regression-detection:} compara o CSV da release atual contra uma baseline commitada sob \texttt{baselines/release\_v1\_1\_0\_kegg\_118\_0plus} no repositório. Endereça o modo de falha em que uma release futura silenciosamente altera uma métrica derivada que deveria permanecer estável.
-\end{itemize}
+\begin{description}
+    \item[\texttt{internal\_consistency}:] compara o CSV da release atual com os JSONs produzidos pela mesma execução. O modo verifica se contagens, distribuições e sumários podem ser reproduzidos a partir do arquivo público.
+
+    \item[\texttt{regression\_detection}:] compara métricas derivadas do CSV atual com uma baseline versionada em \texttt{baselines/release\_v1\_1\_0\_kegg\_118\_0plus}. O modo detecta mudanças em métricas que deveriam permanecer estáveis em relação à referência aprovada.
+\end{description}
+
+Os modos podem ser habilitados de forma independente. As suites de banco, metadados KEGG e relatórios integrados continuam sendo executadas mesmo quando as duas comparações analíticas estão desativadas.
 
 \subsection{Suites de expectativas}
 
-Oito arquivos JSON de suite acompanham o validador. Em tempo de execução, um deles serve como template clonado em duas suites concretas (uma por modo de comparação analítica), totalizando nove identidades de suite ativas (Tabela~\ref{tab:c1-suites}).
+O projeto contém oito arquivos JSON de suite. Um deles funciona como template e é clonado em duas identidades de execução, resultando em nove suites ativas quando os dois modos estão habilitados (Tabela~\ref{tab:c1-suites}).
 
 \begin{table*}[htbp]
 \centering
-\caption{Suites de expectativas do validador \gls{gx} release-level. Mode indica se a suite executa sempre (agnostic), apenas com internal-consistency habilitado (IC) ou apenas com regression-detection habilitado (RD).}
+\caption{Suites executadas pelo validador Great Expectations da release v1.1.0.}
 \label{tab:c1-suites}
 \small
 \begin{tabular}{@{}p{6cm}lp{7cm}@{}}
 \toprule
 \textbf{Suite} & \textbf{Modo} & \textbf{Verificação principal} \\
 \midrule
-\texttt{database\_critical}                              & agnostic & schema ordenado, regex de identificadores, unicidade de linhas \\
-\texttt{database\_warning}                               & agnostic & vocabulários controlados, janelas de drift para cardinalidades \\
-\texttt{metadata\_kegg\_critical}                        & agnostic & provenance KEGG e formato de URL/timestamp \\
-\texttt{pipeline\_reports\_critical}                     & agnostic & sentinelas nos relatórios de validação integrada \\
-\texttt{analysis\_json\_critical}                        & IC       & seções obrigatórias e consistência estrutural do bundle de análise \\
-\texttt{analysis\_json\_warning}                         & IC       & tamanhos top-$N$, presença de texto de sumário, cobertura de descrições de reação \\
-\texttt{cross\_consistency\_critical}                    & IC       & paridade de métricas entre CSV e \texttt{basic\_statistics.json} \\
-\texttt{analysis\_json\_internal\_consistency\_critical} & IC       & paridade exata entre métricas derivadas do CSV e snapshot atual de análise \\
-\texttt{analysis\_json\_regression\_critical}            & RD       & paridade exata entre métricas derivadas do CSV atual e baseline commitada \\
+\texttt{database\_critical} & Sempre & Ordem do schema, campos críticos, regex de identificadores e unicidade de linhas. \\
+\texttt{database\_warning} & Sempre & Vocabulários controlados e intervalos de variação das cardinalidades. \\
+\texttt{metadata\_kegg\_critical} & Sempre & Proveniência KEGG, URL de origem e formato do timestamp. \\
+\texttt{pipeline\_reports\_critical} & Sempre & Valores sentinela nos relatórios integrados e no sumário do workflow. \\
+\texttt{analysis\_json\_critical} & IC & Seções obrigatórias e estrutura dos JSONs da release atual. \\
+\texttt{analysis\_json\_warning} & IC & Tamanho das listas top-$N$, presença de sumários e cobertura das descrições de reação. \\
+\texttt{cross\_consistency\_critical} & IC & Paridade entre métricas do CSV e \texttt{basic\_statistics.json}. \\
+\texttt{analysis\_json\_internal\_consistency\_critical} & IC & Igualdade entre métricas derivadas do CSV e os snapshots analíticos atuais. \\
+\texttt{analysis\_json\_regression\_critical} & RD & Igualdade entre métricas derivadas do CSV atual e a baseline versionada. \\
 \bottomrule
 \end{tabular}
 \end{table*}
 
-\subsection{Materialização de datasets}
+Na Tabela~\ref{tab:c1-suites}, IC corresponde a \texttt{internal\_consistency} e RD a \texttt{regression\_detection}. Os valores efetivos de colunas esperadas, vocabulários e janelas de variação são injetados a partir de \texttt{validation.yaml}, mantendo as suites alinhadas ao contrato da release.
 
-Uma escolha de design que merece destaque é que o Great Expectations nunca opera diretamente sobre os artefatos JSON hierárquicos. O validador primeiro materializa um conjunto de \texttt{DataFrames} pandas nomeados a partir dos artefatos que precisa, e as suites de expectativa operam sobre esses DataFrames. Essa indiretação permite aplicar as idiomas tabulares padrão do Great Expectations (testes de valor de coluna, testes de distribuição, testes de pertencimento a conjunto) a artefatos nativamente hierárquicos sem necessidade de lógica de parsing customizada por suite.
+\subsection{Materialização dos conjuntos de validação}
 
-\subsection{Baseline commitada e refresh}
+O Great Expectations opera sobre representações tabulares. Por isso, o validador transforma os JSONs hierárquicos em \texttt{DataFrames} nomeados. O conjunto \texttt{database\_csv} representa o arquivo público; \texttt{metadata\_kegg} representa a proveniência; \texttt{pipeline\_reports} reúne os relatórios do Snakemake; e \texttt{cross\_consistency} reúne métricas do CSV e de \texttt{basic\_statistics.json}. Outros quatro conjuntos representam a análise atual, os warnings, a consistência interna e a regressão.
 
-A baseline commitada sob \texttt{baselines/release\_v1\_1\_0\_kegg\_118\_0plus} contém nove arquivos JSON de análise e o metadata KEGG necessários para reconstruir o \textit{fingerprint} analítico da release v1.1.0, mas deliberadamente exclui o próprio CSV do banco, os relatórios de validação integrada e o \texttt{workflow\_summary.json}. A regressão é portanto realizada sobre a camada analítica derivada, não sobre os bytes brutos do banco: comparar o conteúdo CSV diretamente confundiria mudanças incidentais em ordem de linhas com mudanças substantivas em comportamento analítico.
+Essa camada de materialização mantém o parsing fora das suites. As expectativas recebem colunas normalizadas e podem usar as operações tabulares do Great Expectations sem interpretar diretamente a estrutura de cada JSON.
 
-\subsection{Teste do próprio validador}
+\subsection{Baseline e testes do validador}
 
-Uma suite pytest sob \texttt{biorempp\_validation/tests/} exercita o validador como um entry point Python in-process contra artefatos realistas do repositório. Cenários cobertos incluem execução end-to-end de sucesso, isolamento de falhas entre os dois modos de validação, falha de preflight quando arquivos obrigatórios estão ausentes, falha de schema crítico ao remover colunas, falha do contrato de metadata KEGG na ausência de campos e comportamento de drift em warnings de cardinalidade. Toda a suite executa no mesmo ambiente Docker pinned que roda o validador em produção.
+A baseline contém nove arquivos JSON de análise e o metadata KEGG necessários para reconstruir o perfil analítico da release v1.1.0. O CSV, os relatórios integrados e \texttt{workflow\_summary.json} não fazem parte da baseline. A comparação ocorre sobre métricas derivadas, evitando que diferenças incidentais na ordem das linhas sejam tratadas como regressão científica.
+
+A suite pytest executa o validador contra cópias temporárias dos artefatos reais do repositório. Os testes cobrem a execução completa, o isolamento entre os modos, ausência de arquivos obrigatórios, remoção de coluna do schema, falha no metadata KEGG e variação acima dos limites de warning. O validador é chamado como ponto de entrada Python no mesmo ambiente com versões fixadas usado na execução operacional.
 
 % -----------------------------------------------------------------------------
 \section{Resultados do componente}
 \label{sec:c1-resultados}
 % -----------------------------------------------------------------------------
 
-O release v1.1.0 do banco integrado \biorempp{} liga 384 compostos ambientalmente prioritários distribuídos em 12 classes químicas a 1.543 \glspl{ko} únicos, 994 números EC, 1.939 identificadores de reação KEGG e 206 famílias curadas de atividade enzimática. Todos os compostos estão ancorados a pelo menos um dos nove códigos de agências regulatórias correspondentes aos sete frameworks internacionais e regionais integrados. As predições toxicológicas de 31 endpoints em cinco categorias cobrem 370 dos 384 compostos (96,4\%).
+A release v1.1.0 contém 123.543 linhas e 11 colunas. O banco reúne 384 compostos distribuídos em 12 classes químicas, 1.543 KOs, 994 números EC, 1.939 reações, 1.517 símbolos gênicos, 1.422 nomes de genes e 206 atividades enzimáticas. Todos os compostos estão associados a pelo menos um dos nove códigos de \texttt{referenceAG}. As predições do ToxCSM cobrem 370 compostos, correspondendo a 96,4\% do inventário.
+
+\subsection{Construção e completude das relações}
+
+O universo inicial continha 7.330 chaves distintas \texttt{cpd}--\texttt{ko}--\texttt{referenceAG}. As relações diretas baseadas em EC contribuíram com 3.461 chaves, as relações baseadas em reação contribuíram com 2.828 e a curadoria acrescentou 3.037; as sobreposições foram removidas antes da expansão.
+
+O estado \texttt{dense} resolveu 4.752 chaves, equivalentes a 64,8\% do universo, e produziu 23.015 linhas. O estado \texttt{fallback\_dense} resolveu 162 das 2.578 chaves residuais e produziu 1.890 linhas. O estado \texttt{compound\_bridge} resolveu 1.158 das 2.416 chaves restantes e produziu 83.077 linhas. As 1.258 chaves residuais foram avaliadas para suporte parcial, gerando 1.105 linhas com EC e 503 com reação. Quarenta e quatro chaves permaneceram sem suporte nos links consultados. Antes da expansão por classes químicas e dos enriquecimentos finais, \texttt{merged\_compounds.rds} continha 109.634 linhas.
+
+No arquivo público, 120.432 linhas possuem EC e reação, 2.150 possuem apenas EC, 888 possuem apenas reação e 73 apresentam os dois campos como \texttt{NA}. A diferença entre os números intermediários e finais decorre principalmente da expansão dos compostos associados a múltiplas classes químicas. O enriquecimento gênico, a filtragem de registros sem anotação e a remoção final de duplicatas completam a definição do arquivo público.
+
+A comparação com os caches KEGG encontrou correspondência direta para 1.527 dos 1.543 KOs e para 169 dos 384 compostos. Os 215 compostos sem correspondência direta nos links em nível de composto permaneceram conectados por suporte baseado em KO ou por pares curados. Esse resultado evidencia a dependência da curadoria para manter no banco substâncias regulatoriamente prioritárias que não possuem cobertura equivalente nas relações públicas consultadas.
 
 \subsection{Distribuição por classe química}
 
-As cinco classes químicas dominantes concentram a maior parte dos compostos: aromáticos (n=123), clorados (n=117), contendo nitrogênio (n=115), poliaromáticos (n=98) e alifáticos (n=94). As sete classes remanescentes (metais, inorgânicos, sulfurados, organofosforados, organometálicos, halogenados e organossulfurados) somam 106 compostos, evitando que o banco fique dominado por uma única classe.
+As classes com maior número de compostos são aromáticos (n=123), clorados (n=117), compostos contendo nitrogênio (n=115), poliaromáticos (n=98) e alifáticos (n=94). As demais classes são metais (n=29), inorgânicos (n=26), compostos contendo enxofre (n=20), organofosforados (n=13), organometálicos (n=9), halogenados (n=8) e organossulfurados (n=1). Como um composto pode receber mais de uma classe, a soma das contagens supera 384.
 
 \begin{figure}[htbp]
 \centering
-\fbox{\parbox{0.75\textwidth}{\centering \todo{Figura 3.3 --- Barra horizontal das 12 classes químicas ordenadas por número de compostos. Uso opcional de cor secundária para diferenciar classes majoritárias das minoritárias.}\vspace{2em}}}
-\caption{Distribuição dos 384 compostos prioritários do banco \biorempp{} v1.1.0 por classe química.}
+\fbox{\parbox{0.75\textwidth}{\centering Gráfico de barras horizontais com as 12 classes químicas ordenadas pelo número de compostos únicos na release v1.1.0.\vspace{2em}}}
+\caption{Distribuição dos compostos prioritários do banco \biorempp{} v1.1.0 por classe química.}
 \label{fig:c1-classes}
 \end{figure}
 
-\subsection{Cobertura por framework regulatório}
+\subsection{Cobertura por referência institucional}
 
-O campo \texttt{referenceAG} apresenta cardinalidade nove, correspondendo aos sete frameworks integrados com IARC subdividido em três códigos (\texttt{IARC1}, \texttt{IARC2A}, \texttt{IARC2B}) refletindo a própria subdivisão de classificação de carcinogenicidade da agência. Os demais frameworks contribuem um código cada.
+A ATSDR contém 191 compostos do inventário (49,7\%). As demais frequências são IARC2B, com 130 compostos (33,9\%); PSL, com 99 (25,8\%); EPC, com 91 (23,7\%); WFD, com 84 (21,9\%); EPA, com 83 (21,6\%); IARC1, com 56 (14,6\%); CONAMA, com 43 (11,2\%); e IARC2A, com 29 (7,6\%). Os percentuais somam mais de 100\% porque um composto pode ocorrer em várias fontes.
 
 \begin{figure}[htbp]
 \centering
-\fbox{\parbox{0.75\textwidth}{\centering \todo{Figura 3.4 --- UpSet plot (ou diagrama de Venn se preferível) mostrando sobreposição de compostos entre os nove códigos de agência. Destacar compostos que aparecem em três ou mais frameworks como grupo de convergência regulatória.}\vspace{2em}}}
-\caption{Sobreposição de compostos entre as nove agências regulatórias integradas no banco \biorempp{}. Compostos em múltiplos frameworks representam convergência regulatória entre jurisdições.}
+\fbox{\parbox{0.75\textwidth}{\centering Diagrama de sobreposição entre os nove códigos de \texttt{referenceAG}, com ênfase nas interseções entre fontes institucionais.\vspace{2em}}}
+\caption{Sobreposição de compostos entre as referências institucionais integradas no banco \biorempp{}.}
 \label{fig:c1-agencias}
 \end{figure}
 
-\subsection{Hubs enzimáticos}
+\subsection{Famílias enzimáticas}
 
-As famílias enzimáticas de maior conectividade (isto é, associadas ao maior número de compostos distintos) refletem estratégias metabólicas amplamente compartilhadas: desidrogenases (n=106 compostos), dioxigenases (n=88), monoxigenases (n=74), citocromo P450 (n=35), hidrolases (n=26). Essa distribuição sinaliza famílias enzimáticas cuja engenharia teria retorno de cobertura ampla em programas de biorremediação.
+A amplitude de cada família foi medida pelo número de compostos distintos associados. As maiores coberturas foram observadas para desidrogenases, com 106 compostos; dioxigenases, com 88; monooxigenases, com 74; redutases, com 53; e citocromos P450, com 35.
+
+A ordenação muda quando a métrica é a frequência de linhas. Citocromo P450 aparece em 17.729 registros, seguido por dioxigenases (11.414), hidrolases (7.818), desidrogenases (6.813) e redutases (6.314). A primeira métrica descreve a diversidade de compostos cobertos. A segunda reflete a participação de cada família na expansão por KO, EC, reação, classe e referência institucional.
 
 \subsection{Métricas de validação}
 
-\escrever{Compilar aqui os números atuais dos dois relatórios de validação integrada (justified NA rate e agreement rate) e o status da última execução do validador Great Expectations sobre a release v1.1.0 (número de suites passing versus failing por checkpoint).}
+A camada KEGG-anchored classificou como justificadas todas as 3.111 linhas com pelo menos um valor ausente entre EC e reação. Nenhuma linha foi classificada como incorreta. A política de união sustentou as 120.432 linhas densas, e nenhuma permaneceu sem suporte pelos modelos admitidos.
 
-\subsection{Publicação}
+A execução do Great Expectations registrada em 28 de junho de 2026 aprovou os checkpoints crítico e de warning. O sumário registrou zero expectativas críticas falhas e zero expectativas de warning falhas (Tabela~\ref{tab:c1-validation-metrics}).
 
-O banco integrado v1.1.0 está arquivado permanentemente no Zenodo (DOI \href{https://doi.org/10.5281/zenodo.18905195}{10.5281/zenodo.18905195}) sob licença CC BY 4.0. O código-fonte do pipeline e do validador está publicado na organização GitHub \url{https://github.com/BioRemPP} sob licença Apache 2.0.
+\begin{table}[htbp]
+\centering
+\caption{Métricas das duas camadas de validação da release v1.1.0.}
+\label{tab:c1-validation-metrics}
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Métrica} & \textbf{Valor} \\
+\midrule
+Linhas com \texttt{NA} em EC ou reação & 3.111 \\
+Ausências classificadas como justificadas & 3.111 \\
+Ausências classificadas como incorretas & 0 \\
+Linhas densas avaliadas & 120.432 \\
+\texttt{policy\_union} & 100,0\% \\
+\texttt{strict5} & 2,42\% \\
+Checkpoint crítico do GX & Aprovado \\
+Checkpoint de warning do GX & Aprovado \\
+Expectativas críticas falhas & 0 \\
+Expectativas de warning falhas & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Disponibilidade e licenciamento}
+
+O banco integrado v1.1.0 está depositado no Zenodo sob licença CC BY 4.0, com DOI \href{https://doi.org/10.5281/zenodo.18905195}{10.5281/zenodo.18905195}. O código do pipeline e do validador está disponível na organização BioRemPP no GitHub sob licença Apache 2.0. O depósito associa os arquivos públicos à versão do KEGG, aos artefatos analíticos e aos relatórios de validação usados na release.
 
 % -----------------------------------------------------------------------------
 \section{Discussão específica do componente}
 \label{sec:c1-discussao}
 % -----------------------------------------------------------------------------
 
-O banco \biorempp{} não é uma agregação da união das fontes constituintes: é uma projeção seletiva delas sobre o universo de compostos formalmente listados por agências regulatórias. Essa restrição, apresentada nas Seções~\ref{sec:c1-motivacao} e~\ref{sec:c1-fontes} como decisão editorial deliberada, é o que sustenta a utilidade prática do artefato. Um banco que agregasse a totalidade dos compostos do KEGG, HADEG e ToxCSM produziria uma superfície ampla mas dispersa; a projeção sobre a lista regulatória concentra a evidência onde ela é necessária para pesquisa aplicada em biorremediação, biomonitoramento e políticas de saúde pública.
+O recorte regulatório determina a função do banco. A incorporação de todos os compostos presentes no KEGG, HADEG ou ToxCSM produziria um inventário mais amplo, mas reduziria a relação direta com prioridades ambientais e sanitárias. O \biorempp{} mantém apenas os compostos associados às fontes institucionais selecionadas e registra essa proveniência no campo \texttt{referenceAG}. A sobreposição entre listas permanece acessível e pode ser usada como indicador de convergência entre jurisdições.
 
-A arquitetura dual de validação apresenta uma decisão de engenharia justificada teoricamente. A validação KEGG-anchored responde à pergunta de fidelidade de conteúdo (\textit{o banco reflete o que o KEGG diz?}), enquanto a validação Great Expectations release-level responde à pergunta de conformidade estrutural e estabilidade (\textit{o banco é o que ele mesmo diz ser, e continua consistente com sua história?}). Nenhuma das duas camadas isolada seria suficiente; a combinação fecha o conjunto de propriedades auditáveis de uma release, alinhando o componente aos princípios de \textit{sustainable data analysis} propostos por~\citet{molder2025snakemake}.
+O modelo em dois eixos preserva a forma de organização das fontes. A evidência funcional pode ser consultada por KO sem exigir que todo ortólogo tenha um composto único correspondente. A evidência toxicológica pode ser consultada por CPD sem reduzir os 31 endpoints a uma anotação gênica. Essa separação também permite que uma consulta iniciada por composto recupere KOs associados e que uma consulta iniciada por KO recupere o conjunto de compostos ligados ao mesmo registro core.
 
-A escolha por schema plano denormalizado, discutida na Seção~\ref{sec:c1-schema}, prioriza usabilidade sobre eficiência de armazenamento. Essa priorização é compatível com o público-alvo do banco, que consome dados em ferramentas tabulares (R, Python \texttt{pandas}, planilhas) mais frequentemente do que em bancos relacionais. A contrapartida é uma inflação aparente do row count, endereçada explicitamente pelas cardinalidades entity-level como métricas de conteúdo científico primárias.
+A expansão relacional mostra que a ligação direta em nível de composto permanece incompleta no KEGG. Apenas 169 dos 384 compostos apresentaram correspondência direta nos conjuntos de links em nível de CPD. A preservação dos 215 compostos restantes dependeu de suporte por KO ou de pares curados composto--KO. A curadoria evita excluir substâncias relevantes por uma limitação de cobertura da fonte funcional, mas cria uma dependência de manutenção manual que precisa ser reavaliada em releases futuras.
 
+Os seis estados de suporte tornam essa heterogeneidade observável. Linhas densas, parciais e sem suporte não são tratadas como equivalentes. Os campos \texttt{ec} e \texttt{reaction} registram a completude disponível no snapshot, e os relatórios de validação verificam se as ausências correspondem aos links recuperados. Essa política é preferível ao preenchimento inferido porque permite que o usuário diferencie uma relação confirmada de uma associação preservada por curadoria.
+
+O schema denormalizado favorece o uso em ferramentas tabulares, mas exige interpretação adequada da cardinalidade. As 123.543 linhas representam a expansão de 384 compostos por classes, referências, KOs, números EC e reações. Contagens científicas em nível de entidade devem usar valores distintos. A publicação conjunta das estatísticas de compostos, KOs, enzimas e genes reduz o risco de interpretar o número bruto de linhas como tamanho do inventário químico.
+
+A validação em duas camadas cobre propriedades que não podem ser avaliadas pelo mesmo mecanismo. O cache KEGG verifica a fidelidade das relações funcionais usadas na construção. O Great Expectations verifica o contrato do arquivo, a coerência dos artefatos derivados e a estabilidade em relação à baseline. A aprovação das duas camadas na release v1.1.0 mostra que o arquivo público reproduz as métricas declaradas e que as relações densas atendem à política de suporte definida pelo pipeline. A separação entre execução, proveniência e validação também aproxima o componente dos princípios de análise sustentável discutidos por~\citet{molder2025snakemake}.
+
+A baseline de regressão precisa ser atualizada de forma controlada quando uma mudança intencional altera as métricas da release. A igualdade com uma versão anterior não deve impedir correções ou expansão do banco. Seu papel é tornar a mudança explícita e exigir revisão antes que o novo perfil analítico seja aceito como referência.
+
+A tabela core sustenta os demais componentes do ecossistema. O \gls{dbx} usa o schema e os identificadores para navegação e consulta. O \gls{bws} usa as relações entre compostos e KOs para analisar dados submetidos pelo usuário. O \gls{cli} depende da estabilidade dos arquivos públicos para integrar o recurso a workflows externos. A reutilização desses componentes depende da manutenção coordenada do contrato de dados, do pipeline e dos relatórios de validação.
