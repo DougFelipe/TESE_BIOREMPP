@@ -595,167 +595,415 @@ descrição detalhada das regras estão disponíveis na documentação oficial d
 pipeline, mantida nos repositórios da organização BioRemPP.
 
 % -----------------------------------------------------------------------------
-\section{Validação ancorada no KEGG}
+\section{Validação das relações funcionais com o KEGG}
 \label{sec:c1-validacao-kegg}
 % -----------------------------------------------------------------------------
 
-A primeira camada de validação foi incorporada ao \gls{dag} e comparou o banco exportado com um instantâneo das relações KEGG recuperadas durante a execução. Foram preservadas as relações entre KO e número EC, KO e reação, composto e número EC, composto e reação, e número EC e reação. O uso do mesmo instantâneo na geração e na validação evitou que alterações da fonte externa entre consultas interferissem na avaliação da versão produzida.
+A primeira camada de validação integra o \gls{dag} e compara o banco exportado
+com o conjunto versionado de relações KEGG recuperado na mesma execução. O
+pipeline registra as associações entre KO e número EC, KO e reação, composto
+e número EC, composto e reação, e número EC e reação. O uso do mesmo conjunto
+na geração e na validação impede que alterações da fonte externa entre
+consultas interfiram na avaliação do banco produzido.
 
-A análise das ausências verificou os registros com \texttt{NA} em \texttt{ec} ou \texttt{reaction}. Uma ausência foi considerada justificada quando as relações necessárias não estavam presentes no instantâneo consultado. Foi considerada inconsistente quando o KEGG continha suporte suficiente para preencher o campo, mas a relação não havia sido materializada no banco.
+A validação examina a consistência dos valores ausentes nos registros com
+\texttt{NA} em \texttt{ec} ou \texttt{reaction}. A ausência é classificada
+como justificada quando as relações necessárias não estão disponíveis no
+conjunto consultado. A classificação como inconsistente ocorre quando as
+relações recuperadas permitem preencher o campo, mas a associação
+correspondente não está incorporada ao banco.
 
-Os registros com número EC e reação preenchidos foram avaliados quanto ao suporte das combinações \texttt{(ko, ec, reaction)}. A política de união, identificada nos relatórios como \texttt{policy\_union}, aceitou as relações sustentadas por qualquer uma das estratégias densas usadas na construção do banco. O critério \texttt{strict5} exigiu concordância simultânea entre as cinco relações consultadas e foi usado como medida restritiva complementar, sem representar isoladamente a cobertura global da validação.
+A validação também examina o suporte das combinações
+\texttt{(ko, ec, reaction)} nos registros com número EC e reação preenchidos.
+O critério de suporte combinado, identificado nos relatórios como
+\texttt{policy\_union}, aceita as combinações sustentadas por qualquer uma
+das estratégias densas usadas na construção do banco. O critério
+\texttt{strict5} exige concordância simultânea entre as cinco relações
+consultadas e representa uma condição adicional de maior restrição. Seu
+resultado não corresponde, isoladamente, à cobertura global da validação.
 
-A proporção máxima de registros sem suporte foi definida antes da execução. A ausência de arquivos obrigatórios, falhas na aquisição das relações, erros de leitura ou ultrapassagem desse limite interromperam o fluxo. Os resultados quantitativos dessa avaliação são apresentados na Seção~\ref{sec:c1-resultados}, junto às demais métricas da versão 1.1.0.
+A configuração define antes da execução a proporção máxima de registros sem
+suporte. A ausência de arquivos obrigatórios, as falhas na aquisição das
+relações, os erros de leitura ou a ultrapassagem desse limite interrompem o
+pipeline. Os resultados quantitativos obtidos para a versão 1.1.0 são
+apresentados na Seção~\ref{sec:c1-resultados}.
 
 % -----------------------------------------------------------------------------
-\section{Validação estrutural e detecção de regressão}
+\section{Validação estrutural e estabilidade entre versões}
 \label{sec:c1-validacao-gx}
 % -----------------------------------------------------------------------------
 
-A segunda camada de validação foi implementada com Great Expectations~\citep{greatexpectations} e executada após a conclusão do pipeline Snakemake. O validador operou em modo somente leitura sobre o banco exportado, os metadados e os resultados analíticos. Seu objetivo foi verificar o contrato estrutural do arquivo público e a coerência entre os artefatos produzidos na mesma execução.
+A segunda camada de validação usa Great
+Expectations~\citep{greatexpectations} após a conclusão do pipeline
+Snakemake. O validador examina o banco exportado, os metadados e os resultados
+das análises sem modificar esses arquivos. A avaliação verifica a conformidade
+do arquivo público com o esquema de dados e a coerência entre os resultados
+produzidos na mesma execução.
 
-\subsection{Complementaridade entre as camadas}
+\subsection{Função das duas camadas}
 
-As duas camadas avaliaram propriedades distintas. A validação ancorada no KEGG examinou a concordância das relações funcionais com a fonte externa usada na construção. O Great Expectations verificou o esquema de dados, os formatos dos identificadores, a nulabilidade dos campos, os vocabulários controlados e a unicidade dos registros. Também comparou as métricas recalculadas a partir do CSV com os resultados analíticos produzidos pelo pipeline.
+As duas camadas avaliam propriedades distintas. A validação com o KEGG examina
+a concordância das relações funcionais com a fonte usada na construção. A
+validação estrutural verifica a ordem e a presença das colunas, os formatos
+dos identificadores, os valores ausentes previstos pelo modelo, os
+vocabulários controlados e a unicidade dos registros. Essa camada também
+compara as métricas recalculadas a partir do CSV com os resultados das análises
+produzidas pelo pipeline.
 
-Essa combinação evita que a aprovação dependa apenas de uma dimensão de qualidade. Um arquivo pode preservar a estrutura esperada e conter relações funcionais incompatíveis com o KEGG. Também pode manter relações biologicamente sustentadas e apresentar quebra na ordem das colunas, nos identificadores ou nas métricas derivadas.
+A conformidade estrutural não assegura a consistência das relações funcionais.
+Um arquivo pode preservar o esquema esperado e conter associações
+incompatíveis com o KEGG. O inverso também pode ocorrer: relações sustentadas
+pela fonte externa podem ser exportadas com colunas ausentes, identificadores
+inválidos ou métricas inconsistentes. A aprovação de uma versão exige a
+conformidade nas duas dimensões.
 
-\subsection{Consistência interna e regressão}
+\subsection{Consistência interna e estabilidade entre versões}
 
-A validação analítica foi organizada em dois modos. O modo de consistência interna comparou o banco com as estatísticas produzidas pela mesma execução. Contagens, distribuições e sumários foram recalculados a partir do CSV e confrontados com os artefatos analíticos correspondentes.
+A validação analítica opera em dois modos. O modo de consistência interna
+compara o banco com as estatísticas produzidas pela mesma execução. O
+validador recalcula as contagens, as distribuições e as medidas de síntese a
+partir do CSV e compara os valores com os resultados correspondentes.
 
-O modo de detecção de regressão comparou as métricas da versão avaliada com uma linha de base versionada (\textit{baseline}). A comparação foi realizada sobre medidas derivadas, e não sobre a sequência bruta das linhas do CSV. Essa escolha impediu que mudanças sem efeito científico, como uma ordenação diferente dos registros, fossem classificadas como regressões.
+O modo de detecção de regressão compara as métricas da versão avaliada com uma
+versão de referência, identificada na implementação como
+\textit{baseline}. A comparação considera medidas derivadas do conteúdo, e
+não a sequência das linhas no CSV. Esse critério evita que diferenças sem
+efeito sobre o conteúdo científico, como a alteração da ordem dos registros,
+sejam classificadas como regressões.
 
-As verificações foram classificadas em críticas e de aviso. Falhas críticas indicaram quebra do contrato necessário para publicação. Os avisos acompanharam variações de cardinalidade ou de vocabulário que exigiam revisão, mas cuja interpretação dependia do contexto da nova versão.
+As verificações são divididas em críticas e de aviso. Uma falha crítica indica
+a quebra de um requisito necessário para publicação. Os avisos registram
+mudanças de cardinalidade ou de vocabulário que exigem revisão, mas cuja
+aceitação depende das modificações previstas para a nova versão.
 
 \begin{table}[htbp]
 \centering
-\caption{Dimensões avaliadas pela validação estrutural e analítica do BioRemPP.}
+\caption{Dimensões avaliadas pela validação estrutural e analítica do
+BioRemPP.}
 \label{tab:c1-validation-dimensions}
 \small
 \begin{tabularx}{\textwidth}{@{}lX@{}}
 \toprule
 \textbf{Dimensão} & \textbf{Verificação} \\
 \midrule
-Contrato do banco
-& Ordem e presença das colunas, formatos dos identificadores, nulabilidade e unicidade dos registros. \\
+
+Estrutura do banco
+& Presença e ordem das colunas, formatos dos identificadores, valores
+ausentes previstos e unicidade dos registros. \\
 
 Proveniência
-& Presença e consistência dos metadados da fonte KEGG usada na construção. \\
+& Presença e consistência dos metadados da versão do KEGG usada na
+construção. \\
 
 Consistência interna
-& Correspondência entre as métricas recalculadas a partir do CSV e os resultados analíticos da mesma execução. \\
+& Correspondência entre as métricas recalculadas a partir do CSV e os
+resultados das análises produzidas na mesma execução. \\
 
-Regressão
-& Comparação das métricas derivadas com a linha de base aprovada para identificar mudanças não previstas. \\
+Estabilidade entre versões
+& Comparação das métricas derivadas com a versão de referência para
+identificar mudanças não previstas. \\
+
 \bottomrule
 \end{tabularx}
 \end{table}
 
-Os artefatos hierárquicos foram convertidos em representações tabulares antes da aplicação das verificações. Essa etapa permitiu validar o banco, os metadados e as métricas com um conjunto uniforme de expectativas, sem incorporar a lógica de leitura de cada arquivo às próprias regras de validação.
+O validador converte os resultados armazenados em estruturas hierárquicas em
+tabelas auxiliares antes de aplicar os critérios. Essa conversão permite
+verificar o banco, os metadados e as métricas derivadas segundo as mesmas
+regras estruturais e quantitativas, sem incluir o tratamento específico de
+cada arquivo nas definições da validação.
 
-\subsection{Controle de qualidade do validador}
+\subsection{Verificação do validador}
 
-O validador foi submetido a testes automatizados que cobriram execuções aprovadas e falhas representativas, incluindo ausência de arquivos, alteração do esquema de dados, inconsistência dos metadados e variações acima dos limites configurados. Esses testes verificaram o comportamento da ferramenta e reduziram o risco de que uma falha no próprio sistema de validação fosse interpretada como propriedade dos dados.
+Testes automatizados verificam o comportamento do validador em execuções
+aprovadas e em condições de falha conhecidas. Os cenários incluem arquivos
+ausentes, alterações no esquema de dados, inconsistências nos metadados e
+variações acima dos limites definidos. Os testes confirmam se cada condição
+produz a resposta esperada e reduzem o risco de atribuir aos dados um erro
+originado no próprio processo de validação.
 
-A configuração completa das expectativas, a composição da linha de base, os cenários de teste e os procedimentos de execução estão documentados nos repositórios oficiais da organização BioRemPP, disponíveis em \url{https://github.com/BioRemPP}.
+A configuração completa dos critérios, a composição da versão de referência,
+os cenários de teste e os procedimentos de execução estão documentados nos
+repositórios oficiais da organização BioRemPP, disponíveis em
+\url{https://github.com/BioRemPP}.
 
 
 % -----------------------------------------------------------------------------
-\section{Resultados do componente}
+\section{Resultados da construção e validação do banco}
 \label{sec:c1-resultados}
 % -----------------------------------------------------------------------------
 
-A release v1.1.0 contém 123.543 linhas e 11 colunas. O banco reúne 384 compostos distribuídos em 12 classes químicas, 1.543 KOs, 994 números EC, 1.939 reações, 1.517 símbolos gênicos, 1.422 nomes de genes e 206 atividades enzimáticas. Todos os compostos estão associados a pelo menos um dos nove códigos de \texttt{referenceAG}. As predições do ToxCSM cobrem 370 compostos, correspondendo a 96,4\% do inventário.
+A versão 1.1.0 totalizou 123.543 linhas e 11 colunas. O banco reuniu
+384 compostos distribuídos em 12 classes químicas, 1.543 KOs, 994 números EC,
+1.939 reações, 1.517 símbolos gênicos, 1.422 descrições funcionais e
+206 descritores de atividade enzimática. Os 384 compostos foram associados a
+pelo menos um dos nove códigos de \texttt{referenceAG}.
 
-\subsection{Construção e completude das relações}
-
-O universo inicial continha 7.330 chaves distintas \texttt{cpd}--\texttt{ko}--\texttt{referenceAG}. As relações diretas baseadas em EC contribuíram com 3.461 chaves, as relações baseadas em reação contribuíram com 2.828 e a curadoria acrescentou 3.037; as sobreposições foram removidas antes da expansão.
-
-O estado \texttt{dense} resolveu 4.752 chaves, equivalentes a 64,8\% do universo, e produziu 23.015 linhas. O estado \texttt{fallback\_dense} resolveu 162 das 2.578 chaves residuais e produziu 1.890 linhas. O estado \texttt{compound\_bridge} resolveu 1.158 das 2.416 chaves restantes e produziu 83.077 linhas. As 1.258 chaves residuais foram avaliadas para suporte parcial, gerando 1.105 linhas com EC e 503 com reação. Quarenta e quatro chaves permaneceram sem suporte nos links consultados. Antes da expansão por classes químicas e dos enriquecimentos finais, \texttt{merged\_compounds.rds} continha 109.634 linhas.
-
-No arquivo público, 120.432 linhas possuem EC e reação, 2.150 possuem apenas EC, 888 possuem apenas reação e 73 apresentam os dois campos como \texttt{NA}. A diferença entre os números intermediários e finais decorre principalmente da expansão dos compostos associados a múltiplas classes químicas. O enriquecimento gênico, a filtragem de registros sem anotação e a remoção final de duplicatas completam a definição do arquivo público.
-
-A comparação com os caches KEGG encontrou correspondência direta para 1.527 dos 1.543 KOs e para 169 dos 384 compostos. Os 215 compostos sem correspondência direta nos links em nível de composto permaneceram conectados por suporte baseado em KO ou por pares curados. Esse resultado evidencia a dependência da curadoria para manter no banco substâncias regulatoriamente prioritárias que não possuem cobertura equivalente nas relações públicas consultadas.
+As predições do ToxCSM abrangeram 370 compostos, o que correspondeu a
+96,4\% do inventário. Os 14 compostos restantes não apresentaram predições no
+conjunto integrado.
 
 \subsection{Distribuição por classe química}
 
-As classes com maior número de compostos são aromáticos (n=123), clorados (n=117), compostos contendo nitrogênio (n=115), poliaromáticos (n=98) e alifáticos (n=94). As demais classes são metais (n=29), inorgânicos (n=26), compostos contendo enxofre (n=20), organofosforados (n=13), organometálicos (n=9), halogenados (n=8) e organossulfurados (n=1). Como um composto pode receber mais de uma classe, a soma das contagens supera 384.
+As maiores contagens foram registradas para compostos aromáticos, com
+123 compostos, clorados, com 117, e contendo nitrogênio, com 115.
+Os grupos poliaromático e alifático reuniram, respectivamente, 98 e
+94 compostos.
+
+As demais classes reuniram 29 metais, 26 compostos inorgânicos,
+20 compostos contendo enxofre, 13 organofosforados, nove organometálicos,
+oito halogenados e um organossulfurado. Como um composto pôde receber mais
+de uma classe, a soma dessas contagens superou os 384 compostos presentes no
+banco.
+
+A Figura~\ref{fig:c1-classes} apresenta a distribuição dos compostos entre as
+12 classes químicas.
 
 \begin{figure}[htbp]
 \centering
-\fbox{\parbox{0.75\textwidth}{\centering Gráfico de barras horizontais com as 12 classes químicas ordenadas pelo número de compostos únicos na release v1.1.0.\vspace{2em}}}
-\caption{Distribuição dos compostos prioritários do banco \biorempp{} v1.1.0 por classe química.}
+\fbox{
+    \parbox{0.75\textwidth}{
+        \centering
+        Gráfico de barras horizontais com as 12 classes químicas ordenadas
+        pelo número de compostos distintos na versão 1.1.0.
+        \vspace{2em}
+    }
+}
+\caption{Distribuição dos compostos prioritários do banco \biorempp{}
+v1.1.0 por classe química.}
 \label{fig:c1-classes}
 \end{figure}
 
 \subsection{Cobertura por referência institucional}
 
-A ATSDR contém 191 compostos do inventário (49,7\%). As demais frequências são IARC2B, com 130 compostos (33,9\%); PSL, com 99 (25,8\%); EPC, com 91 (23,7\%); WFD, com 84 (21,9\%); EPA, com 83 (21,6\%); IARC1, com 56 (14,6\%); CONAMA, com 43 (11,2\%); e IARC2A, com 29 (7,6\%). Os percentuais somam mais de 100\% porque um composto pode ocorrer em várias fontes.
+A ATSDR reuniu 191 compostos do inventário, correspondentes a 49,7\%.
+A categoria IARC2B incluiu 130 compostos, equivalentes a 33,9\%, enquanto a
+PSL incluiu 99, equivalentes a 25,8\%. EPC e WFD abrangeram, respectivamente,
+91 compostos (23,7\%) e 84 compostos (21,9\%).
+
+A EPA reuniu 83 compostos (21,6\%), seguida por IARC1, com 56 (14,6\%),
+CONAMA, com 43 (11,2\%), e IARC2A, com 29 (7,6\%). A soma dos percentuais
+superou 100\% porque um mesmo composto pôde ocorrer em mais de uma fonte
+institucional.
+
+A Figura~\ref{fig:c1-agencias} apresenta as sobreposições entre os nove
+códigos de \texttt{referenceAG}.
 
 \begin{figure}[htbp]
 \centering
-\fbox{\parbox{0.75\textwidth}{\centering Diagrama de sobreposição entre os nove códigos de \texttt{referenceAG}, com ênfase nas interseções entre fontes institucionais.\vspace{2em}}}
-\caption{Sobreposição de compostos entre as referências institucionais integradas no banco \biorempp{}.}
+\fbox{
+    \parbox{0.75\textwidth}{
+        \centering
+        Diagrama de sobreposição entre os nove códigos de
+        \texttt{referenceAG}, com as interseções entre as fontes
+        institucionais.
+        \vspace{2em}
+    }
+}
+\caption{Sobreposição de compostos entre as referências institucionais
+integradas ao banco \biorempp{}.}
 \label{fig:c1-agencias}
 \end{figure}
 
-\subsection{Famílias enzimáticas}
+\subsection{Distribuição dos descritores de atividade enzimática}
 
-A amplitude de cada família foi medida pelo número de compostos distintos associados. As maiores coberturas foram observadas para desidrogenases, com 106 compostos; dioxigenases, com 88; monooxigenases, com 74; redutases, com 53; e citocromos P450, com 35.
+A cobertura de cada descritor foi medida pelo número de compostos distintos
+associados. As desidrogenases apresentaram a maior cobertura, com
+106 compostos, seguidas por dioxigenases, com 88, monooxigenases, com 74,
+redutases, com 53, e citocromos P450, com 35.
 
-A ordenação muda quando a métrica é a frequência de linhas. Citocromo P450 aparece em 17.729 registros, seguido por dioxigenases (11.414), hidrolases (7.818), desidrogenases (6.813) e redutases (6.314). A primeira métrica descreve a diversidade de compostos cobertos. A segunda reflete a participação de cada família na expansão por KO, EC, reação, classe e referência institucional.
+A ordenação diferiu quando se considerou a frequência de linhas. Citocromo
+P450 ocorreu em 17.729 registros, seguido por dioxigenases, com 11.414,
+hidrolases, com 7.818, desidrogenases, com 6.813, e redutases, com 6.314.
+As duas métricas produziram, portanto, ordenações distintas para os
+descritores mais frequentes.
 
 \subsection{Métricas de validação}
 
-A camada KEGG-anchored classificou como justificadas todas as 3.111 linhas com pelo menos um valor ausente entre EC e reação. Nenhuma linha foi classificada como incorreta. A política de união sustentou as 120.432 linhas densas, e nenhuma permaneceu sem suporte pelos modelos admitidos.
+A validação com as relações KEGG examinou 3.111 linhas com pelo menos um valor
+ausente entre \texttt{ec} e \texttt{reaction}. Todas as ausências foram
+classificadas como justificadas, e nenhuma linha foi classificada como
+inconsistente.
 
-A execução do Great Expectations registrada em 28 de junho de 2026 aprovou os checkpoints crítico e de warning. O sumário registrou zero expectativas críticas falhas e zero expectativas de warning falhas (Tabela~\ref{tab:c1-validation-metrics}).
+O critério \texttt{policy\_union} sustentou as 120.432 linhas com número EC
+e reação preenchidos. O critério \texttt{strict5}, que exigiu concordância
+simultânea entre as cinco relações consultadas, sustentou 2,42\% dessas
+linhas.
+
+A validação estrutural executada em 28 de junho de 2026 aprovou as verificações
+críticas e de aviso. Nenhuma expectativa crítica ou de aviso apresentou
+falha. A Tabela~\ref{tab:c1-validation-metrics} resume os resultados das duas
+camadas.
 
 \begin{table}[htbp]
 \centering
-\caption{Métricas das duas camadas de validação da release v1.1.0.}
+\caption{Resultados das duas camadas de validação da versão 1.1.0.}
 \label{tab:c1-validation-metrics}
 \small
 \begin{tabular}{@{}ll@{}}
 \toprule
-\textbf{Métrica} & \textbf{Valor} \\
+\textbf{Métrica} & \textbf{Resultado} \\
 \midrule
-Linhas com \texttt{NA} em EC ou reação & 3.111 \\
-Ausências classificadas como justificadas & 3.111 \\
-Ausências classificadas como incorretas & 0 \\
-Linhas densas avaliadas & 120.432 \\
-\texttt{policy\_union} & 100,0\% \\
-\texttt{strict5} & 2,42\% \\
-Checkpoint crítico do GX & Aprovado \\
-Checkpoint de warning do GX & Aprovado \\
-Expectativas críticas falhas & 0 \\
-Expectativas de warning falhas & 0 \\
+Linhas com \texttt{NA} em EC ou reação
+& 3.111 \\
+
+Ausências justificadas
+& 3.111 \\
+
+Ausências inconsistentes
+& 0 \\
+
+Linhas com EC e reação avaliadas
+& 120.432 \\
+
+Suporte por \texttt{policy\_union}
+& 100,0\% \\
+
+Suporte por \texttt{strict5}
+& 2,42\% \\
+
+Verificações estruturais críticas
+& Aprovadas \\
+
+Verificações estruturais de aviso
+& Aprovadas \\
+
+Falhas críticas
+& 0 \\
+
+Falhas de aviso
+& 0 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Disponibilidade e licenciamento}
+\subsection{Disponibilidade dos recursos}
 
-O banco integrado v1.1.0 está depositado no Zenodo sob licença CC BY 4.0, com DOI \href{https://doi.org/10.5281/zenodo.18905195}{10.5281/zenodo.18905195}. O código do pipeline e do validador está disponível na organização BioRemPP no GitHub sob licença Apache 2.0. O depósito associa os arquivos públicos à versão do KEGG, aos artefatos analíticos e aos relatórios de validação usados na release.
+A versão 1.1.0 do banco está depositada no Zenodo sob licença CC BY 4.0,
+com DOI
+\href{https://doi.org/10.5281/zenodo.18905195}
+{10.5281/zenodo.18905195}. O código do pipeline e do validador está
+disponível nos repositórios da organização BioRemPP no GitHub sob licença
+Apache 2.0.
+
+O depósito reúne os arquivos públicos, os metadados da versão do KEGG e os
+relatórios de validação associados à versão publicada.
 
 % -----------------------------------------------------------------------------
-\section{Discussão específica do componente}
+\section{Discussão do componente}
 \label{sec:c1-discussao}
 % -----------------------------------------------------------------------------
 
-O recorte regulatório determina a função do banco. A incorporação de todos os compostos presentes no KEGG, HADEG ou ToxCSM produziria um inventário mais amplo, mas reduziria a relação direta com prioridades ambientais e sanitárias. O \biorempp{} mantém apenas os compostos associados às fontes institucionais selecionadas e registra essa proveniência no campo \texttt{referenceAG}. A sobreposição entre listas permanece acessível e pode ser usada como indicador de convergência entre jurisdições.
+O recorte institucional delimita o universo químico representado no banco. O
+\biorempp{} inclui compostos associados às fontes selecionadas de
+priorização, regulamentação ou classificação, em vez de incorporar todos os
+compostos disponíveis no KEGG, HADEG ou ToxCSM. Essa decisão mantém a relação
+entre o inventário químico e problemas ambientais ou sanitários documentados.
 
-O modelo em dois eixos preserva a forma de organização das fontes. A evidência funcional pode ser consultada por KO sem exigir que todo ortólogo tenha um composto único correspondente. A evidência toxicológica pode ser consultada por CPD sem reduzir os 31 endpoints a uma anotação gênica. Essa separação também permite que uma consulta iniciada por composto recupere KOs associados e que uma consulta iniciada por KO recupere o conjunto de compostos ligados ao mesmo registro core.
+A recorrência de um composto em diferentes fontes registra a sobreposição
+entre prioridades institucionais, mas não equivale a consenso regulatório.
+As fontes adotam finalidades, critérios de inclusão e contextos jurídicos
+distintos. O campo \texttt{referenceAG} preserva essas diferenças e permite
+identificar a origem institucional de cada associação.
 
-A expansão relacional mostra que a ligação direta em nível de composto permanece incompleta no KEGG. Apenas 169 dos 384 compostos apresentaram correspondência direta nos conjuntos de links em nível de CPD. A preservação dos 215 compostos restantes dependeu de suporte por KO ou de pares curados composto--KO. A curadoria evita excluir substâncias relevantes por uma limitação de cobertura da fonte funcional, mas cria uma dependência de manutenção manual que precisa ser reavaliada em releases futuras.
+A composição das fontes também introduz assimetria geográfica e institucional.
+O universo considerado concentra referências dos Estados Unidos, da Europa,
+do Canadá, do Brasil e da IARC. Compostos relevantes em outras jurisdições
+podem permanecer fora do banco quando não estão presentes nessas fontes.
+Portanto, a ausência de uma substância no \biorempp{} não indica baixa
+relevância ambiental fora do recorte adotado.
 
-Os seis estados de suporte tornam essa heterogeneidade observável. Linhas densas, parciais e sem suporte não são tratadas como equivalentes. Os campos \texttt{ec} e \texttt{reaction} registram a completude disponível no snapshot, e os relatórios de validação verificam se as ausências correspondem aos links recuperados. Essa política é preferível ao preenchimento inferido porque permite que o usuário diferencie uma relação confirmada de uma associação preservada por curadoria.
+A organização relacional baseada em KO e CPD preserva as unidades de
+observação das fontes integradas. Os identificadores KO conectam a tabela
+central às evidências funcionais do HADEG e do subconjunto KEGG Degradation.
+Os identificadores CPD mantêm a ligação com as predições toxicológicas
+organizadas por composto no ToxCSM.
 
-O schema denormalizado favorece o uso em ferramentas tabulares, mas exige interpretação adequada da cardinalidade. As 123.543 linhas representam a expansão de 384 compostos por classes, referências, KOs, números EC e reações. Contagens científicas em nível de entidade devem usar valores distintos. A publicação conjunta das estatísticas de compostos, KOs, enzimas e genes reduz o risco de interpretar o número bruto de linhas como tamanho do inventário químico.
+Essa separação evita impor uma correspondência unívoca entre composto e grupo
+de ortologia KEGG. Uma consulta iniciada por CPD pode recuperar os KOs
+associados ao composto, enquanto uma consulta iniciada por KO pode recuperar
+os compostos ligados à mesma função. As predições toxicológicas permanecem
+associadas à entidade química e não são convertidas em propriedades gênicas.
 
-A validação em duas camadas cobre propriedades que não podem ser avaliadas pelo mesmo mecanismo. O cache KEGG verifica a fidelidade das relações funcionais usadas na construção. O Great Expectations verifica o contrato do arquivo, a coerência dos artefatos derivados e a estabilidade em relação à baseline. A aprovação das duas camadas na release v1.1.0 mostra que o arquivo público reproduz as métricas declaradas e que as relações densas atendem à política de suporte definida pelo pipeline. A separação entre execução, proveniência e validação também aproxima o componente dos princípios de análise sustentável discutidos por~\citet{molder2025snakemake}.
+A cobertura do ToxCSM alcançou 370 dos 384 compostos na versão 1.1.0. Os
+14 compostos sem predição retornada pelo ToxCSM limitam comparações toxicológicas completas para
+todo o inventário, mas permanecem disponíveis nas análises funcionais e
+institucionais. Essa diferença reforça a necessidade de interpretar
+separadamente a cobertura de cada fonte integrada.
 
-A baseline de regressão precisa ser atualizada de forma controlada quando uma mudança intencional altera as métricas da release. A igualdade com uma versão anterior não deve impedir correções ou expansão do banco. Seu papel é tornar a mudança explícita e exigir revisão antes que o novo perfil analítico seja aceito como referência.
+A expansão relacional também mostrou diferenças entre a cobertura por KO e
+por composto no KEGG. Na versão 1.1.0, 1.527 dos 1.543 KOs apresentaram
+correspondência nas relações consultadas, enquanto apenas 169 dos
+384 compostos apresentaram correspondência direta em nível de CPD. Os
+215 compostos restantes permaneceram associados ao banco por relações
+baseadas em KO ou por pares composto--KO incorporados durante a curadoria.
 
-A tabela core sustenta os demais componentes do ecossistema. O \gls{dbx} usa o schema e os identificadores para navegação e consulta. O \gls{bws} usa as relações entre compostos e KOs para analisar dados submetidos pelo usuário. O \gls{cli} depende da estabilidade dos arquivos públicos para integrar o recurso a workflows externos. A reutilização desses componentes depende da manutenção coordenada do contrato de dados, do pipeline e dos relatórios de validação.
+A curadoria preservou substâncias prioritárias que não apresentaram cobertura
+direta nas relações em nível de composto. Esse procedimento amplia a
+representação do universo institucional, mas exige revisão periódica das
+associações curadas. Atualizações do KEGG podem acrescentar, alterar ou remover
+relações e modificar a necessidade de manutenção desses pares em versões
+posteriores.
+
+A ausência de uma relação nos links KEGG consultados não constitui evidência
+negativa sobre a capacidade de degradação de um composto. Ela pode refletir
+falta de anotação, ausência de mapeamento entre identificadores ou cobertura
+incompleta da versão consultada. Por isso, registros classificados como
+\texttt{unsupported} indicam ausência de suporte nas relações avaliadas, e
+não ausência de evidência biológica em outras fontes.
+
+Os seis estados de suporte registram essa diferença de completude. Os estados
+densos representam associações com número EC e reação preenchidos, enquanto
+os estados parciais preservam relações sustentadas por apenas um desses
+campos. O estado sem suporte mantém a associação curada entre composto e KO
+sem acrescentar uma transformação enzimática não sustentada pelas relações
+consultadas.
+
+A nulabilidade de \texttt{ec}, \texttt{reaction} e
+\texttt{reaction\_description} preserva essa distinção no arquivo público. O
+preenchimento inferido desses campos aumentaria artificialmente a completude
+da tabela e impediria diferenciar relações recuperadas de associações
+mantidas por curadoria. Os valores ausentes fazem parte do modelo de evidência
+e não representam, por si só, falhas de processamento.
+
+A estrutura denormalizada facilita o uso do banco em ferramentas tabulares,
+mas exige que as contagens sejam interpretadas segundo a entidade analisada.
+As 123.543 linhas resultam da combinação entre compostos, classes químicas,
+referências institucionais, KOs, números EC e reações. Esse total não
+corresponde ao número de compostos nem ao número de funções distintas.
+
+A repetição de um identificador pode resultar de sua associação a diferentes
+classes, referências ou transformações enzimáticas. Por isso, análises em
+nível de composto, KO, número EC ou reação devem usar cardinalidades
+distintas. A publicação dessas contagens junto ao banco reduz o risco de
+interpretar o número de linhas como medida do tamanho do inventário químico.
+
+As duas camadas de validação verificam propriedades diferentes da versão
+produzida. A validação com o conjunto versionado de relações KEGG examina a
+consistência das associações funcionais e dos valores ausentes. A validação
+estrutural verifica o esquema de dados, os identificadores, os vocabulários
+controlados e a correspondência entre o CSV e as métricas calculadas pelo
+pipeline.
+
+A aprovação das duas camadas na versão 1.1.0 indica que o arquivo atendeu aos
+critérios estruturais e relacionais definidos para essa execução. Esse
+resultado não demonstra que todas as relações biologicamente possíveis estão
+representadas, pois a avaliação permanece limitada pela cobertura das fontes
+consultadas e pelas regras de construção adotadas.
+
+A comparação com uma versão de referência (\textit{baseline}) funciona como
+controle de mudanças entre versões. Diferenças em métricas esperadas exigem
+revisão antes da publicação, mas não são tratadas automaticamente como erro.
+Quando uma correção ou expansão modifica o perfil do banco, a versão de
+referência deve ser atualizada após a avaliação das mudanças.
+
+A tabela central fornece as relações usadas pelos demais componentes do
+ecossistema. O \gls{dbx} permite navegar pelos compostos e identificadores
+funcionais, enquanto o \gls{bws} usa as associações entre compostos e KOs na
+análise de dados submetidos pelo usuário. O \gls{cli} permite consumir os
+arquivos em fluxos computacionais externos.
+
+A reutilização do banco por esses componentes depende da estabilidade do
+esquema de dados e do registro explícito das mudanças entre versões. Essa
+coordenação permite distinguir alterações decorrentes de atualizações das
+fontes externas de modificações introduzidas pelo pipeline ou pela curadoria.
