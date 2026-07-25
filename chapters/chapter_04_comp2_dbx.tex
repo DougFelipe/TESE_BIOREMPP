@@ -7,13 +7,71 @@
 \label{cap:comp2}
 
 % -----------------------------------------------------------------------------
-\section{Motivação do componente}
+\section{Motivação e escopo do componente}
 \label{sec:c2-motivacao}
 % -----------------------------------------------------------------------------
 
-O banco integrado descrito no Capítulo~\ref{cap:comp1} é publicado como conjunto de arquivos CSV/XLSX no Zenodo, formato adequado para consumo programático mas insuficiente para pesquisadores que desejam explorar a evidência sem escrever código. O \gls{dbx} responde a essa lacuna oferecendo uma interface web read-only para navegação da mesma evidência curada, organizada em torno das perspectivas de exploração mais frequentes no domínio de biorremediação: compostos, orthologs, vias, toxicidade e classes químicas.
+O banco integrado descrito no Capítulo~\ref{cap:comp1} é distribuído em
+arquivos CSV e XLSX associados a uma versão publicada. Esse formato preserva
+o conteúdo científico, permite sua reutilização programática e mantém o
+registro das entidades e relações incorporadas ao banco. Entretanto, a
+distribuição por arquivos não oferece, isoladamente, uma camada de consulta
+interativa.
 
-O \gls{dbx} é intencionalmente distinto do \gls{bws} (Capítulo~\ref{cap:comp3}): enquanto o \gls{bws} processa dados submetidos pelo usuário, o \gls{dbx} nunca aceita entrada; sua função é permitir que qualquer pesquisador acesse rapidamente a evidência integrada a partir de qualquer ponto de entrada científico, sem cadastro e sem qualquer barreira operacional.
+A exploração direta desses arquivos exige conhecimento prévio do esquema de
+dados e das relações entre compostos, KOs, números EC, reações, vias,
+referências institucionais e predições toxicológicas. A estrutura
+denormalizada também exige que o pesquisador diferencie o número de linhas das
+cardinalidades de cada entidade e reconstrua localmente associações
+muitos-para-muitos. Essas operações podem ser executadas em R, Python ou
+sistemas de banco de dados, mas dependem da escrita de código e da preparação
+do ambiente de análise.
+
+O \gls{dbx} fornece uma camada de acesso ao conteúdo integrado sem substituir
+os arquivos científicos publicados. A aplicação organiza a evidência em uma
+estrutura orientada à consulta e a disponibiliza por uma interface web. O
+usuário pode pesquisar entidades, aplicar filtros e percorrer relações entre
+compostos, grupos de ortologia KEGG, vias metabólicas, classes químicas,
+referências institucionais e predições toxicológicas sem reconstruir
+localmente as associações do banco.
+
+A navegação é centrada no composto porque as informações recuperadas pela
+interface convergem para as substâncias incluídas no universo institucional do
+BioRemPP. Essa organização não reduz todas as evidências a um único
+identificador. Os identificadores \gls{cpd} preservam a referência química e
+a ligação com as predições toxicológicas, enquanto os identificadores
+\gls{ko} conectam os compostos às anotações funcionais do HADEG e do
+subconjunto KEGG Degradation. CPD e KO permanecem, portanto, como entidades
+complementares de consulta.
+
+A aplicação disponibiliza módulos dedicados a compostos, classes químicas,
+genes e KOs, vias e toxicidade. Esses módulos permitem consultar registros
+individuais e percorrer entidades relacionadas. O componente também reúne
+oito análises guiadas que formalizam perguntas sobre amplitude de anotação
+funcional, toxicidade predita, classificação institucional e conectividade
+entre compostos, KOs e vias. Os filtros e parâmetros dessas análises tornam
+explícito o recorte aplicado a cada resultado.
+
+O \gls{dbx} não recebe conjuntos de dados do usuário para processamento. Sua
+função é consultar o acervo integrado e versionado. Essa característica o
+distingue do \gls{bws}, apresentado no Capítulo~\ref{cap:comp3}, que processa
+anotações funcionais submetidas pelo usuário para produzir perfis associados
+às amostras analisadas. O Database Explorer opera sobre um conjunto de
+referência previamente construído, enquanto o Web Service aplica as relações
+do BioRemPP a dados externos.
+
+O escopo do \gls{dbx} é exploratório. As associações exibidas representam
+registros curados, relações recuperadas de bases públicas e predições
+computacionais. Elas sustentam a formulação de hipóteses e a priorização de
+entidades para análises posteriores, mas não confirmam a degradação de um
+composto nem sua toxicidade em condições ambientais.
+
+A presença de uma substância em uma fonte institucional também não constitui
+avaliação jurídica ou determinação de risco para um local específico. Da
+mesma forma, a ausência de uma relação na interface pode refletir os limites
+de cobertura ou a versão das fontes integradas. A interpretação dos resultados
+deve considerar a proveniência, a natureza da evidência e os critérios usados
+na construção do banco.
 
 % -----------------------------------------------------------------------------
 \section{Arquitetura da aplicação}
