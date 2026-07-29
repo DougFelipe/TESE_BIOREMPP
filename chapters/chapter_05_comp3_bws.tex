@@ -561,7 +561,7 @@ representação. Quando a configuração estabelece filtros, limiares ou
 restrições de exibição, esses parâmetros permanecem associados à saída
 apresentada.
 
-\subsection{Módulos e famílias de análise}
+\subsection{Módulos de análise}
 
 Os 56 casos de uso estão distribuídos em oito módulos temáticos. A divisão
 considera a unidade predominante da análise e a relação examinada entre
@@ -666,7 +666,7 @@ de atividade enzimática. As análises utilizam contagens, cobertura contextual
 e distribuições por entidade para representar a composição funcional de cada
 amostra e comparar os perfis submetidos.
 
-Os módulos M3, M5 e M6 compõem a família de estrutura multivariada e
+Os módulos M3, M5 e M6 compõem as análises de estrutura multivariada e
 relacional. O M3 converte os perfis de presença e ausência em matrizes
 adequadas à análise de componentes principais, à correlação e ao agrupamento
 hierárquico. Essas operações descrevem proximidade, separação e coocorrência
@@ -683,7 +683,7 @@ de uso estabelecem sequências entre amostras, classes químicas, compostos,
 vias e funções anotadas. A largura dos fluxos ou o tamanho dos elementos
 hierárquicos deriva das contagens definidas para cada análise.
 
-O M7 constitui a família de contextualização toxicológica. O módulo utiliza os
+O M7 constitui a contextualização toxicológica. O módulo utiliza os
 CPDs recuperados na integração para selecionar os registros correspondentes
 no ToxCSM. Os casos de uso organizam os valores e as categorias por endpoint,
 composto e amostra, além de relacioná-los às anotações funcionais disponíveis.
@@ -993,9 +993,200 @@ Um manuscrito companheiro dedicado exclusivamente ao \gls{bws} está atualmente 
 \label{sec:c3-discussao}
 % -----------------------------------------------------------------------------
 
-O \gls{bws} atende a um perfil de usuário distinto tanto do \gls{dbx} quanto do \gls{cli} (Capítulo~\ref{cap:comp4}). Enquanto o \gls{dbx} serve pesquisadores que querem explorar o banco curado sem submeter dados próprios, e o \gls{cli} serve bioinformatas que operam em pipelines automatizados, o \gls{bws} atende o meio-termo: pesquisadores com dados próprios que preferem interface web a linha de comando.
+No ecossistema BioRemPP, o \gls{bws} ocupa a camada de análise interativa de
+dados fornecidos pelo usuário. O \gls{dbx} permite consultar as relações
+armazenadas no banco sem vinculá-las a uma entrada externa, enquanto o
+\gls{cli}, apresentado no Capítulo~\ref{cap:comp4}, incorpora as operações a
+fluxos computacionais automatizados. O \gls{bws} mantém a interação por
+interface web e acrescenta a amostra como unidade de organização dos
+resultados. Os três componentes utilizam a mesma base de conhecimento, mas
+atendem a formas distintas de consulta e execução.
 
-A cobertura dos oito módulos totalizando 56 casos de uso é notável em amplitude, mas deve ser avaliada em relação ao público. Uma limitação a reconhecer é que a granularidade fina de opções pode representar barreira cognitiva para usuários novos: o próprio módulo de Guided Analysis do \gls{dbx} (Seção~\ref{sec:c2-guided}) foi projetado em parte para oferecer entrada mais gentil quando o pesquisador ainda não sabe qual dos 56 casos de uso do \gls{bws} melhor responde à sua pergunta.
+Os resultados demonstrativos mostraram que os perfis de KO submetidos podem
+ser relacionados às informações funcionais, químicas, institucionais e
+toxicológicas do BioRemPP sem eliminar a identificação das amostras. Essa
+projeção não produz novas relações biológicas. Ela restringe o conteúdo do
+banco aos identificadores presentes na entrada e organiza as correspondências
+para comparação entre amostras. A contribuição do componente está nessa
+mudança de unidade analítica: as relações curadas deixam de ser examinadas
+apenas como propriedades do banco e passam a ser analisadas no contexto dos
+perfis fornecidos.
 
-\escrever{Adicionar parágrafo comparando o BWS com plataformas correlatas de análise funcional em bioinformática (MicrobiomeAnalyst, EnviPath, RemeDB) em termos de escopo analítico, complexidade de uso e integração com evidência regulatória.}
+As métricas ecológico-funcionais oferecem uma linguagem comum para comparar
+esses perfis. A riqueza de KOs descreve a amplitude do repertório funcional
+anotado, enquanto a riqueza e a cobertura de compostos descrevem o espaço
+químico associado às anotações. As medidas de cobertura de vias indicam a
+representação dos KOs de referência, e as métricas de similaridade e
+complementaridade organizam relações entre amostras. Essas medidas caracterizam
+a estrutura das anotações e não a intensidade dos processos biológicos. A
+ausência de informações sobre abundância, expressão e atividade impede que
+diferenças nas métricas sejam interpretadas diretamente como diferenças nas
+taxas de transformação dos compostos~\cite{prosser2015omics}.
+
+A separação entre riqueza de KOs e cobertura de compostos também evita assumir
+uma relação proporcional entre diversidade funcional e amplitude química. Um
+perfil com muitos KOs pode concentrar suas associações em um conjunto
+restrito de compostos, enquanto outro perfil com menos KOs pode abranger
+classes químicas complementares. Essa distinção é compatível com a
+desassociação observada entre composição taxonômica e organização funcional em
+comunidades microbianas~\cite{louca2018functionalredundancy}. No
+\gls{bws}, a comparação entre riqueza, cobertura e interseção explicita essa
+diferença sem atribuir atividade às funções anotadas.
+
+Os 56 casos de uso ampliam o número de perguntas que podem ser examinadas sem
+a elaboração de scripts adicionais. As análises abrangem descrições por
+amostra, comparações entre fontes, estrutura multivariada, redes, fluxos,
+predições toxicológicas e seleção de combinações candidatas. Essa amplitude
+também aumenta o número de decisões necessárias para selecionar o módulo, a
+métrica e os parâmetros compatíveis com a pergunta de pesquisa. A
+documentação individual dos casos e os limites interpretativos apresentados
+nos painéis integram, portanto, o procedimento analítico e não funcionam apenas
+como material auxiliar da interface.
+
+O módulo de análises guiadas do \gls{dbx} estabelece um contraste útil. Ele
+organiza um conjunto menor de perguntas aplicadas diretamente ao banco, sem
+dados submetidos pelo usuário. O \gls{bws} oferece um catálogo mais extenso,
+condicionado à composição das amostras e aos parâmetros definidos em cada
+execução. A diferença não representa uma progressão de complexidade entre os
+componentes, mas duas estratégias de interação: orientação por perguntas
+recorrentes no \gls{dbx} e seleção entre famílias analíticas no \gls{bws}.
+
+A definição declarativa dos casos de uso reduz a dispersão das regras entre os
+componentes da interface. Os arquivos YAML mantêm associados a pergunta, os
+dados exigidos, as transformações, os parâmetros, a estratégia visual e os
+limites de interpretação. Essa associação permite distinguir mudanças no
+procedimento analítico de alterações restritas à apresentação. O
+versionamento das configurações também fornece um registro verificável da
+análise executada.
+
+A configuração declarativa, entretanto, não garante isoladamente a
+reprodutibilidade. A repetição de um caso de uso requer a mesma entrada, as
+mesmas versões do software e das fontes, os mesmos parâmetros e os mesmos
+critérios de tratamento dos dados. A retenção temporária dos trabalhos torna a
+exportação dos arquivos e o registro dessas informações necessários para
+reproduções posteriores. As configurações versionadas e os artefatos
+exportáveis apoiam aspectos de reprodutibilidade e reutilização associados aos
+princípios FAIR, sem constituir uma avaliação formal de conformidade integral
+com esses princípios~\cite{wilkinson2016fair}.
+
+O escopo do \gls{bws} difere de plataformas web voltadas à análise geral de
+microbiomas. O MicrobiomeAnalyst~2.0 recebe dados brutos de amplicons, tabelas
+de contagem, perfis taxonômicos, dados metagenômicos e conjuntos pareados de
+microbioma e metabolômica. Seus módulos abrangem processamento inicial,
+análise estatística, predição funcional, integração multiômica e
+meta-análise~\cite{lu2023microbiomeanalyst}. O \gls{bws} adota um contrato de
+entrada mais restrito: os KOs já devem ter sido atribuídos antes da submissão.
+Essa restrição reduz o número de decisões relacionadas ao processamento das
+sequências, mas transfere a responsabilidade pela qualidade da anotação para
+as etapas anteriores do fluxo.
+
+A diferença entre as duas plataformas também aparece na especialização
+temática. O MicrobiomeAnalyst oferece métodos aplicáveis a diferentes
+domínios de pesquisa em microbiomas, enquanto o \gls{bws} restringe as
+análises às relações selecionadas para o contexto da biorremediação. O
+BioRemPP não substitui os métodos estatísticos e multiômicos disponíveis no
+MicrobiomeAnalyst. Ele acrescenta uma camada de interpretação orientada por
+compostos prioritários, vias de degradação, referências institucionais e
+predições toxicológicas.
+
+O enviPath ocupa outra posição nesse espaço de ferramentas. A plataforma
+organiza compostos, reações e vias de biotransformação de contaminantes e
+possui recursos para previsão de produtos e rotas a partir de regras de
+transformação química. Sua arquitetura também oferece acesso programático por
+API e representação em RDF~\cite{wicker2016envipath}. O \gls{bws} não prediz
+novas reações nem gera rotas de transformação a partir da estrutura química.
+Ele parte das funções anotadas nas amostras e recupera relações já
+representadas nas fontes integradas. As plataformas são complementares quanto
+à unidade principal: o enviPath parte do composto e de suas transformações,
+enquanto o \gls{bws} parte da amostra e de seus KOs.
+
+O RemeDB atua em uma etapa anterior à análise realizada pelo \gls{bws}. A
+ferramenta identifica sequências candidatas de enzimas associadas à degradação
+de hidrocarbonetos, corantes e plásticos em dados metagenômicos, usando uma
+base curada com mais de 30 mil sequências~\cite{subramanian2020remedb}. O
+\gls{bws}, em contraste, não realiza buscas diretamente sobre sequências. Ele
+recebe identificadores funcionais previamente obtidos e os utiliza para
+comparações entre amostras e para contextualização química, funcional e
+toxicológica. Um resultado produzido pelo RemeDB ou por outra ferramenta de
+anotação pode anteceder a preparação da entrada usada pelo serviço, desde que
+os identificadores sejam convertidos para o contrato baseado em KO.
+
+A comparação documental com MicrobiomeAnalyst, enviPath e RemeDB mostra que o
+diferencial do \gls{bws} não está na substituição de funções já atendidas por
+essas plataformas. Seu escopo específico combina perfis de KO por amostra com
+relações entre compostos, vias, descritores funcionais, referências
+institucionais e predições toxicológicas. Nos artigos que descrevem as três
+plataformas correlatas, esse encadeamento não constitui o eixo central das
+análises~\cite{lu2023microbiomeanalyst,wicker2016envipath,subramanian2020remedb}.
+A comparação indica uma diferença de escopo e não uma superioridade geral do
+BioRemPP.
+
+As análises multivariadas e relacionais exigem limites adicionais de
+interpretação. A PCA representa os principais eixos de variação da matriz
+utilizada, enquanto a correlação e o agrupamento descrevem proximidades entre
+os perfis. Essas operações não demonstram que as amostras pertencem à mesma
+guilda ecológica nem que compartilham uma interação metabólica. A atribuição
+de guildas funcionais requer a definição do espaço de características, da
+medida de similaridade e do procedimento de agrupamento, além de validação
+independente quando se pretende atribuir significado ecológico aos
+grupos~\cite{reynolds2023metabolicguilds}.
+
+As redes, os diagramas de cordas e os fluxos de Sankey representam relações
+presentes nas tabelas integradas. Uma aresta indica coanotação ou
+compartilhamento de uma entidade conforme a regra do caso de uso; ela não
+representa transferência de metabólitos, regulação ou interação bioquímica
+confirmada. A conectividade de um nó também não indica essencialidade ou
+controle de fluxo. Redes construídas a partir de coocorrência fornecem
+hipóteses sobre a organização dos dados, mas não resolvem, por si, a natureza
+mecanística das relações observadas~\cite{faust2012cooccurrence}.
+
+A contextualização toxicológica amplia as possibilidades de priorização, mas
+permanece dependente do endpoint. Os valores do ToxCSM correspondem a
+predições computacionais com definições e escalas próprias. A ordenação de
+compostos em um endpoint não pode ser transferida automaticamente para outro,
+e a combinação de valores em uma única medida exige justificativa específica.
+Os mapas de calor identificam padrões nas predições disponíveis; eles não
+substituem ensaios toxicológicos nem constituem uma avaliação formal de risco.
+
+As referências institucionais também funcionam como contexto documental. A
+presença de um composto em uma lista indica sua inclusão na versão da fonte
+integrada ao banco. Ela não demonstra que uma amostra atende a requisitos de
+remediação, não define a magnitude do risco e não substitui a consulta às
+normas vigentes. Como essas classificações podem mudar, a interpretação exige
+o registro da versão dos dados e da data de acesso às fontes oficiais.
+
+O módulo de seleção de combinações candidatas reduz o espaço de amostras a ser
+examinado em etapas posteriores. A estratégia usa a complementaridade entre os
+conjuntos de KOs, compostos ou vias para identificar combinações com maior
+cobertura do alvo definido. O resultado não constitui um consórcio
+experimentalmente validado. A seleção não avalia competição, coexistência,
+troca de metabólitos, expressão gênica, cinética ou estabilidade nas condições
+ambientais de interesse. Por isso, empregamos a expressão ``combinações
+candidatas orientadas por anotações'', em vez de ``consórcios funcionais
+otimizados''.
+
+A interpretação do componente permanece condicionada a quatro limitações
+principais. A primeira decorre da qualidade das anotações produzidas a
+montante. A segunda resulta da representação qualitativa por presença e
+ausência, que não incorpora abundância nem atividade. A terceira corresponde
+à cobertura e ao recorte temporal das fontes integradas. A quarta está
+relacionada ao catálogo predefinido de análises, que não contempla perguntas
+fora das transformações implementadas sem modificação do software ou uso do
+\gls{cli}.
+
+As verificações realizadas demonstraram o funcionamento dos fluxos avaliados,
+mas não constituem um estudo de usabilidade, acessibilidade ou desempenho sob
+carga concorrente. A amplitude do catálogo de casos de uso justifica uma
+avaliação futura com usuários dos diferentes perfis atendidos pelo ecossistema.
+Essa avaliação deve examinar a seleção das análises, a compreensão das
+métricas, a interpretação das visualizações e a recuperação dos parâmetros
+necessários à reprodução.
+
+O \gls{bws} converte perfis de KO por amostra em recortes comparáveis das
+relações integradas no BioRemPP. Sua contribuição consiste em reunir métodos
+descritivos, multivariados, relacionais e combinatórios em uma interface
+orientada ao domínio da biorremediação. Os resultados delimitam padrões de
+anotação, associações contextuais e combinações candidatas, mas permanecem
+como suporte à formulação de hipóteses e ao planejamento de validações
+experimentais posteriores.
 
