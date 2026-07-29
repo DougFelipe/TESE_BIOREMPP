@@ -7,13 +7,97 @@
 \label{cap:comp3}
 
 % -----------------------------------------------------------------------------
-\section{Motivação do componente}
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+\section{Motivação e escopo do componente}
 \label{sec:c3-motivacao}
 % -----------------------------------------------------------------------------
 
-O \gls{bws} responde a uma necessidade que o \gls{dbx} não atende: análise ativa contra dados do próprio usuário. Pesquisadores em biotecnologia ambiental frequentemente dispõem de perfis de anotação funcional derivados de sequenciamento (genoma, metagenoma, transcriptoma) e querem confrontá-los com o banco curado para inferir potencial de biorremediação, priorizar candidatos e projetar consórcios. Escrever código para essas análises impõe uma barreira que muitos pesquisadores de bancada não estão dispostos ou preparados a atravessar.
+Ferramentas de anotação funcional produzem conjuntos de grupos de ortologia
+KEGG associados a genomas, metagenomas e outros dados ômicos. Esses
+identificadores descrevem funções anotadas, mas sua interpretação no contexto
+da biorremediação depende da associação com compostos, vias, atividades
+enzimáticas e outras informações complementares. Quando a análise compreende
+múltiplas amostras, a origem de cada KO também precisa ser preservada durante
+o mapeamento e a comparação dos perfis funcionais.
 
-O \gls{bws} elimina essa barreira aceitando \gls{ko} profiles submetidos pelo usuário e processando-os através de oito módulos analíticos totalizando 56 casos de uso predefinidos, todos operando contra a mesma evidência integrada exposta pelo \gls{dbx}. O público-alvo é o pesquisador com dados próprios que quer aproveitar a curadoria \biorempp{} sem necessidade de programar.
+A execução dessas etapas por meio de scripts independentes exige a
+padronização dos arquivos, o relacionamento dos identificadores com diferentes
+fontes e a implementação das análises correspondentes. Esse processo dificulta
+a aplicação recorrente das associações integradas no BioRemPP a conjuntos de
+dados produzidos pelos usuários. O \gls{bws} atende a essa lacuna ao receber
+anotações funcionais previamente obtidas e organizá-las em um fluxo de análise
+orientado por amostras.
+
+O \gls{dbx} permite consultar diretamente as entidades e as relações
+armazenadas no banco BioRemPP, sem restringi-las a um conjunto de dados
+submetido. O \gls{bws} possui finalidade distinta. O serviço recebe conjuntos
+de KOs organizados por amostra e recupera as informações do banco associadas
+a esses identificadores. A amostra constitui, portanto, a unidade usada para
+organizar e comparar as relações encontradas.
+
+O serviço relaciona os KOs submetidos às informações funcionais e químicas
+integradas no BioRemPP. As relações recuperadas incluem compostos, vias,
+atividades enzimáticas e referências institucionais, além das predições
+toxicológicas disponíveis para os compostos correspondentes. Essa organização
+permite analisar os perfis funcionais das amostras no contexto das diferentes
+dimensões representadas no banco.
+
+Os casos de uso do \gls{bws} se fundamentam em métricas
+ecológico-funcionais derivadas dos conjuntos de KOs e das associações
+recuperadas. A riqueza de KOs representa o número de grupos de ortologia
+distintos presentes em uma amostra ou conjunto de amostras e descreve a
+amplitude do repertório funcional anotado.
+
+% \cite{armitage2012,arai2018,reynolds2023}
+
+A riqueza de compostos expressa o número de substâncias distintas associadas
+aos KOs de uma amostra. Quando a análise considera um conjunto químico
+previamente delimitado, a cobertura de compostos representa a parcela desse
+conjunto relacionada às anotações disponíveis. Essas medidas adaptam conceitos
+de diversidade química ao contexto das associações entre funções anotadas e
+compostos relevantes para biorremediação.
+
+% \cite{wetzel2020,petren2024}
+
+A cobertura de vias descreve a representação dos KOs associados a uma via no
+perfil funcional da amostra. As guildas metabólicas, por sua vez, organizam
+amostras que compartilham padrões de KOs, vias ou compostos, com base na
+semelhança funcional e não na proximidade taxonômica. Esses conceitos fornecem
+a base para análises de similaridade, agrupamento e complementaridade entre
+amostras.
+
+% \cite{arai2018,reynolds2023}
+% TODO: acrescentar referências específicas sobre cobertura funcional de vias.
+
+A complementaridade entre perfis também fundamenta os casos de uso voltados à
+seleção de combinações candidatas de amostras. Nesse contexto, a seleção
+considera a contribuição conjunta dos repertórios funcionais para ampliar a
+cobertura de KOs, compostos ou vias de interesse. A definição e a
+implementação dessas operações são apresentadas nas seções metodológicas
+seguintes.
+
+As consultas são distribuídas em oito módulos analíticos, que reúnem 56 casos
+de uso predefinidos. Os módulos abrangem comparação entre fontes,
+caracterização funcional por amostra, análise multivariada, relações entre
+entidades, contextualização toxicológica e seleção de combinações candidatas.
+Essa organização associa cada pergunta analítica aos dados, às métricas e à
+forma de apresentação correspondentes.
+
+O componente recebe KOs previamente atribuídos e não executa montagem,
+predição gênica ou anotação funcional de sequências. Leituras de
+sequenciamento, sequências nucleotídicas ou proteicas e dados de abundância ou
+expressão não constituem entradas diretas do serviço. As análises consideram
+a presença dos KOs em cada amostra, sem interpretar ocorrências repetidas como
+maior abundância ou atividade.
+
+O escopo do \gls{bws} compreende a análise exploratória de conjuntos de KOs
+organizados por amostra e sua associação com o conteúdo integrado no
+BioRemPP. As métricas descrevem riqueza, cobertura, similaridade e
+complementaridade das anotações disponíveis. O componente não estima
+expressão gênica, atividade enzimática, fluxo metabólico ou taxa de degradação,
+nem substitui a validação experimental ou a avaliação regulatória.
+
 
 % -----------------------------------------------------------------------------
 \section{Arquitetura upload-based}
