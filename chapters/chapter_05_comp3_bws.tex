@@ -205,6 +205,11 @@ operações analíticas e os contratos de acesso aos dados. Essa camada represen
 amostras, conjuntos funcionais e resultados analíticos sem depender da
 interface web ou das implementações usadas para carregar e armazenar os dados.
 
+A Figura~\ref{fig:c3-organizacao-logica} sintetiza essa organização em quatro
+camadas e evidencia a separação entre o núcleo analítico do domínio, a
+coordenação dos casos de uso, os adaptadores de infraestrutura e os
+componentes de apresentação que entregam os resultados ao usuário final.
+
 A camada de aplicação coordena o envio dos arquivos, a validação da entrada, a
 integração com as fontes, a execução dos casos de uso e a exportação dos
 resultados. Os serviços dessa camada recebem os dados provenientes da
@@ -218,6 +223,15 @@ configurações, o armazenamento temporário dos resultados e os mecanismos de
 cache utilizados durante a sessão. A camada de apresentação recebe as saídas
 da aplicação, organiza os oito módulos analíticos e processa as interações
 realizadas na interface.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/chapter_05/fig_05_01_logical_organization.png}
+\caption{Organização lógica da aplicação \gls{bws}. A separação entre domínio,
+aplicação, infraestrutura e apresentação organiza o fluxo desde a submissão
+dos arquivos de KOs até a entrega dos resultados analíticos na interface web.}
+\label{fig:c3-organizacao-logica}
+\end{figure}
 
 O serviço utiliza Python como linguagem principal. As transformações tabulares
 utilizam pandas e NumPy, enquanto operações estatísticas e multivariadas
@@ -487,6 +501,11 @@ operações definidas para o caso de uso. A figura e a tabela são atualizadas a
 partir do novo conjunto resultante, mantendo a identificação das amostras e os
 critérios aplicados à análise.
 
+A Figura~\ref{fig:c3-arquitetura} complementa essa descrição ao sintetizar o
+encadeamento entre submissão dos perfis \gls{ko}, validação de contrato,
+integração contra o banco curado, processamento server-side e apresentação dos
+resultados na página analítica.
+
 % -----------------------------------------------------------------------------
 \section{Arquitetura upload-based}
 \label{sec:c3-arquitetura}
@@ -496,8 +515,10 @@ critérios aplicados à análise.
 
 \begin{figure}[htbp]
 \centering
-\fbox{\parbox{0.85\textwidth}{\centering \todo{Figura 5.1 --- Diagrama de fluxo do BWS. Usuário $\rightarrow$ upload de arquivo KO $\rightarrow$ validação de contrato $\rightarrow$ merge contra banco integrado $\rightarrow$ processamento pelos módulos analíticos $\rightarrow$ apresentação de resultados. Anotar entradas e saídas de cada etapa.}\vspace{2em}}}
-\caption{Arquitetura upload-based do \gls{bws}. Perfis \gls{ko} submetidos pelo usuário são validados, integrados contra o banco curado e processados através de oito módulos analíticos.}
+\includegraphics[width=\textwidth]{figures/chapter_05/fig_05_02_upload_architecture.png}
+\caption{Arquitetura upload-based do \gls{bws}. Perfis \gls{ko} submetidos
+pelo usuário são validados, integrados contra o banco curado e processados
+através de oito módulos analíticos.}
 \label{fig:c3-arquitetura}
 \end{figure}
 
@@ -721,11 +742,9 @@ Essa consistência é auditável: perguntas exploratórias respondidas por naveg
 Os resultados demonstrativos derivaram de perfis funcionais de nove
 amostras-exemplo, representativas de bactérias, fungos e microalgas associados
 na literatura a processos de degradação de contaminantes ou a aplicações em
-biorremediação. Os grupos KO usados como entrada foram obtidos previamente por
-anotação funcional com o eggNOG-mapper v2.
-
-% \cite{cantalapiedra2021eggnogmapper}
-% \cite{dellanno2021bioremediation}
+biorremediação \cite{dellanno2021bioremediation}. Os grupos KO usados como
+entrada foram obtidos previamente por anotação funcional com o eggNOG-mapper
+v2 \cite{cantalapiedra2021eggnogmapper}.
 
 A seleção dessas amostras teve como finalidade demonstrar o fluxo de
 integração, a organização da página de resultados e as saídas dos módulos
