@@ -100,6 +100,394 @@ nem substitui a validação experimental ou a avaliação regulatória.
 
 
 % -----------------------------------------------------------------------------
+\section{Entrada e fluxo de processamento}
+\label{sec:c3-processamento}
+% -----------------------------------------------------------------------------
+
+O fluxo de processamento do \gls{bws} recebe conjuntos de KOs organizados por
+amostra, verifica a estrutura do arquivo e relaciona os identificadores às
+fontes integradas no ecossistema BioRemPP. O serviço mantém a identificação da
+amostra durante o mapeamento, organiza as correspondências por fonte e associa
+os dados processados a uma sessão temporária de análise.
+
+\subsection{Contrato de entrada e validação}
+
+O \gls{bws} recebe um arquivo de texto estruturado em blocos de amostras. Cada
+bloco começa com um cabeçalho precedido pelo caractere \texttt{>} e contém um
+KO por linha. O contrato de entrada aceita identificadores no padrão
+\texttt{K\#\#\#\#\#}, formado pela letra \texttt{K} seguida por cinco
+algarismos.
+
+O módulo de validação verifica a presença dos cabeçalhos, a associação dos KOs
+a uma amostra, a existência de pelo menos um identificador em cada bloco e a
+conformidade dos valores com o padrão estabelecido. A configuração do serviço
+também define limites para o tamanho do arquivo, o número de amostras e a
+quantidade de KOs. O fluxo interrompe o processamento quando a entrada não
+atende a essas condições.
+
+O serviço representa cada amostra por um conjunto de KOs presentes. Quando um
+identificador ocorre mais de uma vez no mesmo bloco, o módulo de validação
+consolida as ocorrências antes do mapeamento. Quando o mesmo KO ocorre em
+amostras distintas, o serviço mantém uma associação independente com cada
+amostra. A repetição de um identificador não constitui medida de abundância,
+expressão ou atividade funcional.
+
+\subsection{Integração por amostra e rastreabilidade}
+
+O módulo de integração compara os KOs validados por igualdade exata com os
+identificadores presentes nas fontes de referência. O procedimento não aplica
+correspondência aproximada, inferência por similaridade ou atribuição
+probabilística. A ausência de um identificador em uma fonte não interfere nas
+consultas realizadas às demais.
+
+O serviço consulta a tabela central BioRemPP, o subconjunto KEGG e o HADEG
+diretamente pelo KO. Cada consulta conserva os campos e a unidade de observação
+da respectiva fonte, sem combinar previamente conjuntos com escopos
+diferentes.
+
+A associação com o ToxCSM ocorre por CPD. O serviço recupera primeiro os
+compostos relacionados aos KOs na tabela central BioRemPP e usa esses
+identificadores no mapeamento dos endpoints toxicológicos. A recuperação das
+predições depende, portanto, da existência de uma relação entre KO e CPD no
+banco integrado.
+
+As junções preservam as relações multivaloradas registradas nas fontes. Um KO
+pode permanecer associado a diferentes compostos, vias, atividades
+enzimáticas ou referências institucionais, sem seleção de uma única
+correspondência representativa. Cada relação ocupa um registro próprio no
+conjunto derivado.
+
+O identificador da amostra acompanha todas as correspondências recuperadas.
+Essa chave mantém a origem dos KOs e sustenta as operações posteriores de
+agrupamento, comparação e análise entre amostras.
+
+\subsection{Organização, retenção e exportação dos resultados}
+
+O serviço organiza as correspondências em tabelas específicas para a tabela
+central BioRemPP, o subconjunto KEGG, o HADEG e o ToxCSM. Os conjuntos
+permanecem separados porque representam fontes e unidades de observação
+distintas. Todas as tabelas incluem o identificador da amostra usado no
+arquivo de entrada.
+
+A sessão de análise mantém as tabelas integradas e os dados derivados pelos
+casos de uso. Um identificador de trabalho (\textit{Job ID}) vincula a entrada,
+os resultados e os parâmetros da execução durante a janela de retenção
+configurada no serviço. Após esse período, o mecanismo de armazenamento
+temporário remove os arquivos e os dados associados ao trabalho.
+
+A interface disponibiliza para exportação as tabelas integradas e os conjuntos
+derivados pelas análises. Cada visualização permanece associada à tabela e aos
+parâmetros que determinaram sua geração, e pode ser exportada separadamente
+nos formatos fornecidos pelo serviço.
+
+A reprodução de uma análise requer a preservação do arquivo de entrada, das
+tabelas e figuras exportadas, dos parâmetros aplicados e das versões do
+\gls{bws} e dos dados BioRemPP. O \textit{Job ID} identifica o trabalho apenas
+durante a janela de retenção e não substitui o armazenamento externo desses
+artefatos.
+
+% -----------------------------------------------------------------------------
+\section{Arquitetura e configuração das análises}
+\label{sec:c3-arquitetura}
+% -----------------------------------------------------------------------------
+
+O \gls{bws} separa as regras analíticas, a coordenação dos fluxos, o acesso às
+fontes de dados e a interação com o usuário em quatro camadas. As definições
+dos casos de uso permanecem em arquivos YAML, enquanto as operações de
+processamento e as estratégias de visualização permanecem no código da
+aplicação. Essa organização mantém a configuração de cada análise separada da
+composição da interface.
+
+\subsection{Organização lógica da aplicação}
+
+A camada de domínio concentra as entidades, as regras de validação, as
+operações analíticas e os contratos de acesso aos dados. Essa camada representa
+amostras, conjuntos funcionais e resultados analíticos sem depender da
+interface web ou das implementações usadas para carregar e armazenar os dados.
+
+A camada de aplicação coordena o envio dos arquivos, a validação da entrada, a
+integração com as fontes, a execução dos casos de uso e a exportação dos
+resultados. Os serviços dessa camada recebem os dados provenientes da
+infraestrutura, aplicam as operações definidas para cada análise e entregam à
+camada de apresentação as estruturas necessárias para compor tabelas e
+visualizações.
+
+A camada de infraestrutura implementa o acesso à tabela central BioRemPP, ao
+subconjunto KEGG, ao HADEG e ao ToxCSM. Ela também concentra a leitura das
+configurações, o armazenamento temporário dos resultados e os mecanismos de
+cache utilizados durante a sessão. A camada de apresentação recebe as saídas
+da aplicação, organiza os oito módulos analíticos e processa as interações
+realizadas na interface.
+
+O serviço utiliza Python como linguagem principal. As transformações tabulares
+utilizam pandas e NumPy, enquanto operações estatísticas e multivariadas
+empregam funções do SciPy e do Scikit-learn. A interface utiliza Dash, as
+figuras são geradas com Plotly e as tabelas interativas utilizam componentes
+do Dash e do AG Grid. Os elementos necessários à execução são distribuídos em
+um ambiente conteinerizado.
+
+\subsection{Definição declarativa dos casos de uso}
+
+Cada caso de uso possui dois arquivos YAML associados pelo mesmo identificador.
+O arquivo de configuração analítica registra os dados necessários, as colunas
+obrigatórias, a sequência de transformações, os parâmetros de interação, a
+estratégia de visualização e as regras de validação. O arquivo de painel
+registra a pergunta analítica, a descrição da saída, os elementos representados
+na figura, as orientações de interpretação e as limitações específicas da
+análise.
+
+A configuração analítica define quais dados da sessão integram o caso de uso e
+quais operações incidem sobre esses dados. As etapas compreendem, conforme a
+pergunta, seleção de registros, agrupamento, contagem de entidades distintas,
+ordenação, aplicação de limiares, normalização e transformação de matrizes. A
+configuração também informa os parâmetros que o usuário pode modificar antes
+da execução.
+
+A estratégia de visualização permanece identificada no mesmo arquivo que
+define o processamento. A aplicação associa esse identificador à implementação
+em Python responsável pela geração da figura. O tipo de gráfico, as variáveis
+representadas e as opções de apresentação seguem a definição do caso de uso e
+não são determinados por inferência durante a execução.
+
+O arquivo de painel mantém o conteúdo interpretativo separado das operações
+computacionais. A pergunta, a descrição dos elementos visuais e os limites de
+interpretação podem ser revisados sem alteração das funções responsáveis pelo
+processamento. Da mesma forma, modificações na implementação da estratégia não
+exigem a incorporação do conteúdo científico ao código analítico.
+
+Cada configuração contém um identificador e uma versão. Os arquivos permanecem
+versionados com o código do \gls{bws}, o que vincula a pergunta, os parâmetros,
+as transformações e a apresentação à versão correspondente do software. A
+reprodução de um caso de uso requer a mesma configuração, a mesma versão das
+fontes e os mesmos parâmetros de entrada.
+
+A Tabela~\ref{tab:ap-c3-casos-de-uso}, apresentada no
+Apêndice~\ref{ap:c3-casos-de-uso}, detalha os 56 casos de uso do
+\gls{bws}. Para cada análise, a tabela informa o módulo correspondente, a
+pergunta analítica, os dados requeridos, as principais transformações, os
+parâmetros disponíveis, a estratégia de visualização e os limites de
+interpretação. Esse detalhamento complementa a organização por famílias
+analíticas apresentada neste capítulo sem reproduzir, no corpo do texto, a
+descrição individual de cada caso de uso.
+
+\subsection{Métodos de processamento de dados e visualização}
+
+Os casos de uso são executados sob demanda após a integração dos KOs
+submetidos com as fontes de referência. A página de resultados apresenta a
+organização dos módulos, mas cada análise é iniciada somente quando o usuário
+seleciona o caso de uso correspondente. Os casos operam de forma independente
+e não modificam as tabelas integradas mantidas na sessão.
+
+A configuração de cada caso de uso especifica os dados de entrada, as
+operações aplicadas e a estratégia de visualização. Os métodos abrangem
+normalização de identificadores, agregações, normalizações quantitativas,
+operações entre conjuntos, estatísticas descritivas, métodos multivariados,
+representações em rede e organização hierárquica. A
+Tabela~\ref{tab:c3-data-processing} sintetiza os métodos, sua implementação,
+seu papel analítico e os módulos nos quais são empregados.
+
+\begin{table*}[!p]
+\caption{Métodos de processamento de dados e visualização implementados no
+BioRemPP Web Service. A funcionalidade analítica está distribuída em oito
+módulos temáticos (M1--M8), que reúnem 56 casos de uso. Os métodos estão
+agrupados segundo sua função computacional, e as visualizações correspondem às
+estruturas produzidas em cada análise.}
+\label{tab:c3-data-processing}
+\scriptsize
+\centering
+\begin{tabularx}{\textwidth}{
+    @{}
+    p{1.75cm}
+    p{2.25cm}
+    p{2.65cm}
+    X
+    p{2.55cm}
+    p{1.15cm}
+    @{}
+}
+\toprule
+\textbf{Categoria}
+& \textbf{Método}
+& \textbf{Implementação}
+& \textbf{Função analítica}
+& \textbf{Visualização}
+& \textbf{Módulos} \\
+\midrule
+
+Pré-processamento
+& Deduplicação
+& Normalização dos identificadores
+& Consistência dos dados
+& Aplicação global
+& Todos \\
+
+\addlinespace[0.3em]
+
+Agregação
+& Contagem por grupo
+& Frequência de registros
+& Análise de coocorrência
+& Sankey, pontos e cordas
+& M2, M6, M7 \\
+
+Agregação
+& Contagem distinta por grupo
+& Cardinalidade de entidades distintas
+& Riqueza funcional
+& Mapa de calor, bolhas e radar
+& M1, M3--M8 \\
+
+Agregação
+& Soma por grupo
+& Totais acumulados
+& Síntese de valores toxicológicos
+& Mapa de árvore
+& M7 \\
+
+\addlinespace[0.3em]
+
+Normalização
+& Proporção (\%)
+& $n_i/N \times 100$
+& Distribuições relativas
+& Barras empilhadas
+& M1 \\
+
+Normalização
+& Completude contextual (\%)
+& $\lvert A \cap B\rvert/\lvert B\rvert \times 100$
+& Cálculo de cobertura
+& Mapa de calor com escores
+& M1, M8 \\
+
+Normalização
+& Escore Z
+& $(x-\mu)/\sigma$
+& Padronização das variáveis
+& Entrada da PCA
+& M3 \\
+
+\addlinespace[0.3em]
+
+Álgebra de conjuntos
+& Interseção e união
+& Operações entre conjuntos
+& Análise de sobreposição
+& UpSet e cordas
+& M1, M5, M8 \\
+
+Álgebra de conjuntos
+& Sobreposição par a par
+& $\lvert A \cap B\rvert$
+& Similaridade funcional
+& Correlograma
+& M3, M5 \\
+
+\addlinespace[0.3em]
+
+Otimização
+& Cobertura gulosa de conjuntos
+& Seleção iterativa
+& Seleção parcimoniosa de combinações candidatas
+& Visualização de cobertura
+& M8 \\
+
+\addlinespace[0.3em]
+
+Estatística
+& Correlação de Pearson
+& Matriz de correlação
+& Avaliação de similaridade
+& Correlograma
+& M3 \\
+
+Estatística
+& Quartis e intervalo interquartil
+& Métricas descritivas
+& Caracterização da distribuição
+& Diagrama de caixa e dispersão
+& M2, M7 \\
+
+Estatística
+& Estimativa de densidade por núcleo
+& Estimativa KDE
+& Distribuição dos escores
+& Gráfico de densidade
+& M7 \\
+
+\addlinespace[0.3em]
+
+Métodos não supervisionados
+& Análise de componentes principais
+& Projeção por SVD
+& Redução de dimensionalidade
+& Gráfico de dispersão
+& M3 \\
+
+Métodos não supervisionados
+& Agrupamento hierárquico
+& Ligação baseada em distâncias
+& Organização relacional
+& Dendrograma
+& M3 \\
+
+\addlinespace[0.3em]
+
+Redes
+& Grafo bipartido
+& Mapeamento entre entidades
+& Identificação de nós com maior conectividade
+& Disposição dirigida por forças
+& M5 \\
+
+\addlinespace[0.3em]
+
+Fluxos
+& Agregação de trajetórias
+& Agrupamento em múltiplos níveis
+& Fluxos entre categorias funcionais
+& Diagrama de Sankey
+& M6 \\
+
+\addlinespace[0.3em]
+
+Estruturas hierárquicas
+& Estrutura aninhada
+& Construção de árvores
+& Representação hierárquica
+& Treemap e sunburst
+& M4, M6, M7 \\
+
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+A execução de um caso de uso começa pela recuperação das tabelas indicadas em
+sua configuração. O serviço verifica a presença dos campos exigidos e aplica,
+na ordem definida, as operações de seleção, agrupamento, agregação,
+normalização ou transformação. O conjunto resultante é encaminhado à
+estratégia de visualização associada ao caso.
+
+A escolha da representação gráfica acompanha a estrutura da saída analítica.
+Contagens e ordenações são apresentadas por gráficos de barras, pontos ou
+bolhas. Distribuições utilizam gráficos de densidade e diagramas de caixa.
+Matrizes de associação utilizam mapas de calor e correlogramas. Relações entre
+conjuntos, entidades ou níveis hierárquicos são representadas por diagramas
+UpSet, redes, diagramas de cordas, Sankey, mapas de árvore ou diagramas
+radiais.
+
+A figura e a tabela de cada caso de uso derivam do mesmo conjunto
+transformado. A figura seleciona a representação definida na configuração,
+enquanto a tabela mantém os valores correspondentes às entidades exibidas.
+Quando o caso de uso estabelece um recorte por ordenação, limiar ou quantidade
+máxima de registros, o mesmo critério é aplicado aos dois elementos do painel.
+
+A alteração dos parâmetros disponíveis na interface aciona novamente as
+operações definidas para o caso de uso. A figura e a tabela são atualizadas a
+partir do novo conjunto resultante, mantendo a identificação das amostras e os
+critérios aplicados à análise.
+
+% -----------------------------------------------------------------------------
 \section{Arquitetura upload-based}
 \label{sec:c3-arquitetura}
 % -----------------------------------------------------------------------------
@@ -114,40 +502,205 @@ nem substitui a validação experimental ou a avaliação regulatória.
 \end{figure}
 
 % -----------------------------------------------------------------------------
-\section{Oito módulos analíticos e 56 casos de uso}
+\section{Organização dos módulos analíticos}
 \label{sec:c3-modulos}
 % -----------------------------------------------------------------------------
 
-\reaproveitar{Trazer do draft anterior a descrição dos oito módulos analíticos (Seções 3.3.3 e 4.2 do original), atualizando terminologia para consistência com esta versão da tese e removendo qualquer conteúdo que se refira ao web browsing (que agora pertence ao \gls{dbx}, Capítulo~\ref{cap:comp2}).}
+A página de resultados reúne as tabelas produzidas pela integração e os casos
+de uso aplicados aos conjuntos de KOs submetidos. A organização mantém
+separadas a inspeção dos registros recuperados e a execução das análises
+derivadas. Os oito módulos utilizam os mesmos dados integrados da sessão, mas
+cada caso de uso define sua própria unidade de análise, seus parâmetros e sua
+forma de apresentação.
 
-\escrever{Estruturar como oito subseções (5.3.1 a 5.3.8), uma por módulo, cada uma cobrindo: nome do módulo, pergunta que ele responde, tipos de entrada esperados, principais casos de uso oferecidos, tipo de output. Ao final, incluir tabela resumo.}
+\subsection{Estrutura da página de resultados}
 
-\subsection{Panorama geral}
+A página de resultados é composta por três blocos. O primeiro apresenta um
+resumo da entrada, com a identificação das amostras e dos KOs aceitos após a
+validação. O segundo disponibiliza as tabelas obtidas pelo mapeamento com a
+tabela central BioRemPP, o subconjunto KEGG, o HADEG e o ToxCSM. O terceiro
+organiza os 56 casos de uso nos oito módulos analíticos.
+
+As tabelas integradas preservam a identificação das amostras e os campos
+provenientes de cada fonte. Esses conjuntos constituem a base comum das
+análises e permanecem disponíveis para consulta e exportação durante a sessão.
+A separação por fonte mantém as respectivas unidades de observação e evita
+tratar como equivalentes registros produzidos por critérios distintos de
+curadoria.
+
+Os módulos são apresentados em seções expansíveis. Cada caso de uso ocupa um
+painel próprio, que reúne a pergunta analítica, os parâmetros disponíveis, a
+descrição dos elementos apresentados, a visualização e a tabela
+correspondente. A documentação específica do caso também informa os limites
+de interpretação associados à métrica e ao conjunto consultado.
+
+A execução ocorre sob demanda. A abertura da página não calcula
+antecipadamente os 56 casos de uso. O serviço inicia uma análise quando o
+usuário aciona o painel correspondente, recupera os dados indicados na
+configuração e aplica as transformações definidas para o caso.
+
+Os casos de uso não exigem uma ordem de execução. Uma análise não altera as
+tabelas integradas nem os dados utilizados pelas demais. Essa independência
+permite selecionar apenas os módulos relacionados à pergunta de pesquisa,
+mantendo a mesma entrada e as mesmas correspondências com as fontes de
+referência.
+
+Cada caso de uso produz uma figura interativa e uma tabela derivadas do mesmo
+conjunto transformado. A figura apresenta a estrutura visual definida para a
+análise, enquanto a tabela registra as entidades e os valores que sustentam a
+representação. Quando a configuração estabelece filtros, limiares ou
+restrições de exibição, esses parâmetros permanecem associados à saída
+apresentada.
+
+\subsection{Módulos e famílias de análise}
+
+Os 56 casos de uso estão distribuídos em oito módulos temáticos. A divisão
+considera a unidade predominante da análise e a relação examinada entre
+amostras, KOs, compostos, vias, referências institucionais e predições
+toxicológicas. A Tabela~\ref{tab:c3-modulos} apresenta a distribuição dos casos
+e o escopo metodológico de cada módulo.
 
 \begin{table*}[htbp]
 \centering
-\caption{Panorama dos oito módulos analíticos do \gls{bws} totalizando 56 casos de uso.}
+\caption{Módulos analíticos do BioRemPP Web Service e distribuição dos
+56 casos de uso.}
 \label{tab:c3-modulos}
 \small
-\begin{tabular}{@{}rlrp{6cm}@{}}
+\begin{tabularx}{\textwidth}{
+    @{}
+    p{0.75cm}
+    p{4.7cm}
+    p{0.9cm}
+    X
+    @{}
+}
 \toprule
-\textbf{\#} & \textbf{Módulo} & \textbf{UCs} & \textbf{Escopo analítico} \\
+\textbf{\#}
+& \textbf{Módulo}
+& \textbf{UCs}
+& \textbf{Escopo analítico} \\
 \midrule
-1 & \todo{Nome do módulo 1}                     & \todo{n} & \todo{Escopo} \\
-2 & \todo{Nome do módulo 2}                     & \todo{n} & \todo{Escopo} \\
-3 & \todo{Nome do módulo 3}                     & \todo{n} & \todo{Escopo} \\
-4 & \todo{Nome do módulo 4}                     & \todo{n} & \todo{Escopo} \\
-5 & \todo{Nome do módulo 5}                     & \todo{n} & \todo{Escopo} \\
-6 & \todo{Nome do módulo 6}                     & \todo{n} & \todo{Escopo} \\
-7 & \todo{Nome do módulo 7}                     & \todo{n} & \todo{Escopo} \\
-8 & \todo{Nome do módulo 8}                     & \todo{n} & \todo{Escopo} \\
+
+M1
+& Avaliação comparativa de fontes, amostras e referências institucionais
+& 6
+& Comparação da representação dos KOs e compostos entre fontes, amostras e
+conjuntos definidos por referências institucionais. \\
+
+M2
+& Caracterização exploratória das anotações
+& 5
+& Ordenação e descrição das amostras por riqueza de KOs, compostos e outras
+medidas derivadas das associações recuperadas. \\
+
+M3
+& Estrutura dos perfis: agrupamento, similaridade e coocorrência
+& 7
+& Análise multivariada e comparação dos perfis de presença e ausência entre
+amostras. \\
+
+M4
+& Perfil funcional e gênico
+& 13
+& Caracterização das relações entre amostras, KOs, símbolos gênicos,
+compostos, vias e descritores de atividade enzimática. \\
+
+M5
+& Modelagem das relações entre amostras, genes e compostos
+& 6
+& Representação das conexões e sobreposições entre entidades por redes,
+diagramas de cordas e operações entre conjuntos. \\
+
+M6
+& Análise funcional hierárquica e baseada em fluxos
+& 5
+& Organização das associações em estruturas hierárquicas e trajetórias entre
+amostras, classes químicas e funções anotadas. \\
+
+M7
+& Contextualização por predições toxicológicas
+& 7
+& Associação dos compostos recuperados aos endpoints do ToxCSM e descrição de
+sua distribuição entre amostras e categorias toxicológicas. \\
+
+M8
+& Seleção de combinações funcionais candidatas
+& 7
+& Avaliação da complementaridade entre amostras e seleção de combinações
+orientadas à cobertura de KOs, compostos ou vias de referência. \\
+
 \midrule
-\textbf{Total} & & \textbf{56} & \\
+\textbf{Total}
+&
+& \textbf{56}
+& \\
+
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table*}
 
-\todo{Preencher a tabela com os nomes reais dos oito módulos e a distribuição dos 56 casos de uso entre eles. Como esses módulos são o coração diferencial do BWS, vale a pena dedicar prosa técnica robusta a cada um.}
+Os módulos M1 e M2 formam a família de comparação e caracterização
+descritiva. O M1 compara as correspondências recuperadas nas diferentes
+fontes e examina interseções entre amostras, bancos e conjuntos
+institucionais. Suas operações utilizam contagens distintas, proporções,
+interseções e uniões para descrever concordâncias e diferenças de cobertura.
+
+O M2 organiza as amostras segundo medidas de riqueza e distribuição das
+anotações. Os casos de uso consideram o número de KOs, compostos ou outras
+entidades distintas relacionadas a cada amostra. As ordenações e os resumos
+descritivos fornecem recortes para comparação, sem incorporar abundância,
+expressão ou atividade às contagens.
+
+O M4 concentra a família de perfil funcional. Seus casos de uso relacionam os
+KOs das amostras a símbolos gênicos, compostos, vias, números EC e descritores
+de atividade enzimática. As análises utilizam contagens, cobertura contextual
+e distribuições por entidade para representar a composição funcional de cada
+amostra e comparar os perfis submetidos.
+
+Os módulos M3, M5 e M6 compõem a família de estrutura multivariada e
+relacional. O M3 converte os perfis de presença e ausência em matrizes
+adequadas à análise de componentes principais, à correlação e ao agrupamento
+hierárquico. Essas operações descrevem proximidade, separação e coocorrência
+entre os conjuntos funcionais das amostras.
+
+O M5 representa relações entre amostras, KOs, genes e compostos por operações
+de sobreposição e estruturas em rede. Os nós correspondem às entidades
+definidas pelo caso de uso, e as arestas representam relações presentes nas
+tabelas integradas. A construção das redes não acrescenta interações
+bioquímicas além das associações registradas nas fontes.
+
+O M6 organiza as relações em níveis hierárquicos ou fluxos agregados. Os casos
+de uso estabelecem sequências entre amostras, classes químicas, compostos,
+vias e funções anotadas. A largura dos fluxos ou o tamanho dos elementos
+hierárquicos deriva das contagens definidas para cada análise.
+
+O M7 constitui a família de contextualização toxicológica. O módulo utiliza os
+CPDs recuperados na integração para selecionar os registros correspondentes
+no ToxCSM. Os casos de uso organizam os valores e as categorias por endpoint,
+composto e amostra, além de relacioná-los às anotações funcionais disponíveis.
+Cada análise mantém identificado o endpoint utilizado, pois as variáveis
+toxicológicas possuem definições e escalas próprias.
+
+O M8 reúne os casos de uso voltados à complementaridade e à seleção de
+combinações candidatas. As amostras são representadas pelos conjuntos de KOs,
+compostos ou vias associados aos seus perfis. As análises comparam
+interseções, elementos exclusivos e cobertura conjunta e aplicam a estratégia
+de seleção definida para reduzir o número de amostras necessário ao recorte
+considerado.
+
+A cobertura funcional utilizada no M8 corresponde à proporção das unidades de
+referência representadas pelos KOs das amostras. O cálculo considera os
+conjuntos definidos para cada caso de uso e não incorpora a ordem das reações,
+a estequiometria, a regulação ou o fluxo metabólico. As combinações
+selecionadas constituem candidatos definidos pela complementaridade das
+anotações.
+
+Os oito módulos permanecem vinculados ao mesmo modelo de entrada e ao mesmo
+processo de integração. As diferenças entre os casos de uso decorrem das
+entidades selecionadas, das transformações aplicadas e da estratégia usada
+para representar os resultados. A descrição individual das perguntas, dos
+parâmetros e das saídas dos 56 casos de uso permanece na documentação oficial
+do \gls{bws}.
 
 
 
@@ -165,7 +718,261 @@ Essa consistência é auditável: perguntas exploratórias respondidas por naveg
 \label{sec:c3-resultados}
 % -----------------------------------------------------------------------------
 
-\escrever{Reunir aqui: (i) screenshot da interface principal do BWS mostrando o fluxo de submissão; (ii) exemplo de output para pelo menos dois módulos representativos; (iii) discussão de escalabilidade (tamanho máximo de upload aceito, tempo típico de execução).}
+Os resultados demonstrativos derivaram de perfis funcionais de nove
+amostras-exemplo, representativas de bactérias, fungos e microalgas associados
+na literatura a processos de degradação de contaminantes ou a aplicações em
+biorremediação. Os grupos KO usados como entrada foram obtidos previamente por
+anotação funcional com o eggNOG-mapper v2.
+
+% \cite{cantalapiedra2021eggnogmapper}
+% \cite{dellanno2021bioremediation}
+
+A seleção dessas amostras teve como finalidade demonstrar o fluxo de
+integração, a organização da página de resultados e as saídas dos módulos
+analíticos. O conjunto não constituiu um benchmark de acurácia preditiva nem
+uma comparação experimental da capacidade de degradação entre os organismos.
+
+\subsection{Integração e apresentação dos dados demonstrativos}
+
+A Figura~\ref{fig:architecture} reúne a arquitetura dos dados de referência e
+os resultados iniciais da integração das amostras-exemplo. O painel A apresenta
+a relação da tabela central BioRemPP com o HADEG, o subconjunto KEGG
+Degradation e o ToxCSM. O painel B mostra as interseções de KOs entre as três
+fontes indexadas por identificadores funcionais.
+
+O painel C apresenta a página de tabelas integradas do \gls{bws}. Na execução
+demonstrativa, a interface registra nove amostras, 23.644 registros de KO,
+17.501 relações recuperadas e correspondências nas quatro fontes consultadas.
+O mesmo painel apresenta as contribuições de cada fonte e os resumos
+correspondentes à tabela central BioRemPP.
+
+O painel D apresenta a cobertura de compostos por amostra e código de
+referência institucional. Cada célula corresponde à proporção do conjunto de
+compostos da referência que possui associação com os KOs da amostra. O painel
+E apresenta as interseções entre os conjuntos de compostos vinculados aos
+códigos institucionais.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{Slide1.JPG}
+\caption{\textbf{Arquitetura de dados do BioRemPP e integração com referências
+institucionais.}
+(\textbf{A}) Representação esquemática da arquitetura de dados. A tabela
+central BioRemPP relaciona-se ao HADEG, ao subconjunto KEGG Degradation e ao
+ToxCSM por mapeamentos baseados em KO e CPD.
+(\textbf{B}) Diagrama UpSet da distribuição dos KOs entre as fontes. As
+alturas das barras representam as cardinalidades das interseções e distinguem
+os subconjuntos exclusivos e compartilhados.
+(\textbf{C}) Página de tabelas integradas do \gls{bws}. O painel apresenta o
+número de amostras, os registros de KO processados, o tempo registrado, as
+relações recuperadas e a contribuição de cada fonte.
+(\textbf{D}) Mapa de calor da cobertura de compostos por amostra e código de
+referência institucional. A intensidade representa o percentual do conjunto
+de referência associado aos KOs de cada amostra.
+(\textbf{E}) Diagrama UpSet das interseções de compostos entre os códigos de
+referência institucional. As barras verticais representam as interseções e as
+barras horizontais, o número total de compostos por código.}
+\label{fig:architecture}
+\end{figure}
+
+As tabelas correspondentes ao BioRemPP, ao KEGG Degradation, ao HADEG e ao
+ToxCSM ficaram disponíveis na sessão demonstrativa. Os registros conservaram
+a identificação das amostras e puderam ser consultados, filtrados e
+exportados nos formatos oferecidos pela interface.
+
+\subsection{Caracterização dos perfis funcionais}
+
+A Figura~\ref{fig:clustering} reúne saídas representativas dos módulos de
+caracterização, análise multivariada e perfil funcional. O painel A apresenta
+a ordenação das nove amostras pela contagem de KOs distintos. A seleção da
+fonte de referência e o intervalo de contagens permanecem disponíveis como
+parâmetros da visualização.
+
+Os painéis B a D apresentam três representações da estrutura dos perfis de
+presença e ausência de KOs. O painel B projeta as amostras nos dois primeiros
+componentes da análise de componentes principais. O painel C mostra a matriz
+de correlação de Pearson entre os perfis funcionais. O painel D apresenta o
+dendrograma obtido pelo agrupamento hierárquico.
+
+O painel E apresenta as associações entre amostras, compostos e KOs. Cada
+ponto corresponde a um par amostra--composto, e seu tamanho e sua escala visual
+representam a quantidade de KOs distintos associados. O painel F apresenta os
+símbolos gênicos vinculados aos KOs de cada amostra.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{\detokenize{Slide1(1).JPG}}
+\caption{\textbf{Ordenação exploratória, agrupamento e caracterização dos
+perfis de KO por amostra.}
+(\textbf{A}) Gráfico de barras com a ordenação das amostras pela riqueza
+funcional, definida pela contagem de KOs distintos. A interface apresenta a
+seleção da fonte e o filtro por intervalo de contagens.
+(\textbf{B}) Projeção por análise de componentes principais da matriz binária
+de presença e ausência de KOs. Cada ponto representa uma amostra, e os eixos
+informam a variância explicada pelos componentes.
+(\textbf{C}) Mapa de calor da correlação de Pearson entre os perfis
+funcionais das amostras.
+(\textbf{D}) Dendrograma do agrupamento hierárquico das amostras segundo a
+distância entre os perfis de KO.
+(\textbf{E}) Gráfico de bolhas das associações entre compostos e KOs. O
+tamanho e a escala visual representam a quantidade de KOs distintos por
+amostra e composto.
+(\textbf{F}) Inventário de símbolos gênicos associados aos KOs de cada
+amostra. Cada ponto indica a presença da anotação correspondente.}
+\label{fig:clustering}
+\end{figure}
+
+As saídas demonstrativas abrangeram ordenação por riqueza de KOs, redução de
+dimensionalidade, correlação, agrupamento hierárquico e detalhamento das
+associações funcionais. Essas representações usaram os mesmos conjuntos de
+presença e ausência produzidos pela integração das nove amostras.
+
+\subsection{Relações entre amostras, genes e compostos}
+
+A Figura~\ref{fig:networks} reúne as representações relacionais aplicadas aos
+dados demonstrativos. O painel A apresenta um diagrama de cordas entre as
+amostras e as classes químicas associadas aos seus KOs. Os segmentos
+identificam as entidades e a largura das faixas representa a frequência das
+associações.
+
+O painel B apresenta uma rede de coanotação no nível dos símbolos gênicos. Os
+nós correspondem aos símbolos recuperados, as arestas representam relações
+compartilhadas e a escala visual indica o número de conexões de cada nó.
+
+O painel C apresenta um diagrama de Sankey organizado em três níveis. As
+colunas correspondem às amostras, às classes químicas e aos descritores de
+atividade enzimática. A largura dos fluxos representa a frequência das
+relações entre os níveis adjacentes.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{\detokenize{Slide1(2).JPG}}
+\caption{\textbf{Representações relacionais e análise de fluxos das
+anotações funcionais.}
+(\textbf{A}) Diagrama de cordas das associações entre amostras e classes
+químicas. Os segmentos representam as entidades e a largura das faixas
+corresponde à frequência das associações.
+(\textbf{B}) Rede de coanotação no nível dos símbolos gênicos. Os nós
+representam as anotações, as arestas representam relações compartilhadas e a
+escala visual indica o número de conexões.
+(\textbf{C}) Diagrama de Sankey das relações entre amostras, classes químicas
+e descritores de atividade enzimática. A largura dos fluxos é proporcional à
+frequência das associações agregadas.}
+\label{fig:networks}
+\end{figure}
+
+As três representações conservaram a identificação das amostras e usaram as
+relações recuperadas pela integração. As redes e os fluxos corresponderam às
+associações registradas nas tabelas de referência, sem inclusão de interações
+bioquímicas adicionais.
+
+\subsection{Contextualização toxicológica e combinações candidatas}
+
+A Figura~\ref{fig:toxicity} reúne saídas dos módulos de contextualização
+toxicológica e seleção de combinações candidatas. O painel A apresenta os
+valores preditos do ToxCSM por composto e endpoint. As colunas estão agrupadas
+nas categorias de resposta nuclear, resposta ao estresse, toxicidade genômica,
+ambiental e em órgãos.
+
+O painel B relaciona os compostos priorizados pelos valores toxicológicos
+preditos às anotações funcionais das amostras. Cada célula apresenta a
+quantidade de símbolos gênicos distintos associada ao par
+amostra--composto.
+
+O painel C apresenta as combinações de amostras selecionadas pelo procedimento
+de cobertura mínima. As colunas identificam os grupos candidatos, enquanto os
+pontos representam os compostos e a quantidade de KOs distintos associados.
+
+O painel D apresenta a cobertura contextual por amostra e classe química. Cada
+célula corresponde à proporção dos KOs de referência representada no perfil
+funcional da amostra.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{Fig4.JPG}
+\caption{\textbf{Predições toxicológicas e seleção de combinações funcionais
+candidatas.}
+(\textbf{A}) Mapa de calor do perfil toxicológico predito. Os compostos são
+apresentados nas linhas e os endpoints nas colunas, agrupados nas categorias
+de resposta nuclear, resposta ao estresse, toxicidade genômica, ambiental e
+em órgãos. A intensidade representa o valor predito.
+(\textbf{B}) Mapa de calor que relaciona compostos priorizados por valores
+toxicológicos preditos às contagens de símbolos gênicos por amostra. A
+intensidade representa a quantidade de anotações distintas em cada par.
+(\textbf{C}) Resultado da seleção de cobertura mínima para combinações
+candidatas de amostras. As colunas representam os grupos selecionados, e a
+escala dos pontos indica o número de KOs distintos associados aos compostos.
+(\textbf{D}) Mapa de calor da cobertura contextual. As linhas representam as
+amostras, as colunas representam as classes químicas e a intensidade
+corresponde à proporção dos KOs de referência representados no perfil.}
+\label{fig:toxicity}
+\end{figure}
+
+Os resultados demonstrativos contemplaram as oito categorias de análise
+definidas para o \gls{bws}. As figuras selecionadas representam parte dos 56
+casos de uso, enquanto as saídas individuais permanecem descritas na
+documentação oficial do serviço.
+
+\subsection{Perfil computacional e limites operacionais}
+
+Na configuração avaliada, o limite de entrada correspondeu a 5~MB por arquivo,
+100 amostras por submissão, 10.000 KOs por amostra e 500.000 identificadores
+no conjunto total. Entradas acima desses valores foram rejeitadas antes do
+mapeamento.
+
+O perfil computacional registrou cinco etapas da aplicação. As execuções
+totalizaram 12,50~s, e os picos de memória variaram entre 3,3 e 38,4~MB. A
+Tabela~\ref{tab:c3-computational-profile} apresenta os valores por etapa.
+
+\begin{table}[htbp]
+\centering
+\caption{Perfil computacional de referência do BioRemPP Web Service.}
+\label{tab:c3-computational-profile}
+\small
+\begin{tabularx}{\textwidth}{@{}Xrr@{}}
+\toprule
+\textbf{Etapa avaliada}
+& \textbf{Tempo (s)}
+& \textbf{Pico de memória (MB)} \\
+\midrule
+
+Carregamento das fontes de referência
+& 2,884
+& 38,4 \\
+
+Operações centrais do BioRemPP
+& 0,270
+& 6,3 \\
+
+Serialização das saídas
+& 2,313
+& 8,1 \\
+
+Exportação em múltiplos formatos
+& 2,664
+& 3,3 \\
+
+Normalização e transformação dos dados
+& 4,367
+& 36,7 \\
+
+\midrule
+\textbf{Total do perfil}
+& \textbf{12,50}
+& --- \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+O maior tempo ocorreu na etapa de normalização e transformação, com
+4,367~s. O carregamento das fontes registrou 2,884~s e o maior pico de memória,
+38,4~MB. As operações centrais registraram o menor tempo, com 0,270~s.
+
+Os valores da Tabela~\ref{tab:c3-computational-profile} correspondem ao
+ambiente e aos alvos definidos para o perfil de referência. A avaliação não
+incluiu submissões concorrentes, variação da latência de rede ou ensaios
+prolongados de carga.
 
 % -----------------------------------------------------------------------------
 \section{Status editorial}
