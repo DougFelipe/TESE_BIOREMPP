@@ -1,0 +1,212 @@
+\chapter{Catálogo de casos de uso do BioRemPP Web Service}
+\label{ap:c3-casos-de-uso}
+
+Este apêndice organiza os 56 casos de uso do \gls{bws} em oito tabelas, uma
+por módulo analítico. As colunas sintetizam a pergunta analítica, a descrição
+resumida da análise, o tipo de gráfico e as saídas primárias declaradas na
+documentação de cada caso de uso.
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\bwsusecaseheader}{\toprule \textbf{UC} &
+\textbf{Pergunta analítica} & \textbf{Descrição resumida} &
+\textbf{Visualization} & \textbf{Saídas primárias} \\ \midrule}
+
+\section{M1 -- Avaliação comparativa de fontes, amostras e referências institucionais}
+\begin{landscape}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{L{1.1cm} L{5.0cm} L{7.8cm} L{4.2cm} L{5.3cm}}
+\caption{Casos de uso do M1 do BioRemPP Web Service.}\label{tab:ap-c3-m1}\\
+\bwsusecaseheader
+\endfirsthead
+\caption[]{Casos de uso do M1 do BioRemPP Web Service (continuação).}\\
+\bwsusecaseheader
+\endhead
+\bottomrule
+\endfoot
+UC-1.1 & Em que medida as anotações funcionais de diferentes bancos concordam entre si e quais contribuições exclusivas cada fonte oferece para a análise focada em biorremediação? & Quantifica a sobreposição e a exclusividade de identificadores KO entre BioRemPP, HADEG e KEGG, contrastando sinal consensual e cobertura específica de cada fonte. & UpSet plot & Cardinalidades das interseções e visualização UpSet. \\
+UC-1.2 & Em que medida as listas de compostos monitorados por diferentes agências ambientais se sobrepõem e quais compostos aparecem em múltiplas listas regulatórias? & Quantifica a sobreposição e a exclusividade de compostos entre as referências regulatórias representadas no BioRemPP, destacando alvos compartilhados e específicos por agência. & UpSet plot & Cardinalidades das interseções de compostos entre agências regulatórias. \\
+UC-1.3 & Qual é a representação proporcional dos KOs associados a cada agência regulatória dentro da diversidade total de KOs únicos observada no conjunto? & Particiona o conjunto global de KOs únicos por contexto regulatório e quantifica quanto da diversidade funcional anotada se associa a cada agência. & Stacked bar chart & Contribuição proporcional de KOs únicos por agência regulatória. \\
+UC-1.4 & Qual é a largura relativa de anotações KO de cada amostra biológica em relação ao conjunto total de KOs únicos observado no conjunto? & Decompõe o conjunto global de KOs únicos em contribuições por amostra e compara a amplitude relativa das anotações KO entre as amostras. & Stacked bar chart & Contribuição proporcional de KOs únicos por amostra. \\
+UC-1.5 & Em que medida o repertório de compostos anotados de cada amostra se sobrepõe às listas de compostos de diferentes agências regulatórias, medido pela porcentagem de compostos monitorados coanotados? & Quantifica a sobreposição em nível de anotação entre cada amostra e as principais listas regulatórias por meio de um escore de conformidade. & Heatmap & Matriz de escores de conformidade entre amostras e agências regulatórias. \\
+UC-1.6 & Em que medida a amplitude de anotações KO das diferentes amostras se sobrepõe às listas de compostos de várias agências ambientais, medida por contagens de KOs únicos em cada interseção amostra-agência? & Caracteriza como as anotações KO de cada amostra se distribuem entre contextos regulatórios pela contagem de KOs únicos em cada interseção amostra-agência. & Heatmap & Matriz de KOs únicos por amostra e agência regulatória. \\
+\end{longtable}
+\end{landscape}
+\clearpage
+
+\section{M2 -- Caracterização exploratória das anotações}
+\begin{landscape}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{L{1.1cm} L{5.0cm} L{7.8cm} L{4.2cm} L{5.3cm}}
+\caption{Casos de uso do M2 do BioRemPP Web Service.}\label{tab:ap-c3-m2}\\
+\bwsusecaseheader
+\endfirsthead
+\caption[]{Casos de uso do M2 do BioRemPP Web Service (continuação).}\\
+\bwsusecaseheader
+\endhead
+\bottomrule
+\endfoot
+UC-2.1 & Como a classificação de riqueza funcional de cada amostra muda quando observada sob a lente de diferentes bases de anotação, como BioRemPP, HADEG e KEGG? & Compara contagens de KOs entre amostras em diferentes fontes de anotação e evidencia como a riqueza funcional varia com a base selecionada. & Bar chart & Ordenação de amostras por riqueza funcional, medida por KOs únicos, em cada base. \\
+UC-2.2 & Quais amostras biológicas estão coanotadas com a maior variedade de compostos químicos únicos? & Ordena as amostras pelo total de compostos distintos com os quais estão coanotadas e oferece uma visão comparativa da amplitude química. & Bar chart & Ordenação de amostras por número de compostos únicos. \\
+UC-2.3 & Dentro de uma classe química específica, quais compostos estão coanotados com o maior número de amostras biológicas e o que isso sugere sobre potencial funcional compartilhado? & Ordena os compostos de uma classe química selecionada pelo número de amostras distintas com as quais estão coanotados. & Bar chart & Ordenação de compostos por número de amostras interagentes em uma classe química selecionada. \\
+UC-2.4 & Dentro de uma classe química específica, quais compostos estão associados à maior diversidade de genes únicos no conjunto? & Ordena os compostos de uma classe química selecionada pela diversidade de genes únicos coanotados com eles. & Bar chart & Ordenação de compostos por número de genes únicos em uma classe química selecionada. \\
+UC-2.5 & Como a distribuição estatística das contagens de KO varia entre amostras e bancos de anotação, e que indícios isso oferece sobre escopo e foco? & Resume como as contagens de KOs únicos se distribuem entre amostras sob diferentes fontes de anotação, permitindo comparação além da ordenação simples. & Box-and-scatter plot & Distribuição de contagens de KOs únicos por amostra em cada base. \\
+\end{longtable}
+\end{landscape}
+\clearpage
+
+\section{M3 -- Estrutura dos perfis: agrupamento, similaridade e coocorrência}
+\begin{landscape}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{L{1.1cm} L{5.0cm} L{7.8cm} L{4.2cm} L{5.3cm}}
+\caption{Casos de uso do M3 do BioRemPP Web Service.}\label{tab:ap-c3-m3}\\
+\bwsusecaseheader
+\endfirsthead
+\caption[]{Casos de uso do M3 do BioRemPP Web Service (continuação).}\\
+\bwsusecaseheader
+\endhead
+\bottomrule
+\endfoot
+UC-3.1 & Como as amostras se agrupam ou se separam com base em seus perfis globais de anotação KO, e quais são as mais similares ou distintas nesse espaço funcional? & Aplica PCA para visualizar relações de anotação de alta dimensionalidade entre amostras usando perfis de KO como espaço de atributos. & PCA scatter plot & Coordenadas das amostras nos componentes principais, como PC1 e PC2. \\
+UC-3.2 & Como as amostras se agrupam ou se separam com base em seus perfis de coanotação de compostos, e quais são as mais similares ou distintas nesse espaço químico? & Aplica PCA para caracterizar relações entre amostras com base em perfis de coanotação de compostos, e não em repertórios de KO. & PCA scatter plot & Coordenadas das amostras nos componentes principais baseadas em perfis de interação química. \\
+UC-3.3 & Como as amostras se organizam em uma estrutura hierárquica com base na similaridade de seus perfis KO, e como diferentes métricas alteram essas relações? & Constrói um dendrograma interativo a partir de perfis binários de KO para expor agrupamentos aninhados no espaço de anotação. & Dendrogram & Árvore de agrupamento hierárquico das amostras baseada em perfis KO. \\
+UC-3.4 & Quão similares são as amostras entre si em termos de seus perfis de anotação KO compartilhados? & Quantifica a similaridade pareada entre amostras a partir da presença e ausência de KOs e a representa como correlograma. & Correlogram & Matriz de similaridade entre amostras baseada em presença e ausência de KOs. \\
+UC-3.5 & Quão similares são as amostras entre si com base no repertório de compostos químicos com os quais estão coanotadas? & Quantifica a similaridade pareada entre amostras a partir de perfis de coanotação de compostos e a representa como correlograma. & Correlogram & Matriz de similaridade entre amostras baseada em perfis de interação com compostos. \\
+UC-3.6 & Quais genes tendem a coocorrer entre as amostras e o que esse padrão sugere sobre relações funcionais potenciais? & Mapeia padrões de coanotação gênica entre amostras por meio de um correlograma gene-gene construído a partir de estruturas compartilhadas de ocorrência. & Correlogram & Matriz de coocorrência e similaridade pareada de genes entre amostras. \\
+UC-3.7 & Quais compostos químicos tendem a coocorrer nas mesmas anotações de amostra e o que isso sugere sobre contextos compartilhados? & Mapeia padrões de coanotação de compostos entre amostras por meio de um correlograma composto-composto construído a partir de estruturas compartilhadas de ocorrência. & Correlogram & Matriz de coocorrência e similaridade pareada de compostos entre amostras. \\
+\end{longtable}
+\end{landscape}
+\clearpage
+
+\section{M4 -- Perfil funcional e gênico}
+\begin{landscape}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{L{1.1cm} L{5.0cm} L{7.8cm} L{4.2cm} L{5.3cm}}
+\caption{Casos de uso do M4 do BioRemPP Web Service.}\label{tab:ap-c3-m4}\\
+\bwsusecaseheader
+\endfirsthead
+\caption[]{Casos de uso do M4 do BioRemPP Web Service (continuação).}\\
+\bwsusecaseheader
+\endhead
+\bottomrule
+\endfoot
+UC-4.1 & Qual é o perfil de anotação KO de cada amostra, definido pela riqueza de KOs anotados em suas vias metabólicas? & Caracteriza, para uma amostra selecionada, quais vias KEGG possuem anotações KO e quantos KOs únicos se mapeiam a cada via. & Bar chart & Ordenação de vias KEGG por contagem de KOs únicos em uma amostra selecionada. \\
+UC-4.2 & Para uma determinada via metabólica, quais amostras apresentam maior riqueza de anotação KO, medida por sua contagem de KOs únicos? & Compara todas as amostras, para uma via KEGG selecionada, segundo sua riqueza de KOs únicos. & Bar chart & Ordenação de amostras por contagem de KOs únicos em uma via KEGG selecionada. \\
+UC-4.3 & Para uma via metabólica específica, qual é a riqueza relativa de anotação KO de cada amostra e quais amostras apresentam cobertura mais extensa? & Compara simultaneamente todas as amostras para uma via KEGG selecionada e converte a riqueza KO da via em uma impressão digital polar. & Radar chart & Impressão digital funcional polar de uma via selecionada entre as amostras. \\
+UC-4.4 & Qual é a impressão digital de anotação KO de uma amostra, definida pela distribuição de KOs únicos entre suas vias metabólicas? & Resume, para uma amostra selecionada, como suas anotações KO únicas se distribuem entre as vias KEGG. & Radar chart & Impressão digital funcional por via de uma amostra selecionada. \\
+UC-4.5 & Para uma via metabólica específica, quais genes estão anotados em quais amostras e como esses padrões revelam genes amplamente ou restritamente distribuídos? & Fornece uma visão gênica de uma via KEGG selecionada e destaca genes amplamente distribuídos entre amostras versus genes restritos a poucas amostras. & Scatter plot & Mapa de presença e ausência gênica entre amostras para uma via KEGG selecionada. \\
+UC-4.6 & Para uma classe química específica, quais amostras apresentam maior diversidade de anotação KO coanotada com compostos específicos? & Quantifica quantos KOs únicos se associam a cada par amostra-composto e converte esse valor em um mapa de potencial funcional em nível de composto. & Scatter plot & Mapa de potencial funcional amostra-composto para uma classe química selecionada. \\
+UC-4.7 & Quais são as relações específicas de coanotação entre genes individuais e compostos químicos, e quais amostras carregam essas coanotações? & Expõe uma interface de consulta sobre a tabela BioRemPP para exploração centrada em compostos, genes e amostras das associações gene-composto. & Scatter plot & Mapa filtrável de associações gene-composto com ligação às amostras contribuintes. \\
+UC-4.8 & Qual é o inventário de anotações gênicas de cada amostra e quais amostras carregam um gene de interesse? & Oferece uma visão inventarial em nível de gene e suporta consultas centradas em amostras e em genes. & Scatter plot & Mapa filtrável de presença gênica entre amostras. \\
+UC-4.9 & Para uma amostra específica, quais funções enzimáticas estão mais amplamente representadas, medidas pela diversidade de genes únicos associados? & Perfilha as atividades enzimáticas de uma amostra selecionada pela contagem de genes distintos que sustentam cada classe de atividade. & Bar chart & Perfil ranqueado de atividades enzimáticas por amostra. \\
+UC-4.10 & Quais funções enzimáticas, em quais amostras, apresentam a maior diversidade de genes únicos? & Compara a diversidade de atividades enzimáticas entre amostras e destaca atividades com maior cobertura gênica. & Bubble chart & Matriz de atividades enzimáticas por amostra com áreas de maior diversidade gênica. \\
+UC-4.11 & Qual é a estrutura hierárquica global da diversidade gênica no HADEG e como ela se distribui entre classes de vias e rotas específicas? & Resume a estrutura de vias HADEG como hierarquia e quantifica como a diversidade gênica se distribui entre classes de compostos e rotas específicas. & Sunburst chart & Mapa hierárquico da diversidade gênica nas vias HADEG. \\
+UC-4.12 & Para uma amostra específica, como suas anotações KO de vias metabólicas se distribuem entre famílias químicas mais amplas, como \texttt{compound\_pathway}, às quais se associam? & Quantifica a diversidade de KO únicos em cada interseção \texttt{Pathway-compound\_pathway} para uma amostra selecionada e expõe seu mapa funcional entre famílias químicas. & Heatmap & Matriz específica da amostra de riqueza funcional por \texttt{Pathway x compound\_pathway}. \\
+UC-4.13 & Para uma classe de vias de degradação, quais genes estão anotados em quais amostras e quão diversa é sua anotação KO? & Quantifica, para cada gene e amostra, quantos KOs distintos se associam ao gene dentro de uma classe de via de composto selecionada. & Heatmap & Matriz de riqueza funcional gênica por classe de via de composto. \\
+\end{longtable}
+\end{landscape}
+\clearpage
+
+\section{M5 -- Modelagem das relações entre amostras, genes e compostos}
+\begin{landscape}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{L{1.1cm} L{5.0cm} L{7.8cm} L{4.2cm} L{5.3cm}}
+\caption{Casos de uso do M5 do BioRemPP Web Service.}\label{tab:ap-c3-m5}\\
+\bwsusecaseheader
+\endfirsthead
+\caption[]{Casos de uso do M5 do BioRemPP Web Service (continuação).}\\
+\bwsusecaseheader
+\endhead
+\bottomrule
+\endfoot
+UC-5.1 & Quais amostras estão mais coanotadas com quais classes químicas e o que isso revela sobre seus padrões de cobertura anotacional? & Mapeia a frequência de coanotações entre amostras e classes de compostos, fornecendo uma visão sistêmica da cobertura por classe. & Chord diagram & Matriz de interação entre amostras e classes químicas, baseada em contagens de coocorrência. \\
+UC-5.2 & Quão similares são as amostras em seus perfis de coanotação de compostos e qual é a estrutura desses grupos baseados em anotação? & Quantifica a similaridade pareada entre amostras pelo número de compostos compartilhados e visualiza essa estrutura como diagrama de cordas. & Chord diagram & Matriz de similaridade entre amostras baseada em compostos únicos compartilhados. \\
+UC-5.3 & Quais amostras estão mais coanotadas com compostos monitorados por diferentes agências regulatórias? & Quantifica a intensidade com que cada amostra se associa aos contextos regulatórios representados no conjunto. & Chord diagram & Matriz de interação entre amostras e agências regulatórias, baseada em contagens de coocorrência. \\
+UC-5.4 & Qual é a estrutura global da rede de interação entre genes e compostos químicos, e quais entidades podem atuar como nós centrais? & Constrói uma rede bipartida de coanotação ligando genes a compostos e destaca nós centrais e módulos altamente conectados na paisagem anotacional. & Network graph & Rede de interação gene-composto, com nós, arestas e medidas de conectividade. \\
+UC-5.5 & Quais genes compartilham mais coanotações de compostos entre amostras e que estrutura formam essas relações gene-gene? & Examina a sobreposição gene-gene mediada por compostos compartilhados e revela a estrutura das relações gênicas implicadas por vizinhanças comuns de anotação. & Network graph & Rede gene-gene ponderada pelo número de compostos compartilhados e pela conectividade nodal. \\
+UC-5.6 & Quais compostos químicos compartilham mais coanotações gênicas entre amostras e que estrutura formam essas relações composto-composto? & Examina a sobreposição composto-composto mediada por genes compartilhados e revela a estrutura das relações químicas implicadas por vizinhanças comuns de anotação. & Network graph & Rede composto-composto ponderada pelo número de genes compartilhados e pela conectividade nodal. \\
+\end{longtable}
+\end{landscape}
+\clearpage
+
+\section{M6 -- Análise funcional hierárquica e baseada em fluxos}
+\begin{landscape}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{L{1.1cm} L{5.0cm} L{7.8cm} L{4.2cm} L{5.3cm}}
+\caption{Casos de uso do M6 do BioRemPP Web Service.}\label{tab:ap-c3-m6}\\
+\bwsusecaseheader
+\endfirsthead
+\caption[]{Casos de uso do M6 do BioRemPP Web Service (continuação).}\\
+\bwsusecaseheader
+\endhead
+\bottomrule
+\endfoot
+UC-6.1 & Como contextos regulatórios de alto nível fluem por amostras e suas coanotações gênicas até alcançar compostos químicos individuais? & Traça caminhos de coanotação das agências regulatórias, passando por amostras e genes, até compostos, em uma estrutura aluvial de quatro estágios. & Sankey diagram & Rede de fluxo multiestágio entre agências regulatórias, amostras, genes e compostos. \\
+UC-6.2 & Como as coanotações das amostras se distribuem entre classes químicas e quais atividades enzimáticas se coanotam com maior frequência em cada uma? & Organiza as anotações das amostras em um diagrama aluvial de três estágios que conecta amostras, classes químicas e atividades enzimáticas. & Sankey diagram & Rede de fluxo multiestágio entre amostras, classes químicas e atividades enzimáticas. \\
+UC-6.3 & Quais classes químicas e compostos específicos se coanotam com os conjuntos gênicos mais diversos, e quais amostras mais contribuem para essa diversidade? & Fornece uma visão hierárquica descendente da distribuição de coanotações gênicas entre classes químicas, compostos e amostras. & Treemap & Particionamento hierárquico da diversidade gênica entre classes, compostos e amostras. \\
+UC-6.4 & Quais funções enzimáticas se coanotam com a maior variedade de compostos únicos, como essa amplitude se distribui entre classes químicas e quais genes mais contribuem? & Fornece uma visão hierárquica da paisagem de coanotações enzimáticas ao organizar atividades, classes químicas e genes. & Treemap & Particionamento hierárquico do escopo de substrato entre atividades enzimáticas, classes químicas e genes. \\
+UC-6.5 & Para cada classe química, quais funções enzimáticas são mais frequentemente coanotadas e quais genes mostram a maior cobertura de coanotação de compostos nessa classe? & Fornece uma visão hierárquica centrada na química, indo de classes químicas a atividades enzimáticas e genes. & Treemap & Particionamento hierárquico do escopo de substrato entre classes químicas, atividades enzimáticas e genes. \\
+\end{longtable}
+\end{landscape}
+\clearpage
+
+\section{M7 -- Contextualização por predições toxicológicas}
+\begin{landscape}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{L{1.1cm} L{5.0cm} L{7.8cm} L{4.2cm} L{5.3cm}}
+\caption{Casos de uso do M7 do BioRemPP Web Service.}\label{tab:ap-c3-m7}\\
+\bwsusecaseheader
+\endfirsthead
+\caption[]{Casos de uso do M7 do BioRemPP Web Service (continuação).}\\
+\bwsusecaseheader
+\endhead
+\bottomrule
+\endfoot
+UC-7.1 & Qual é o perfil toxicológico abrangente de cada composto químico em um amplo conjunto de categorias de risco, e quais compostos apresentam perigos em múltiplos desfechos? & Fornece uma impressão digital toxicológica em nível de composto ao integrar predições do ToxCSM em múltiplos desfechos e supercategorias. & Faceted heatmap & Impressões digitais toxicológicas por composto em múltiplos desfechos e supercategorias. \\
+UC-7.2 & Qual é a estrutura e a magnitude da sobreposição entre compostos monitorados por agências regulatórias e compostos preditos como de alto risco toxicológico? & Quantifica a concordância entre compostos classificados como alto risco pelo ToxCSM e compostos listados por agências ambientais. & Chord diagram & Sobreposição pareada, por contagem de compostos compartilhados, entre agências regulatórias e o conjunto de alto risco predito. \\
+UC-7.3 & Para uma categoria toxicológica de alto nível, quais amostras apresentam a maior diversidade de anotações KO coanotadas com compostos prioritários associados? & Foca em compostos preditos de alto risco dentro de uma supercategoria selecionada e quantifica a diversidade de anotações associadas entre amostras. & Heatmap & Matriz de contagens de genes únicos para compostos de alto risco entre amostras, estratificada por supercategoria toxicológica. \\
+UC-7.4 & Dentro de um domínio toxicológico amplo, qual é a distribuição estatística dos escores toxicológicos preditos entre seus desfechos específicos? & Fornece uma visão estatística em nível de desfecho da paisagem toxicológica predita e compara distribuições de escore dentro de um domínio selecionado. & Box plot & Distribuição por desfecho dos escores toxicológicos preditos em uma supercategoria selecionada. \\
+UC-7.5 & Dentro de um domínio toxicológico amplo, quais são as distribuições de probabilidade dos escores toxicológicos preditos entre seus desfechos específicos? & Complementa os resumos baseados em quartis ao mostrar distribuições contínuas de densidade para os escores toxicológicos preditos por desfecho. & KDE plot & Curvas de densidade de probabilidade por desfecho para escores toxicológicos preditos em uma supercategoria selecionada. \\
+UC-7.6 & Quais amostras têm a maior cobertura de coanotação de compostos, medida pela variedade de compostos de alto risco com os quais se coanotam em cada categoria toxicológica? & Caracteriza a amplitude das coanotações amostra-composto para compostos preditos de alto risco entre categorias toxicológicas. & Treemap & Perfis por amostra de amplitude de mitigação de risco entre categorias toxicológicas. \\
+UC-7.7 & Quais amostras apresentam o maior número de coocorrências de anotação KO ligadas a diferentes categorias de risco toxicológico predito? & Foca na profundidade da estrutura de coanotação gene-composto e resume o quão intensamente cada amostra se liga a categorias de alto risco. & Treemap & Perfis por amostra de profundidade de mitigação de risco entre categorias toxicológicas e compostos. \\
+\end{longtable}
+\end{landscape}
+\clearpage
+
+\section{M8 -- Seleção de combinações funcionais candidatas}
+\begin{landscape}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{L{1.1cm} L{5.0cm} L{7.8cm} L{4.2cm} L{5.3cm}}
+\caption{Casos de uso do M8 do BioRemPP Web Service.}\label{tab:ap-c3-m8}\\
+\bwsusecaseheader
+\endfirsthead
+\caption[]{Casos de uso do M8 do BioRemPP Web Service (continuação).}\\
+\bwsusecaseheader
+\endhead
+\bottomrule
+\endfoot
+UC-8.1 & Qual é o número mínimo de perfis distintos de coanotação de compostos necessário para cobrir coletivamente todas as coanotações observadas dentro de uma classe química selecionada? & Formaliza a seleção de consórcios como um problema de cobertura por conjuntos e identifica grupos de anotação mínimos e não redundantes que preservam cobertura completa de compostos. & Scatter plot & Conjunto mínimo de guildas funcionais que fornece cobertura completa de compostos em uma classe química selecionada. \\
+UC-8.2 & Quais amostras apresentam a cobertura de anotação KO mais completa para uma determinada classe química e como isso pode ser usado para identificar alta completude anotacional? & Quantifica a completude em nível de classe química por meio de um escore de completude de anotação KO calculado para cada par amostra-classe. & Heatmap & Matriz de escores de completude por amostra para cada classe química. \\
+UC-8.3 & Para um composto químico específico, qual amostra apresenta a cobertura de anotação KO mais completa? & Leva a análise de completude à resolução de composto e calcula um escore de completude de anotação KO para cada par amostra-composto. & Heatmap & Matriz de escores de completude de KO por amostra para compostos individuais. \\
+UC-8.4 & Quais amostras apresentam a cobertura de anotação KO mais completa para uma via de degradação do HADEG e como isso permite comparar a completude entre amostras? & Foca na completude em nível de via no HADEG e compara quanto do repertório de KOs de cada via está representado em cada amostra. & Heatmap & Matriz de escores de completude por amostra para vias de degradação do HADEG. \\
+UC-8.5 & Quais amostras apresentam a cobertura de anotação KO mais completa para uma via metabólica KEGG e como isso permite comparar a completude entre amostras? & Estende o arcabouço de completude às vias KEGG e mede que fração do repertório observado de KOs de cada via está presente em cada amostra. & Heatmap & Matriz de escores de completude por amostra para vias metabólicas KEGG. \\
+UC-8.6 & Para uma via metabólica específica, como seus KOs anotados se distribuem entre diferentes amostras e o que essa sobreposição revela sobre redundância e complementaridade? & Examina uma via-alvo por vez e usa conjuntos de KO específicos por amostra para revelar redundância e complementaridade na cobertura da via. & UpSet plot & Visão em nível de conjunto e interseção da cobertura de KO entre amostras para uma via-alvo. \\
+UC-8.7 & Quantos identificadores KO são compartilhados entre as amostras selecionadas e quais amostras carregam anotações KO exclusivas ou raras? & Quantifica como os identificadores KO se distribuem entre amostras selecionadas e separa um núcleo compartilhado de anotações raras ou específicas. & UpSet plot & Estatísticas de interseção dos conjuntos de KOs entre amostras selecionadas. \\
+\end{longtable}
+\end{landscape}
+\clearpage
