@@ -5,7 +5,7 @@
 % =============================================================================
 \chapter{Introdução geral}
 \label{cap:introducao}
-
+\todo{Ainda pendente de escrita}
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % BLOQUEADO - SEÇÃO CONTEXTUALIZAÇÃO, BIORREMEDIAÇÃO E PROBLEMA COMENTADA
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
@@ -97,40 +97,141 @@
 
 \subsection{Objetivo geral}
 
-Desenvolver o \biorempp{} (\textit{Bioremediation Potential Profiling}), um ecossistema integrado de bioinformática para análise funcional e integração multi-ômica orientada a compostos prioritários para biorremediação, composto por quatro componentes interoperáveis: banco de dados integrado com pipeline reprodutível de geração e validação; interface web de navegação (\gls{dbx}); serviço web de análise por upload (\gls{bws}); e cliente de linha de comando (\gls{cli}).
+Desenvolver o \biorempp{} --- \textit{Bioremediation Potential Profiling} ---,
+um ecossistema integrado de bioinformática destinado à análise funcional de
+dados ômicos e à integração de evidências biológicas, químicas, toxicológicas
+e institucionais relacionadas a compostos prioritários para biorremediação. O
+ecossistema compreende quatro componentes complementares e interoperáveis: o
+banco de dados integrado BioRemPP, acompanhado por um pipeline reprodutível de
+geração e validação; o BioRemPP Database Explorer
+(\glsentryshort{dbx}), interface web destinada à exploração do banco; o
+BioRemPP Web Service (\glsentryshort{bws}), destinado à análise de perfis
+funcionais submetidos pelo usuário; e a BioRemPP Command-Line Interface
+(\glsentryshort{cli}), destinada à execução programática e à integração com
+pipelines automatizados.
 
 \subsection{Objetivos específicos}
 
 
-\Needspace{14\baselineskip}
 \begin{enumerate}
-    \item Construir uma base de dados curada, suportada por pipeline reprodutível em Snakemake, que consolide compostos priorizados por nove frameworks regulatórios, mapeados às vias do \gls{kegg}, com ênfase nas 20 vias canônicas de metabolismo e degradação de xenobióticos, e integrada a bases externas complementares de evidências de degradação especializada (\gls{hadeg}) e predições toxicológicas (\gls{toxcsm}).
 
-    \item Desenvolver o \gls{dbx}, uma interface web de acesso aberto para navegação read-only da base integrada, organizada em entidades centrais (Compostos, Classes, Genes, Vias e Toxicidade) e complementada por recursos de análise guiada.
+    \item Construir o banco de dados curado BioRemPP, cuja tabela central é gerada
+    e validada por um pipeline reprodutível implementado em Snakemake e reúne
+    compostos associados a nove códigos de referências institucionais. Integrar,
+    por meio de identificadores interoperáveis, às relações funcionais
+    e químicas do \gls{kegg}, incluindo um recorte de 20 vias de metabolismo e
+    degradação de xenobióticos, às evidências especializadas de degradação do
+    \gls{hadeg} e às predições toxicológicas do \gls{toxcsm}.
 
-    \item Implementar o \gls{bws}, um serviço web baseado em upload de arquivos de anotação funcional de \gls{ko}, oferecendo módulos analíticos e casos de uso que operem sobre a base integrada e forneçam uma camada de análise de dados \textit{in silico} para suporte à inferência e à tomada de decisão.
+    \item Desenvolver o \gls{dbx}, uma interface web de acesso aberto e somente
+    leitura para consulta e exploração do banco integrado, organizada em torno
+    de compostos, classes químicas, genes, vias e informações toxicológicas, e
+    complementada por análises guiadas.
 
-    \item Implementar o \gls{cli} distribuído via \gls{pypi} para integração do processamento em pipelines bioinformáticos automatizados, com quatro modos operacionais cobrindo entradas genômicas, transcriptômicas, metabolômicas e enzimáticas.
+    \item Implementar o \gls{bws}, um serviço web destinado à submissão de
+    conjuntos de \glspl{ko} organizados por amostra, com módulos analíticos que
+    projetem esses perfis sobre as relações do banco integrado e apoiem a
+    caracterização exploratória, a comparação funcional e a formulação de
+    hipóteses para estudos posteriores.
 
-    \item Garantir a conformidade do ecossistema com os princípios \gls{fair} através do uso consistente de identificadores interoperáveis (\gls{ko}, \gls{cpd}, KEGG Reaction, \gls{ec}, \gls{cas}, \gls{chebi}, \gls{smiles}), arquivamento com \gls{doi} estável e licenciamento aberto (código Apache~2.0, dados CC~BY~4.0).
+    \item Implementar o \gls{cli} e distribuí-lo por meio do \gls{pypi}, de
+    modo a disponibilizar as operações do ecossistema para execução
+    programática e incorporação a pipelines bioinformáticos automatizados, com
+    modos operacionais destinados a entradas genômicas, transcriptômicas,
+    metabolômicas e enzimáticas.
 
-    \item Demonstrar retrospectivamente a aplicabilidade do ecossistema por meio de três estudos \textit{peer-reviewed} que utilizaram a base integrada em contextos de caracterização de novas espécies e subespécies, bem como de integração transcriptômica e metatranscriptômica.
+    \item Incorporar mecanismos alinhados aos princípios \gls{fair} por meio do
+    uso consistente de identificadores interoperáveis, incluindo \gls{ko},
+    \gls{cpd}, KEGG Reaction, \gls{ec}, \gls{cas}, \gls{chebi} e
+    \gls{smiles}, do versionamento dos artefatos, do arquivamento em repositório
+    com \gls{doi} persistente e da adoção de licenças abertas para o código
+    (Apache~2.0) e para os dados (CC~BY~4.0).
+
+    \item Examinar retrospectivamente a aplicabilidade do ecossistema por meio
+    de três estudos publicados e revisados por pares que utilizaram dados ou
+    relações do BioRemPP em contextos de caracterização funcional de novas
+    espécies e subespécies e de integração de dados transcriptômicos e
+    metatranscriptômicos.
+
 \end{enumerate}
 
+\newpage
 % -----------------------------------------------------------------------------
 \section{Organização da tese}
 \label{sec:organizacao}
 % -----------------------------------------------------------------------------
 
-\escrever{Nota metodológica sobre estrutura orientada a componentes:} Esta tese adota estrutura em sete capítulos organizada em torno dos componentes do ecossistema \biorempp{}, em alternativa à estrutura tradicional Métodos--Resultados--Discussão. Cada componente é apresentado integralmente em um capítulo dedicado (motivação, arquitetura, resultados, discussão específica), evitando fragmentação de descrição entre capítulos temáticos. Um capítulo final integra as contribuições e discute o ecossistema como unidade coerente.
+\todo{\textbf{Comentário:} Até a versão atual do manuscrito,
+encontram-se redigidos os capítulos referentes ao banco de dados BioRemPP, ao
+website de exploração do banco e ao website de análise dos dados submetidos
+pelo usuário.}
 
-\escrever{Descrição breve de cada capítulo:}
-\begin{description}
-    \item[Capítulo~\ref{cap:fundamentacao}] Fundamentação teórica sobre biorremediação, genômica funcional, bases de dados especializadas, ferramentas computacionais existentes e princípios \gls{fair}.
-    \item[Capítulo~\ref{cap:comp1}] Componente~1: banco de dados integrado, pipeline de geração e camadas de validação.
-    \item[Capítulo~\ref{cap:comp2}] Componente~2: \gls{dbx} para navegação read-only.
-    \item[Capítulo~\ref{cap:comp3}] Componente~3: \gls{bws} para análise por upload.
-    \item[Capítulo~\ref{cap:comp4}] Componente~4: \gls{cli} para integração em pipelines.
-    \item[Capítulo~\ref{cap:conclusao}] Discussão integrada, aplicações retrospectivas publicadas, limitações e perspectivas.
-\end{description}
+A tese está organizada em sete capítulos. 
+Após a introdução e a fundamentação teórica, cada componente
+computacional é apresentado em um capítulo próprio, no qual são reunidos sua
+motivação, seu escopo, sua metodologia e arquitetura, seus procedimentos de validação, seus
+resultados e  discussão específica. O último capítulo retoma essas contribuições de maneira
+integrada e discute o BioRemPP como um ecossistema computacional.
 
+O primeiro capítulo apresenta o contexto científico e computacional que
+motivou o desenvolvimento do BioRemPP. Nele são delimitados o problema de
+pesquisa, a hipótese, os objetivos geral e específicos, as contribuições da
+tese e a organização adotada para o manuscrito.
+
+O Capítulo~\ref{cap:fundamentacao} reúne a fundamentação teórica necessária à
+interpretação dos componentes desenvolvidos. O capítulo aborda os fundamentos
+da biorremediação, a contribuição das abordagens ômicas para a caracterização
+do potencial funcional, o uso de grupos de ortologia e
+identificadores químicos na integração de dados, as bases especializadas
+relacionadas à degradação de contaminantes e as ferramentas computacionais
+disponíveis nesse domínio. Também apresenta os princípios de organização,
+interoperabilidade e reutilização de dados que orientam a adoção dos princípios
+\gls{fair} no ecossistema.
+
+O Capítulo~\ref{cap:comp1} apresenta o banco de dados integrado BioRemPP e o
+processo computacional responsável por sua construção. O capítulo descreve as
+fontes incorporadas, os critérios de curadoria, as relações estabelecidas entre
+KOs, compostos, números EC, reações, vias, símbolos gênicos, descritores de
+atividade enzimática, referências institucionais e predições toxicológicas.
+Também detalha o workflow implementado em Snakemake, a organização do esquema
+de dados, os procedimentos de verificação e validação e os resultados
+correspondentes à versão 1.1.0 do banco.
+
+O Capítulo~\ref{cap:comp2} descreve o BioRemPP Database Explorer
+(\gls{dbx}), componente destinado à consulta e à exploração das relações
+armazenadas no banco. O capítulo apresenta a arquitetura da aplicação, os
+módulos de navegação, as análises guiadas e as
+consultas SQL versionadas que acompanham as principais operações. Os resultados
+demonstram como o componente organiza diferentes recortes do banco sem exigir
+a submissão de dados externos ou a elaboração de consultas pelo usuário.
+
+O Capítulo~\ref{cap:comp3} apresenta o BioRemPP Web Service
+(\gls{bws}), componente destinado à análise interativa de conjuntos de KOs
+organizados por amostra. O capítulo descreve o contrato de entrada, o fluxo de
+validação e integração, a arquitetura em camadas e a definição declarativa dos
+casos de uso. Também organiza os 56 casos de uso distribuídos em oito módulos,
+que abrangem análises descritivas, multivariadas, relacionais, funcionais,
+toxicológicas e de complementaridade entre amostras. Os resultados
+demonstrativos utilizam perfis funcionais de amostras exemplo associadas na
+literatura ao potencial de degradação de contaminantes e delimitam o alcance
+interpretativo das análises baseadas na presença de KOs.
+
+O Capítulo~\ref{cap:comp4} descreve a interface de linha de comando
+(\gls{cli}) e sua incorporação a fluxos computacionais automatizados. O
+capítulo apresenta a organização dos comandos, os contratos de entrada e
+saída, o acesso programático às operações do ecossistema, os mecanismos de
+configuração e os recursos destinados à execução reprodutível. Também discute
+a relação entre a interface de linha de comando, o banco de dados, o
+\gls{dbx} e o \gls{bws}, destacando os contextos nos quais a automação e a
+integração com pipelines externos são necessárias.
+
+O Capítulo~\ref{cap:conclusao} integra as contribuições dos quatro componentes
+e discute o BioRemPP como uma unidade computacional orientada à análise
+funcional da biorremediação. O capítulo retoma os resultados centrais, examina
+a complementaridade entre as formas de acesso ao banco e relaciona o
+ecossistema a aplicações retrospectivas baseadas em estudos já publicados.
+Também sistematiza as limitações associadas à cobertura das fontes, à qualidade
+das anotações produzidas, ao uso de dados de presença e ausência e
+à necessidade de validação experimental. Por fim, apresenta as perspectivas de
+expansão do banco, incorporação de novas fontes, avaliação com usuários e
+integração com outros fluxos de análise ômica.
