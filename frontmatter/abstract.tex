@@ -2,16 +2,45 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-\nota{Versão equivalente ao Resumo, expandindo a partir do abstract finalizado para o Congresso de Genética 2026 (2.485 caracteres). Manter mesma estrutura seccional.}
+% Reduz o espaço vertical após o título e amplia localmente a área útil.
+\vspace{-1.2cm}
+\enlargethispage{2\baselineskip}
 
-\reaproveitar{Base do abstract congressual (adaptar tempo verbal e expandir para 250-500 palavras):}
+Environmental contamination by priority compounds requires the integration of
+information on chemical structures, biological functions, degradation
+pathways, toxicity, and institutional references. This information remains
+distributed across databases with distinct observational units and curation
+criteria, which hinders the interpretation of functional profiles derived from
+omics data. BioRemPP constitutes a compound-oriented computational ecosystem
+that integrates this content and provides different forms of querying and
+analysis. The ecosystem comprises four components: the curated BioRemPP
+database, the BioRemPP Database Explorer, the BioRemPP Web Service, and a
+command-line interface. The database integrates the BioRemPP central table,
+HADEG, the KEGG Degradation subset, and ToxCSM through relationships among
+KEGG Orthology groups (KOs), compounds, EC numbers, reactions, pathways,
+enzyme activity descriptors, institutional references, and toxicity
+predictions. A Snakemake workflow automates its construction, while checks
+anchored in KEGG relationships and structural and regression validations with
+Great Expectations assess the consistency of the generated artifacts. The
+Database Explorer provides five exploration modules and eight guided analyses
+accompanied by versioned SQL queries. The Web Service receives sets of KOs
+organized by sample and comprises 56 use cases distributed across eight
+modules, including descriptive, multivariate, relational, toxicological, and
+functional complementarity analyses. The command-line interface provides the
+same operations for programmatic execution and integration into automated
+pipelines. Version 1.1.0 of the database comprises 384 compounds distributed
+across 12 chemical classes, 1,543 KOs, 994 EC numbers, 1,939 KEGG reaction
+identifiers, 1,517 gene symbols, and 206 enzyme activity descriptors. Nine
+institutional reference codes define the scope of priority compounds, and 370
+compounds have predictions for 31 toxicological endpoints. The components
+preserve KO and CPD identifiers, record software versions and analysis
+parameters, and provide exportable tables, visualizations, and artifacts.
+BioRemPP supports \textit{in silico} screening, functional profile comparison,
+and hypothesis selection for subsequent studies. Associations based on KO
+presence and predicted toxicity values represent functional potential and
+computational context but do not replace transcriptomic, proteomic,
+metabolomic, biochemical, or environmental validation.
 
-\begin{quote}
-\textit{Chemical contamination by priority pollutants remains a global concern, reflected in international regulatory frameworks. Functional, toxicological and regulatory evidence remain scattered across independent databases, hindering multi-omics analysis of these compounds. \biorempp{} (Bioremediation Potential Profile) addresses this gap by unifying regulatory prioritisation with functional annotation through a compound-centric approach, delivered as an ecosystem of four components sharing a curated evidence base consolidated in the \biorempp{} core database: the Integrated Database, the Database Explorer (DBX), the analysis-based Web Service (BWS) and a command line interface (CLI). [\ldots]}
-\end{quote}
-
-\escrever{Expandir os blocos de metodologia e resultados no abstract para tese; adicionar frase sobre validação dupla e sobre as três publicações de aplicação retrospectiva (Freitas 2023, Silva-Portela 2024, Freitas 2025).}
-
-\vspace{1em}
-\textbf{Keywords:} bioinformatics; bioremediation; functional genomics; multi-omics integration; priority compounds; tool ecosystem.
-
+\vspace{0.35em}
+\noindent\textbf{Keywords:} bioinformatics; bioremediation; functional
+genomics; multi-omics integration; priority compounds; tool ecosystem.

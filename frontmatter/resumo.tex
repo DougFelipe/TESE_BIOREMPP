@@ -2,17 +2,47 @@
 \chapter*{Resumo}
 \addcontentsline{toc}{chapter}{Resumo}
 
-\nota{Resumo entre 250 e 500 palavras. Adaptar do abstract em inglês finalizado para o Congresso de Genética 2026 (Área 7 - Bioinformática Aplicada às Ômicas), expandindo para o escopo maior da tese e traduzindo com precisão os termos técnicos.}
+% Reduz o espaço vertical após o título e amplia localmente a área útil.
+\vspace{-1.2cm}
+\enlargethispage{2\baselineskip}
 
-\escrever{Estrutura recomendada:}
-\begin{itemize}
-    \item \textbf{Contexto} (aprox. 3-4 frases): contaminação por poluentes prioritários; frameworks regulatórios internacionais; fragmentação de evidências funcionais, toxicológicas e regulatórias.
-    \item \textbf{Objetivo} (1-2 frases): apresentar o \biorempp{} como ecossistema integrado de quatro componentes.
-    \item \textbf{Metodologia} (aprox. 4-5 frases): banco integrado consolidando quatro fontes (\gls{kegg}, \gls{hadeg}, \gls{toxcsm}, curadoria interna); pipeline Snakemake com validação dupla (KEGG-anchored + \gls{gx}); \gls{dbx} para navegação; \gls{bws} para upload de análise; \gls{cli} para pipelines automatizados.
-    \item \textbf{Resultados} (aprox. 4-5 frases com números concretos): 384 compostos, 12 classes químicas, 1.543 \glspl{ko}, 994 números \gls{ec}, 1.939 identificadores de reação KEGG, 206 famílias enzimáticas curadas, nove códigos de agências regulatórias (\gls{iarc}, \gls{epa}, \gls{atsdr}, \gls{wfd}, \gls{psl}, \gls{epc}, \gls{conama}); 370 compostos com cobertura toxicológica em 31 endpoints.
-    \item \textbf{Conclusão} (2-3 frases): o ecossistema torna evidência integrada acessível para diferentes perfis de usuário e diferentes tipos de dados ômicos, apoiando triagem in silico prévia a estudos experimentais.
-\end{itemize}
+A contaminação ambiental por compostos prioritários exige a articulação de
+informações sobre estruturas químicas, funções biológicas, vias de degradação,
+toxicidade e referências institucionais. Essas informações permanecem
+distribuídas entre bases com unidades de observação e critérios de curadoria
+distintos, o que dificulta a interpretação de perfis funcionais derivados de
+dados ômicos. O BioRemPP constitui um ecossistema computacional orientado por
+compostos que integra esse conteúdo e o disponibiliza por diferentes formas de
+consulta e análise. O ecossistema reúne quatro componentes: o banco de dados
+curado BioRemPP, o BioRemPP Database Explorer, o BioRemPP Web Service e uma
+interface de linha de comando. O banco integra a tabela central BioRemPP, o
+HADEG, o subconjunto KEGG Degradation e o ToxCSM por meio de relações entre
+grupos de ortologia KEGG (KOs), compostos, números EC, reações, vias,
+descritores de atividade enzimática, referências institucionais e predições
+toxicológicas. Um workflow Snakemake automatiza sua construção, enquanto
+verificações ancoradas nas relações do KEGG e validações estruturais e
+regressivas com Great Expectations avaliam a consistência dos artefatos
+gerados. O Database Explorer oferece cinco módulos de exploração e oito
+análises guiadas, acompanhadas por consultas SQL versionadas. O Web Service
+recebe conjuntos de KOs organizados por amostra e reúne 56 casos de uso
+distribuídos em oito módulos, que abrangem análises descritivas,
+multivariadas, relacionais, toxicológicas e de complementaridade funcional. A
+interface de linha de comando disponibiliza as mesmas operações para execução
+programática e incorporação a pipelines automatizados. A versão 1.1.0 do banco
+reúne 384 compostos distribuídos em 12 classes químicas, 1.543 KOs, 994 números
+EC, 1.939 identificadores de reação KEGG, 1.517 símbolos gênicos e 206
+descritores de atividade enzimática. Nove códigos de referências institucionais
+delimitam o recorte de compostos prioritários, e 370 compostos apresentam
+predições para 31 endpoints toxicológicos. Os componentes preservam os
+identificadores KO e CPD, registram versões e parâmetros de análise e fornecem
+tabelas, visualizações e artefatos exportáveis. O BioRemPP apoia a triagem
+\textit{in silico}, a comparação de perfis funcionais e a seleção de hipóteses
+para estudos posteriores. As associações baseadas na presença de KOs e os
+valores toxicológicos preditos representam potencial funcional e contexto
+computacional, mas não substituem validações transcriptômicas, proteômicas,
+metabolômicas, bioquímicas ou ambientais.
 
-\vspace{1em}
-\textbf{Palavras-chave:} bioinformática; biorremediação; genômica funcional; integração multiômica; compostos prioritários; ecossistema de ferramentas.
-
+\vspace{0.35em}
+\noindent\textbf{Palavras-chave:} bioinformática; biorremediação; genômica
+funcional; integração de dados ômicos; compostos prioritários; ecossistema de
+software.
