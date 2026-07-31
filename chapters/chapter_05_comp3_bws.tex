@@ -19,9 +19,7 @@ identificadores descrevem funções anotadas, mas sua interpretação no context
 da biorremediação depende da associação com compostos, vias, atividades
 enzimáticas e outras informações complementares. Quando a análise compreende
 múltiplas amostras, a origem de cada KO também precisa ser preservada durante
-o mapeamento e a comparação dos perfis funcionais.
-
-A execução dessas etapas por meio de scripts independentes exige a
+o mapeamento e a comparação dos perfis funcionais. A execução dessas etapas por meio de scripts independentes exige a
 padronização dos arquivos, o relacionamento dos identificadores com diferentes
 fontes e a implementação das análises correspondentes. Esse processo dificulta
 a aplicação recorrente das associações integradas no BioRemPP a conjuntos de
@@ -34,9 +32,7 @@ armazenadas no banco BioRemPP, sem restringi-las a um conjunto de dados
 submetido. O \gls{bws} possui finalidade distinta. O serviço recebe conjuntos
 de KOs organizados por amostra e recupera as informações do banco associadas
 a esses identificadores. A amostra constitui, portanto, a unidade usada para
-organizar e comparar as relações encontradas.
-
-O serviço relaciona os KOs submetidos às informações funcionais e químicas
+organizar e comparar as relações encontradas. O serviço relaciona os KOs submetidos às informações funcionais e químicas
 integradas no BioRemPP. As relações recuperadas incluem compostos, vias,
 atividades enzimáticas e referências institucionais, além das predições
 toxicológicas disponíveis para os compostos correspondentes. Essa organização
@@ -47,24 +43,17 @@ Os casos de uso do \gls{bws} se fundamentam em métricas
 ecológico-funcionais derivadas dos conjuntos de KOs e das associações
 recuperadas. A riqueza de KOs representa o número de grupos de ortologia
 distintos presentes em uma amostra ou conjunto de amostras e descreve a
-amplitude do repertório funcional anotado \cite{armitage2012,arai2018,reynolds2023}.
-
-A riqueza de compostos expressa o número de substâncias distintas associadas
+amplitude do repertório funcional anotado \cite{armitage2012,arai2018,reynolds2023}. A riqueza de compostos expressa o número de substâncias distintas associadas
 aos KOs de uma amostra. Quando a análise considera um conjunto químico
 previamente delimitado, a cobertura de compostos representa a parcela desse
 conjunto relacionada às anotações disponíveis. Essas medidas adaptam conceitos
 de diversidade química ao contexto das associações entre funções anotadas e
-compostos relevantes para biorremediação \cite{wetzel2020,petren2024}.
-
-A cobertura de vias descreve a representação dos KOs associados a uma via no
+compostos relevantes para biorremediação \cite{wetzel2020,petren2024}. A cobertura de vias descreve a representação dos KOs associados a uma via no
 perfil funcional da amostra. As guildas metabólicas, por sua vez, organizam
 amostras que compartilham padrões de KOs, vias ou compostos, com base na
 semelhança funcional e não na proximidade taxonômica. Esses conceitos fornecem
 a base para análises de similaridade, agrupamento e complementaridade entre
-amostras \cite{arai2018,reynolds2023}.
-% TODO: acrescentar referências específicas sobre cobertura funcional de vias.
-
-A complementaridade entre perfis também fundamenta os casos de uso voltados à
+amostras \cite{arai2018,reynolds2023}. A complementaridade entre perfis também fundamenta os casos de uso voltados à
 seleção de combinações candidatas de amostras. Nesse contexto, a seleção
 considera a contribuição conjunta dos repertórios funcionais para ampliar a
 cobertura de KOs, compostos ou vias de interesse. A definição e a
@@ -76,9 +65,7 @@ de uso predefinidos. Os módulos abrangem comparação entre fontes,
 caracterização funcional por amostra, análise multivariada, relações entre
 entidades, contextualização toxicológica e seleção de combinações candidatas.
 Essa organização associa cada pergunta analítica aos dados, às métricas e à
-forma de apresentação correspondentes.
-
-O componente recebe KOs previamente atribuídos e não executa montagem,
+forma de apresentação correspondentes. O componente recebe KOs previamente atribuídos e não executa montagem,
 predição gênica ou anotação funcional de sequências. Leituras de
 sequenciamento, sequências nucleotídicas ou proteicas e dados de abundância ou
 expressão não constituem entradas diretas do serviço. As análises consideram
@@ -1008,8 +995,8 @@ projeção não produz novas relações biológicas. Ela restringe o conteúdo d
 banco aos identificadores presentes na entrada e organiza as correspondências
 para comparação entre amostras. A contribuição do componente está nessa
 mudança de unidade analítica: as relações curadas deixam de ser examinadas
-apenas como propriedades do banco e passam a ser analisadas no contexto dos
-perfis fornecidos.
+apenas como propriedades do banco e passam a ser analisadas no contexto das
+amostras fornecidas.
 
 As métricas ecológico-funcionais oferecem uma linguagem comum para comparar
 esses perfis. A riqueza de KOs descreve a amplitude do repertório funcional
@@ -1020,9 +1007,7 @@ complementaridade organizam relações entre amostras. Essas medidas caracteriza
 a estrutura das anotações e não a intensidade dos processos biológicos. A
 ausência de informações sobre abundância, expressão e atividade impede que
 diferenças nas métricas sejam interpretadas diretamente como diferenças nas
-taxas de transformação dos compostos~\cite{prosser2015omics}.
-
-A separação entre riqueza de KOs e cobertura de compostos também evita assumir
+taxas de transformação dos compostos~\cite{prosser2015omics}. A separação entre riqueza de KOs e cobertura de compostos também evita assumir
 uma relação proporcional entre diversidade funcional e amplitude química. Um
 perfil com muitos KOs pode concentrar suas associações em um conjunto
 restrito de compostos, enquanto outro perfil com menos KOs pode abranger
@@ -1040,15 +1025,13 @@ também aumenta o número de decisões necessárias para selecionar o módulo, a
 métrica e os parâmetros compatíveis com a pergunta de pesquisa. A
 documentação individual dos casos e os limites interpretativos apresentados
 nos painéis integram, portanto, o procedimento analítico e não funcionam apenas
-como material auxiliar da interface.
-
-O módulo de análises guiadas do \gls{dbx} estabelece um contraste útil. Ele
+como material auxiliar da interface. O módulo de análises guiadas do \gls{dbx} estabelece um contraste útil. Ele
 organiza um conjunto menor de perguntas aplicadas diretamente ao banco, sem
 dados submetidos pelo usuário. O \gls{bws} oferece um catálogo mais extenso,
 condicionado à composição das amostras e aos parâmetros definidos em cada
 execução. A diferença não representa uma progressão de complexidade entre os
 componentes, mas duas estratégias de interação: orientação por perguntas
-recorrentes no \gls{dbx} e seleção entre famílias analíticas no \gls{bws}.
+recorrentes no \gls{dbx} e seleção entre módulos analíticss no \gls{bws}. 
 
 A definição declarativa dos casos de uso reduz a dispersão das regras entre os
 componentes da interface. Os arquivos YAML mantêm associados a pergunta, os
@@ -1056,17 +1039,14 @@ dados exigidos, as transformações, os parâmetros, a estratégia visual e os
 limites de interpretação. Essa associação permite distinguir mudanças no
 procedimento analítico de alterações restritas à apresentação. O
 versionamento das configurações também fornece um registro verificável da
-análise executada.
-
-A configuração declarativa, entretanto, não garante isoladamente a
+análise executada. A configuração declarativa, entretanto, não garante isoladamente a
 reprodutibilidade. A repetição de um caso de uso requer a mesma entrada, as
 mesmas versões do software e das fontes, os mesmos parâmetros e os mesmos
 critérios de tratamento dos dados. A retenção temporária dos trabalhos torna a
 exportação dos arquivos e o registro dessas informações necessários para
 reproduções posteriores. As configurações versionadas e os artefatos
 exportáveis apoiam aspectos de reprodutibilidade e reutilização associados aos
-princípios FAIR, sem constituir uma avaliação formal de conformidade integral
-com esses princípios~\cite{wilkinson2016fair}.
+princípios FAIR ~\cite{wilkinson2016fair}.
 
 O escopo do \gls{bws} difere de plataformas web voltadas à análise geral de
 microbiomas. O MicrobiomeAnalyst~2.0 recebe dados brutos de amplicons, tabelas
@@ -1165,21 +1145,13 @@ candidatas orientadas por anotações'', em vez de ``consórcios funcionais
 otimizados''.
 
 A interpretação do componente permanece condicionada a quatro limitações
-principais. A primeira decorre da qualidade das anotações produzidas a
-montante. A segunda resulta da representação qualitativa por presença e
+principais. A primeira decorre da qualidade das anotações produzidas previamente. A segunda resulta da representação qualitativa por presença e
 ausência, que não incorpora abundância nem atividade. A terceira corresponde
 à cobertura e ao recorte temporal das fontes integradas. A quarta está
 relacionada ao catálogo predefinido de análises, que não contempla perguntas
 fora das transformações implementadas sem modificação do software ou uso do
 \gls{cli}.
 
-As verificações realizadas demonstraram o funcionamento dos fluxos avaliados,
-mas não constituem um estudo de usabilidade, acessibilidade ou desempenho sob
-carga concorrente. A amplitude do catálogo de casos de uso justifica uma
-avaliação futura com usuários dos diferentes perfis atendidos pelo ecossistema.
-Essa avaliação deve examinar a seleção das análises, a compreensão das
-métricas, a interpretação das visualizações e a recuperação dos parâmetros
-necessários à reprodução.
 
 O \gls{bws} converte perfis de KO por amostra em recortes comparáveis das
 relações integradas no BioRemPP. Sua contribuição consiste em reunir métodos
