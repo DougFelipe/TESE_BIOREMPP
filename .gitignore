@@ -32,6 +32,9 @@
 *.pdf
 *.dvi
 *.ps
+/*.docx
+/tmp_*.tex
+/.tmp_pdf_check/
 
 # Latexmk / MakeIndex temp files
 *.nav
