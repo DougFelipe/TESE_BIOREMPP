@@ -25,9 +25,7 @@ denormalizada também exige que o pesquisador diferencie o número de linhas das
 cardinalidades de cada entidade e reconstrua localmente associações
 muitos-para-muitos. Essas operações podem ser executadas em R, Python ou
 sistemas de banco de dados, mas dependem da escrita de código e da preparação
-do ambiente de análise.
-
-O \gls{dbx} fornece uma camada de acesso ao conteúdo integrado sem substituir
+do ambiente de análise. O \gls{dbx} fornece uma camada de acesso ao conteúdo integrado sem substituir
 os arquivos científicos publicados. A aplicação organiza a evidência em uma
 estrutura orientada à consulta e a disponibiliza por uma interface web. O
 usuário pode pesquisar entidades, aplicar filtros e percorrer relações entre
@@ -42,9 +40,7 @@ identificador. Os identificadores \gls{cpd} preservam a referência química e
 a ligação com as predições toxicológicas, enquanto os identificadores
 \gls{ko} conectam os compostos às anotações funcionais do HADEG e do
 subconjunto KEGG Degradation. CPD e KO permanecem, portanto, como entidades
-complementares de consulta.
-
-A aplicação disponibiliza módulos dedicados a compostos, classes químicas,
+complementares de consulta. A aplicação disponibiliza módulos dedicados a compostos, classes químicas,
 genes e KOs, vias e toxicidade. Esses módulos permitem consultar registros
 individuais e percorrer entidades relacionadas. O componente também reúne
 oito análises guiadas que formalizam perguntas sobre amplitude de anotação
@@ -58,9 +54,7 @@ distingue do \gls{bws}, apresentado no Capítulo~\ref{cap:comp3}, que processa
 anotações funcionais submetidas pelo usuário para produzir perfis associados
 às amostras analisadas. O Database Explorer opera sobre um conjunto de
 referência previamente construído, enquanto o Web Service aplica as relações
-do BioRemPP a dados externos.
-
-O escopo do \gls{dbx} é exploratório. As associações exibidas representam
+do BioRemPP a dados externos. O escopo do \gls{dbx} é exploratório. As associações exibidas representam
 registros curados, relações recuperadas de bases públicas e predições
 computacionais. Elas sustentam a formulação de hipóteses e a priorização de
 entidades para análises posteriores, mas não confirmam a degradação de um
@@ -90,9 +84,7 @@ publicados. Essa representação mantém apenas as estruturas necessárias às
 consultas da aplicação e permite selecionar, ordenar, agrupar e paginar os
 registros sem processar novamente a tabela denormalizada. O formato em arquivo
 único também reduz os componentes necessários para disponibilizar o banco no
-ambiente de execução.
-
-A camada interna de API orquestra o acesso entre a interface web e o SQLite. A
+ambiente de execução. A camada interna de API orquestra o acesso entre a interface web e o SQLite. A
 interface envia os parâmetros de busca, filtragem e paginação, enquanto a API
 executa as consultas correspondentes e retorna os resultados em estruturas
 consumidas pelos módulos da aplicação. O frontend não acessa diretamente o
@@ -115,15 +107,11 @@ O processo verifica os identificadores necessários às associações e agrupa o
 valores distintos de cada entidade. Os registros são reorganizados por
 composto, KO, via, referência institucional e endpoint toxicológico. Também
 são preservadas as combinações entre composto, KO, número EC, reação, via e
-fonte necessárias às páginas de detalhe e às análises guiadas.
-
-O SQLite é reconstruído a partir dos conjuntos correspondentes a cada versão
+fonte necessárias às páginas de detalhe e às análises guiadas. O SQLite é reconstruído a partir dos conjuntos correspondentes a cada versão
 do banco. Após a carga, verificações de consistência comparam as contagens
 armazenadas nos resumos por entidade com os registros que lhes dão origem. Os
 resultados quantitativos da construção e dessas verificações são apresentados
-na Seção~\ref{sec:c2-resultados}.
-
-A Figura~\ref{fig:c2-data-architecture} resume o fluxo entre os conjuntos de
+na Seção~\ref{sec:c2-resultados}. A Figura~\ref{fig:c2-data-architecture} resume o fluxo entre os conjuntos de
 entrada, o banco SQLite, a API interna e a interface web.
 
 \begin{figure}[htbp]
@@ -172,9 +160,11 @@ entrada, o banco SQLite, a API interna e a interface web.
 \caption{Arquitetura de dados do BioRemPP Database Explorer. Os conjuntos de
 entrada são associados por KO ou CPD e reorganizados em um banco SQLite. A
 API interna consulta esse banco e fornece os resultados apresentados pela
-interface web.}
+interface web. \todo{ELABORAR DIAGRAMA}} 
 \label{fig:c2-data-architecture}
 \end{figure}
+
+\todo{ELABORAR DIAGRAMA}
 
 Os arquivos publicados e o SQLite atendem a finalidades distintas. Os
 arquivos CSV e XLSX preservam e distribuem o conteúdo integrado, enquanto o
@@ -284,7 +274,7 @@ omitidos.
 }
 \caption{Organização conceitual das consultas no banco SQLite. O composto
 constitui o principal ponto de navegação, com associações a KOs, vias,
-referências institucionais e endpoints toxicológicos.}
+referências institucionais e endpoints toxicológicos. \todo{ELABORAR DIAGRAMA}}
 \label{fig:c2-relational-model}
 \end{figure}
 
@@ -409,9 +399,7 @@ classe apresentado pela interface. Essa perspectiva permite delimitar um
 conjunto de substâncias antes da consulta aos respectivos registros
 individuais. A classe é empregada na apresentação, no agrupamento e na
 filtragem dos compostos, sem participar da definição das associações
-funcionais estabelecidas por CPD e KO.
-
-A seleção de uma classe recupera os compostos apresentados sob o mesmo
+funcionais estabelecidas por CPD e KO. A seleção de uma classe recupera os compostos apresentados sob o mesmo
 rótulo e permite prosseguir para suas páginas de detalhe. A
 Figura~\ref{fig:c2-compound-classes-explorer} exemplifica essa forma de
 consulta.
@@ -429,9 +417,7 @@ registros correspondentes.}
 O módulo de genes e KOs permite iniciar a consulta por uma entidade funcional.
 O KO constitui o identificador principal do registro, enquanto o símbolo e o
 nome gênico fornecem descrições associadas. A listagem apresenta medidas
-derivadas do número de compostos e vias relacionados a cada KO.
-
-A página de detalhe recupera os compostos, as vias, as atividades enzimáticas
+derivadas do número de compostos e vias relacionados a cada KO. A página de detalhe recupera os compostos, as vias, as atividades enzimáticas
 e os números EC associados ao registro. As contagens apresentadas descrevem a
 conectividade observada no banco e não representam expressão gênica, atividade
 enzimática ou relevância metabólica. A
@@ -451,9 +437,7 @@ O módulo de vias mantém a fonte de anotação como parte da identificação do
 registro. Essa distinção permite consultar separadamente as vias provenientes
 do HADEG, do subconjunto KEGG Degradation e das categorias adicionais
 incorporadas à representação da aplicação, sem pressupor equivalência entre
-seus critérios de organização.
-
-Para cada via, a interface apresenta medidas derivadas das associações com
+seus critérios de organização. Para cada via, a interface apresenta medidas derivadas das associações com
 compostos e anotações funcionais. A página de detalhe recupera os compostos e
 KOs relacionados ao registro selecionado. Essas contagens não correspondem à
 completude da via, ao fluxo metabólico ou à atividade dos seus componentes. A
@@ -474,9 +458,7 @@ unidade de consulta. Os registros podem ser delimitados por grupo de
 endpoints, endpoint específico, categoria predita, classe química e intervalo
 numérico. A interpretação dos valores permanece condicionada ao endpoint
 selecionado, pois os descritores representam propriedades toxicológicas
-distintas.
-
-Cada resultado mantém a ligação com o CPD correspondente, o que permite
+distintas. Cada resultado mantém a ligação com o CPD correspondente, o que permite
 prosseguir para as informações funcionais e institucionais associadas ao
 composto. Os valores apresentados resultam de modelos preditivos e não
 equivalem a medidas experimentais de toxicidade. A
@@ -506,9 +488,7 @@ Os módulos de exploração permitem combinar livremente os critérios de
 consulta. As análises guiadas complementam essa modalidade ao formalizar oito
 perguntas recorrentes sobre o banco. Para cada pergunta, são definidos a
 unidade analisada, os parâmetros, a métrica principal, a ordenação e a forma
-de apresentação dos resultados.
-
-Cada caso de uso possui uma especificação declarativa em YAML. Essa
+de apresentação dos resultados. Cada caso de uso possui uma especificação declarativa em YAML. Essa
 especificação registra a pergunta analítica, o conjunto consultado, os
 parâmetros aceitos e a operação aplicada. O mesmo arquivo define os elementos
 de apresentação, incluindo as medidas resumidas, a visualização, as colunas da
@@ -564,7 +544,7 @@ de uso e documentam as operações necessárias à reprodução das consultas.
 \caption{Organização dos casos de uso das análises guiadas. A especificação
 YAML define a pergunta, os parâmetros e a apresentação dos resultados; a API
 executa a consulta correspondente no SQLite; e a receita SQL documenta a
-operação sobre a mesma versão do banco.}
+operação sobre a mesma versão do banco. \todo{ELABORAR DIAGRAMA}}
 \label{fig:c2-guided-structure}
 \end{figure}
 
@@ -679,8 +659,7 @@ dispersão; e as análises dependentes de endpoints empregam mapas de calor ou
 boxplots. A interpretação permanece condicionada ao conjunto filtrado e aos
 parâmetros registrados na execução.
 
-Cada caso de uso possui uma receita SQL correspondente. Essas receitas
-registram as tabelas consultadas, as junções, os critérios de seleção, as
+Cada caso de uso possui uma consulta SQL correspondente. Essas registram as tabelas consultadas, as junções, os critérios de seleção, as
 agregações e a ordenação aplicadas. Desse modo, a consulta pode ser repetida
 sobre o banco SQLite da mesma versão e com os mesmos parâmetros, sem depender
 da visualização fornecida pela aplicação.
@@ -713,58 +692,56 @@ resumidas, visualização e tabela de resultados sob uma estrutura comum.}
 O BioRemPP Database Explorer foi implementado como ambiente web de consulta à
 versão do banco apresentada no Capítulo~\ref{cap:comp1}. Os resultados
 compreenderam a implementação do ambiente de consulta, a disponibilização dos
-módulos de exploração, a execução das análises guiadas e a verificação do
-software. As cardinalidades e as propriedades científicas dos conjuntos
-integrados não são reapresentadas nesta seção.
+módulos de exploração, a execução das análises guiadas. 
 
 \subsection{Implementação do ambiente de consulta}
 
-A versão avaliada reuniu uma interface desenvolvida em React e TypeScript, uma
+A versão avaliada reúne uma interface desenvolvida em React e TypeScript, uma
 API interna baseada em Express e um banco SQLite destinado às operações da
-aplicação. Esses elementos foram distribuídos em uma configuração
-conteinerizada, que reuniu o servidor, a interface compilada e a representação
-dos dados usada em tempo de execução.
+aplicação. Esses elementos integram uma configuração conteinerizada que
+combina o servidor, a interface compilada e a representação dos dados utilizada
+durante a execução.
 
-O banco SQLite apresentou as 12 tabelas requeridas pelo servidor e ocupou
-15,77~MiB. A aplicação abriu esse arquivo em modo somente leitura, e as
-consultas não exigiram o carregamento dos arquivos CSV e XLSX publicados. O
-SQLite funcionou, portanto, como representação operacional do conteúdo
-descrito no Capítulo~\ref{cap:comp1}, sem substituir os artefatos científicos
-usados para distribuição e reutilização dos dados.
+O banco SQLite contém as 12 tabelas requeridas pelo servidor e ocupa
+15,77~MiB. A aplicação acessa esse arquivo em modo somente leitura, e as
+consultas não dependem do carregamento dos arquivos CSV e XLSX publicados. O
+SQLite constitui, portanto, a representação operacional do conteúdo descrito
+no Capítulo~\ref{cap:comp1}, sem substituir os artefatos científicos
+disponibilizados para distribuição e reutilização dos dados.
 
-A API interna disponibilizou operações para os domínios de compostos, classes
-químicas, genes e KOs, vias, toxicidade, metadados e análises guiadas. As
-requisições realizadas durante a avaliação retornaram respostas válidas para
-os módulos examinados e preservaram a paginação, a filtragem e a recuperação
-das entidades relacionadas.
+A API interna disponibiliza operações para os domínios de compostos, classes
+químicas, genes e KOs, vias, toxicidade, metadados e análises guiadas. Na
+avaliação da versão, as requisições aos módulos examinados retornam respostas
+válidas e preservam os mecanismos de paginação, filtragem e recuperação das
+entidades relacionadas.
 
 \subsection{Módulos de exploração e navegação entre entidades}
 
-Foram disponibilizados os cinco módulos previstos: \textit{Compounds},
+Os cinco módulos previstos integram a aplicação: \textit{Compounds},
 \textit{Compound Classes}, \textit{Genes / KO}, \textit{Pathways} e
-\textit{Toxicity}. As respectivas interfaces são apresentadas nas
-Figuras~\ref{fig:c2-compounds-explorer} a
-\ref{fig:c2-toxicity-explorer}, enquanto suas unidades de consulta e relações
-recuperadas são sintetizadas na Tabela~\ref{tab:c2-explorer-modules}.
+\textit{Toxicity}. As Figuras~\ref{fig:c2-compounds-explorer} a
+\ref{fig:c2-toxicity-explorer} apresentam as respectivas interfaces, enquanto
+a Tabela~\ref{tab:c2-explorer-modules} sintetiza suas unidades de consulta e
+as relações recuperadas.
 
-O módulo de compostos permitiu recuperar as anotações funcionais, as vias, as
-referências institucionais e as predições toxicológicas associadas a cada CPD.
-O módulo de classes químicas agrupou os compostos pelo atributo empregado na
-interface. Os módulos de genes e KOs e de vias permitiram iniciar a consulta
-por entidades funcionais, enquanto o módulo de toxicidade organizou os
-resultados por combinação entre composto e endpoint.
+O módulo de compostos recupera as anotações funcionais, as vias, as referências
+institucionais e as predições toxicológicas associadas a cada CPD. O módulo de
+classes químicas agrupa os compostos conforme o atributo utilizado na
+interface. Os módulos de genes e KOs e de vias iniciam as consultas por
+entidades funcionais, enquanto o módulo de toxicidade organiza os resultados
+por combinação entre composto e endpoint.
 
-A navegação entre listagens e páginas de detalhe foi verificada a partir das
-relações retornadas pela aplicação. Os registros de compostos conduziram aos
-KOs, às vias e às predições toxicológicas associadas. Em sentido inverso, as
-consultas iniciadas por KO ou via recuperaram os compostos correspondentes.
-Também foi preservado o acesso ao registro do composto a partir dos módulos de
-classes químicas e toxicidade.
+A avaliação verifica a navegação entre as listagens e as páginas de detalhe a
+partir das relações retornadas pela aplicação. Os registros de compostos
+conduzem aos KOs, às vias e às predições toxicológicas associadas. No sentido
+inverso, as consultas iniciadas por KO ou via recuperam os compostos
+correspondentes. Os módulos de classes químicas e toxicidade também preservam
+o acesso ao registro individual de cada composto.
 
-Essa verificação examinou a correspondência entre as entidades apresentadas
-nas listagens e aquelas recuperadas nas páginas de detalhe. Seu escopo não
-incluiu avaliação de usabilidade com participantes ou mensuração do
-desempenho da interface sob carga concorrente.
+A verificação examina a correspondência entre as entidades apresentadas nas
+listagens e aquelas recuperadas nas páginas de detalhe. Seu escopo não abrange
+uma avaliação de usabilidade com participantes nem a mensuração do desempenho
+da interface sob carga concorrente.
 
 \subsection{Análises guiadas e reprodutibilidade das consultas}
 
@@ -806,29 +783,29 @@ gênicos, KOs, compostos e valores toxicológicos preditos. \\
 \end{tabularx}
 \end{table}
 
-As oito análises usaram a estrutura compartilhada apresentada na
-Figura~\ref{fig:c2-guided-structure}. As configurações YAML foram processadas
-para definir os parâmetros, as medidas resumidas, as visualizações e as
-tabelas de cada caso de uso. A execução pela API retornou essas informações
-sob um formato comum, independentemente da entidade adotada como ponto de
-entrada.
+As oito análises seguem a estrutura compartilhada apresentada na
+Figura~\ref{fig:c2-guided-structure}. A aplicação processa as configurações
+YAML para definir os parâmetros, as medidas resumidas, as visualizações e as
+tabelas de cada caso de uso. A API organiza essas informações em um formato
+comum, independentemente da entidade adotada como ponto de entrada.
 
-A interface resultante é exemplificada na
-Figura~\ref{fig:c2-guided-analysis}. A mesma organização foi mantida entre os
-casos de uso, com seleção da análise, definição dos parâmetros, apresentação
-das medidas resumidas, visualização e tabela de resultados.
+A Figura~\ref{fig:c2-guided-analysis} exemplifica a interface correspondente.
+Todos os casos de uso mantêm a mesma organização, composta pela seleção da
+análise, definição dos parâmetros, apresentação das medidas resumidas,
+visualização e tabela de resultados.
 
-Cada caso de uso permaneceu associado a uma receita SQL versionada. As oito
-receitas foram executadas sobre a mesma versão do banco SQLite e reproduziram
-as unidades de análise, os filtros, as agregações, as métricas principais e os
-critérios de ordenação definidos pela aplicação. Diferenças relacionadas à
-paginação ou à seleção dos campos apresentados permaneceram restritas à
-projeção da resposta e não modificaram as operações analíticas.
+Cada caso de uso permanece associado a uma receita SQL versionada. As oito
+receitas operam sobre a mesma versão do banco SQLite e reproduzem as unidades
+de análise, os filtros, as agregações, as métricas principais e os critérios de
+ordenação definidos pela aplicação. As diferenças relacionadas à paginação ou
+à seleção dos campos apresentados permanecem restritas à projeção da resposta e
+não modificam as operações analíticas.
 
-A combinação entre especificações YAML e receitas SQL permitiu registrar tanto
-a configuração usada pela interface quanto a consulta executada sobre o banco.
-Desse modo, os procedimentos analíticos puderam ser repetidos
-independentemente da visualização disponibilizada pelo Database Explorer.
+A associação entre as especificações YAML e as receitas SQL registra tanto a
+configuração utilizada pela interface quanto a consulta executada sobre o
+banco. Essa organização possibilita repetir os procedimentos analíticos
+independentemente das visualizações apresentadas pelo BioRemPP Database
+Explorer.
 
 \subsection{Verificação técnica e disponibilização}
 
@@ -909,10 +886,6 @@ consultas de verificação retornaram respostas válidas. \\
 \end{tabularx}
 \end{table}
 
-As verificações demonstraram o funcionamento da aplicação no escopo definido
-para o componente. Os resultados não constituíram uma avaliação de desempenho
-sob carga, de disponibilidade contínua do serviço ou de usabilidade com
-participantes, aspectos que exigiriam protocolos específicos.
 
 Os elementos necessários à reprodução do Database Explorer foram mantidos no
 repositório, incluindo o código-fonte, os arquivos de configuração, as
@@ -924,17 +897,8 @@ O BioRemPP Database Explorer foi disponibilizado em
 \url{https://bioinfo.imd.ufrn.br/bioremppdbx/}. O código-fonte encontra-se em
 \url{https://github.com/BioRemPP/biorempp-dbx}, e a documentação está
 disponível em
-\url{https://biorempp-dbx.readthedocs.io/en/stable/}. A versão avaliada da
-aplicação corresponde à versão beta~1.0.0 e utiliza a versão~1.1.0 dos dados
-BioRemPP.
-
-O código foi distribuído sob a licença Apache~2.0, enquanto os dados
-permaneceram disponíveis sob a licença CC~BY~4.0. A aplicação web e a
-documentação ampliaram as formas de acesso; o uso de CPD e KO manteve a
-interoperabilidade com identificadores externos; e as configurações, receitas
-SQL, licenças e artefatos versionados forneceram mecanismos para reprodução e
-reutilização. Esses elementos contribuíram para a implementação dos
-princípios FAIR no escopo do componente.
+\url{https://biorempp-dbx.readthedocs.io/en/stable/}. O código foi distribuído sob a licença Apache~2.0, enquanto os dados
+permaneceram disponíveis sob a licença CC~BY~4.0.
 
 % -----------------------------------------------------------------------------
 \section{Discussão do componente}
@@ -955,16 +919,12 @@ alterações produzidas pelos usuários durante a execução. A representação
 operacional permite aplicar filtros, ordenações, agregações e paginação sem
 reprocessar os arquivos CSV e XLSX em cada requisição. A abertura do banco em
 modo somente leitura também preserva o conteúdo materializado durante o uso
-da interface.
-
-A separação entre os arquivos publicados e o SQLite mantém funções distintas
+da interface. A separação entre os arquivos publicados e o SQLite mantém funções distintas
 para os dois formatos. Os arquivos CSV e XLSX preservam o conteúdo científico
 em uma forma adequada à distribuição, à citação e ao processamento externo. O
 SQLite organiza as estruturas exigidas pelas consultas da aplicação e pode ser
 reconstruído a partir da versão correspondente dos conjuntos de entrada. A
-interface não se torna, portanto, a única forma de acesso ao banco BioRemPP.
-
-A API interna restringe o acoplamento entre a interface e a organização física
+interface não se torna, portanto, a única forma de acesso ao banco BioRemPP. A API interna restringe o acoplamento entre a interface e a organização física
 dos dados. Os módulos enviam os parâmetros da consulta e recebem respostas
 estruturadas sem acessar diretamente o arquivo SQLite. Essa separação permite
 alterar a apresentação dos resultados sem modificar a representação
@@ -977,21 +937,13 @@ enquanto os módulos de genes e KOs e de vias iniciam a consulta pela dimensão
 funcional. Os módulos de classes químicas e toxicidade acrescentam recortes
 voltados, respectivamente, ao agrupamento dos compostos e às predições por
 endpoint. Essa organização operacionaliza a complementaridade entre CPD e KO
-descrita no modelo do banco.
-
-A navegação entre listagens e páginas de detalhe mantém o contexto das
+descrita no modelo do banco. A navegação entre listagens e páginas de detalhe mantém o contexto das
 associações recuperadas. Um composto pode ser examinado em relação aos KOs,
 vias, números EC, reações, referências institucionais e endpoints associados.
 De forma recíproca, uma consulta iniciada por KO ou via permite recuperar os
 compostos relacionados. Os módulos funcionam, assim, como diferentes acessos
 ao mesmo conjunto de relações, e não como coleções independentes.
 
-A classe química exerce uma função distinta das relações estabelecidas por CPD
-e KO. O valor apresentado na interface permite agrupar e filtrar compostos,
-mas não participa da definição das associações funcionais, toxicológicas ou
-institucionais. Essa delimitação impede que a classificação usada na
-apresentação seja interpretada como uma nova relação biológica produzida pelo
-Database Explorer.
 
 As contagens exibidas nos exploradores sintetizam a quantidade de associações
 registradas para cada entidade. Elas permitem ordenar resultados e delimitar
@@ -1004,30 +956,24 @@ As análises guiadas complementam a exploração baseada em filtros livres. Os
 oito casos de uso formalizam perguntas recorrentes ao definir a unidade
 analisada, os parâmetros aceitos, a métrica calculada e a forma de
 apresentação. Essa definição reduz a variação decorrente da composição manual
-de filtros e mantém explícito o procedimento aplicado a cada consulta.
-
-A implementação declarativa em YAML associa a pergunta analítica aos
+de filtros e mantém explícito o procedimento aplicado a cada consulta. A implementação declarativa em YAML associa a pergunta analítica aos
 parâmetros, às medidas resumidas, à visualização e aos limites de
 interpretação. Alterações nesses elementos permanecem vinculadas à versão da
 configuração correspondente. A definição da análise fica separada dos
 componentes responsáveis por sua apresentação, o que permite distinguir
-mudanças no procedimento analítico de modificações exclusivamente visuais.
+mudanças no procedimento analítico de modificações exclusivamente de interface.
 
 As receitas SQL associadas aos casos de uso fornecem uma representação
 executável das consultas. A repetição dos resultados depende da mesma versão
 do SQLite, dos mesmos parâmetros e dos mesmos critérios para valores ausentes,
 agregações e ordenação. A receita documenta o procedimento independentemente
 da interface, enquanto o YAML registra como esse procedimento é parametrizado
-e apresentado no Database Explorer.
-
-A reprodução das métricas principais pelas receitas SQL indica
+e apresentado no Database Explorer. A reprodução das métricas principais pelas receitas SQL indica
 correspondência entre as análises executadas pela aplicação e sua descrição
 externa. Diferenças de paginação, seleção de campos ou apresentação de
 subconjuntos não modificam necessariamente a operação analítica. Essas
 diferenças precisam, contudo, permanecer documentadas quando a saída da
-interface for comparada diretamente à consulta completa.
-
-Os casos de uso mantêm caráter exploratório. Os rankings baseados em KOs,
+interface for comparada diretamente à consulta completa. Os casos de uso mantêm caráter exploratório. Os rankings baseados em KOs,
 símbolos gênicos ou compostos descrevem relações presentes no banco e não
 demonstram desempenho biológico. As análises que combinam anotações funcionais
 e valores toxicológicos também não estabelecem causalidade entre genes, vias e
@@ -1038,9 +984,7 @@ A interpretação das predições toxicológicas depende do endpoint selecionado
 Cada endpoint descreve uma propriedade distinta e pode apresentar escala,
 direção e significado próprios. Seus valores não devem ser combinados como uma
 medida única de risco sem justificativa específica. As categorias exibidas
-também não substituem ensaios experimentais ou avaliações formais de perigo.
-
-Os limiares calculados a partir do conjunto filtrado produzem classificações
+também não substituem ensaios experimentais ou avaliações formais de perigo. Os limiares calculados a partir do conjunto filtrado produzem classificações
 relativas ao recorte analisado. No caso da análise que relaciona amplitude de
 anotação gênica e toxicidade predita, a posição de um composto depende da
 distribuição dos registros incluídos na consulta. A alteração dos filtros pode
@@ -1054,19 +998,6 @@ regulatória individualizada. O processamento de amostras pertence ao serviço
 de análise do ecossistema BioRemPP, enquanto decisões regulatórias exigem a
 consulta às fontes oficiais e à legislação vigente.
 
-A arquitetura atual é compatível com um banco versionado, predominantemente
-consultivo e distribuído em arquivo único. Cenários com escrita concorrente,
-atualizações frequentes ou aumento substancial da carga podem exigir outro
-sistema de gerenciamento de dados ou separação adicional dos serviços. Essa
-possibilidade constitui uma condição de evolução da infraestrutura e não
-altera o conteúdo científico representado pelo componente.
-
-As verificações técnicas avaliaram o comportamento da implementação no escopo
-dos testes automatizados, das consultas à API e da execução conteinerizada.
-Esses procedimentos não correspondem a ensaios de usabilidade, acessibilidade
-com participantes ou desempenho sob carga concorrente. Avaliações dessa
-natureza exigem protocolos próprios e podem orientar versões posteriores da
-aplicação.
 
 A disponibilização do código-fonte, da documentação, das configurações YAML,
 das receitas SQL e do ambiente conteinerizado fornece mecanismos concretos
@@ -1079,8 +1010,7 @@ Esses mecanismos apoiam aspectos dos princípios FAIR no escopo do Database
 Explorer. A aplicação e a documentação ampliam o acesso ao conteúdo; CPD e KO
 favorecem a interoperabilidade; as receitas SQL e as configurações versionadas
 permitem repetir as consultas; e as licenças estabelecem as condições de
-reutilização. Esses elementos não constituem, isoladamente, uma avaliação
-formal de conformidade com todas as dimensões FAIR.
+reutilização.
 
 No ecossistema BioRemPP, o Database Explorer ocupa a camada de consulta direta
 ao banco integrado. Os arquivos publicados preservam o conteúdo científico, o
