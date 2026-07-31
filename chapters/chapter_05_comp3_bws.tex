@@ -704,9 +704,38 @@ do \gls{bws}.
 \label{sec:c3-interop}
 % -----------------------------------------------------------------------------
 
-O \gls{bws} consome a mesma release do banco integrado que o \gls{dbx}, garantindo consistência entre resultados obtidos nas duas ferramentas. A cada release do banco corresponde uma release do \gls{bws} que a incorpora; upgrades de versão do banco propagam-se para o \gls{bws} através do mesmo pipeline de deploy.
+O \gls{dbx} e o \gls{bws} utilizam projeções distintas do banco BioRemPP,
+definidas conforme as necessidades de cada componente. O \gls{dbx} opera sobre
+o schema completo da versão 1.1.0, que contém 11 campos e inclui os
+identificadores de número EC, reação KEGG e descrição da reação. Essa maior
+granularidade atende às operações de exploração detalhada das relações entre
+compostos, KOs, atividades enzimáticas e transformações químicas.
 
-Essa consistência é auditável: perguntas exploratórias respondidas por navegação no \gls{dbx} produzem os mesmos números que perguntas analíticas equivalentes rodadas no \gls{bws}. Isso torna as duas ferramentas complementares em fluxo de trabalho: um pesquisador tipicamente começa pela navegação exploratória no \gls{dbx} para escolher escopo, e depois submete seus próprios dados ao \gls{bws} para análise dirigida.
+O \gls{bws}, por sua vez, utiliza uma projeção reduzida correspondente ao
+contrato de oito campos da versão 1.0.0. Essa projeção preserva as relações
+necessárias para associar os KOs submetidos por amostra a compostos, classes
+químicas, símbolos e nomes de genes, descritores de atividade enzimática e
+referências institucionais. Os campos \texttt{ec}, \texttt{reaction} e
+\texttt{reaction\_description} não integram o contrato mínimo do serviço,
+porque os casos de uso implementados operam principalmente sobre as relações
+entre amostras, KOs e compostos.
+
+A diferença entre os schemas constitui uma decisão arquitetural e não uma
+divergência entre as bases de conhecimento utilizadas. Os dois componentes
+preservam os mesmos identificadores interoperáveis para as entidades
+compartilhadas, mas adotam níveis distintos de detalhamento. O \gls{dbx}
+mantém a maior resolução relacional da versão 1.1.0, enquanto o \gls{bws}
+evita propagar para as análises por amostra a multiplicação de linhas
+decorrente das combinações entre números EC e reações KEGG.
+
+Por essa razão, resultados equivalentes nos dois componentes devem ser
+comparados no nível das entidades e relações comuns aos respectivos contratos,
+como KOs, compostos, classes químicas e referências institucionais. As
+cardinalidades que dependem de números EC ou reações permanecem específicas do
+\gls{dbx} e não possuem correspondência direta no \gls{bws}. Essa organização
+torna os componentes complementares: o \gls{dbx} apoia a exploração detalhada
+do conteúdo integrado, enquanto o \gls{bws} projeta as relações necessárias
+sobre os perfis funcionais submetidos pelo usuário.
 
 % -----------------------------------------------------------------------------
 \section{Resultados do componente}
@@ -714,7 +743,7 @@ Essa consistência é auditável: perguntas exploratórias respondidas por naveg
 % -----------------------------------------------------------------------------
 
 Os resultados demonstrativos derivaram de perfis funcionais de nove
-amostras-exemplo, representativas de bactérias, fungos e microalgas associados
+amostras de exemplo, representativas de bactérias, fungos e microalgas associados
 na literatura a processos de degradação de contaminantes ou a aplicações em
 biorremediação \cite{dellanno2021bioremediation}. Os grupos KO usados como
 entrada foram obtidos previamente por anotação funcional com o eggNOG-mapper
@@ -727,23 +756,22 @@ uma comparação experimental da capacidade de degradação entre os organismos.
 
 \subsection{Integração e apresentação dos dados demonstrativos}
 
-A Figura~\ref{fig:architecture} reúne a arquitetura dos dados de referência e
-os resultados iniciais da integração das amostras-exemplo. O painel A apresenta
-a relação da tabela central BioRemPP com o HADEG, o subconjunto KEGG
-Degradation e o ToxCSM. O painel B mostra as interseções de KOs entre as três
-fontes indexadas por identificadores funcionais.
+A Figura~\ref{fig:architecture} reúne a arquitetura das fontes de referência e
+os resultados iniciais da integração das amostras-exemplo. Em A, observa-se a
+relação da tabela central BioRemPP com o HADEG, o subconjunto KEGG Degradation
+e o ToxCSM. Em B, são representadas as interseções de KOs entre as três fontes
+indexadas por identificadores funcionais.
 
-O painel C apresenta a página de tabelas integradas do \gls{bws}. Na execução
-demonstrativa, a interface registra nove amostras, 23.644 registros de KO,
-17.501 relações recuperadas e correspondências nas quatro fontes consultadas.
-O mesmo painel apresenta as contribuições de cada fonte e os resumos
-correspondentes à tabela central BioRemPP.
+Em C, a página de tabelas integradas do \gls{bws} registra, na execução
+demonstrativa, nove amostras, 23.644 registros de KO, 17.501 relações
+recuperadas e correspondências nas quatro fontes consultadas. A mesma
+representação discrimina a contribuição de cada fonte e sintetiza os resultados
+associados à tabela central BioRemPP.
 
-O painel D apresenta a cobertura de compostos por amostra e código de
-referência institucional. Cada célula corresponde à proporção do conjunto de
-compostos da referência que possui associação com os KOs da amostra. O painel
-E apresenta as interseções entre os conjuntos de compostos vinculados aos
-códigos institucionais.
+Em D, cada célula representa a proporção dos compostos de uma referência
+institucional que possui associação com os KOs da respectiva amostra. Em E,
+são apresentadas as interseções entre os conjuntos de compostos vinculados aos
+diferentes códigos de referência institucional.
 
 \begin{figure}[p]
 \centering
@@ -776,21 +804,21 @@ exportados nos formatos oferecidos pela interface.
 \subsection{Caracterização dos perfis funcionais}
 
 A Figura~\ref{fig:clustering} reúne saídas representativas dos módulos de
-caracterização, análise multivariada e perfil funcional. O painel A apresenta
-a ordenação das nove amostras pela contagem de KOs distintos. A seleção da
-fonte de referência e o intervalo de contagens permanecem disponíveis como
-parâmetros da visualização.
+caracterização, análise multivariada e perfil funcional. Em A, as nove
+amostras são ordenadas pela contagem de KOs distintos. A fonte de referência e
+o intervalo de contagens permanecem disponíveis como parâmetros da
+visualização.
 
-Os painéis B a D apresentam três representações da estrutura dos perfis de
-presença e ausência de KOs. O painel B projeta as amostras nos dois primeiros
-componentes da análise de componentes principais. O painel C mostra a matriz
-de correlação de Pearson entre os perfis funcionais. O painel D apresenta o
-dendrograma obtido pelo agrupamento hierárquico.
+Em B, C e D, a estrutura dos perfis de presença e ausência de KOs é examinada
+por três abordagens complementares. Em B, as amostras são projetadas nos dois
+primeiros componentes da análise de componentes principais. Em C, a matriz de
+correlação de Pearson representa a similaridade entre os perfis funcionais. Em
+D, o dendrograma apresenta o agrupamento hierárquico das amostras.
 
-O painel E apresenta as associações entre amostras, compostos e KOs. Cada
-ponto corresponde a um par amostra--composto, e seu tamanho e sua escala visual
-representam a quantidade de KOs distintos associados. O painel F apresenta os
-símbolos gênicos vinculados aos KOs de cada amostra.
+Em E, são representadas as associações entre amostras, compostos e KOs. Cada
+ponto corresponde a uma combinação amostra--composto, enquanto seu tamanho e
+sua escala visual indicam a quantidade de KOs distintos associados. Em F, são
+apresentados os símbolos gênicos vinculados aos KOs de cada amostra.
 
 \begin{figure}[p]
 \centering
@@ -823,19 +851,19 @@ presença e ausência produzidos pela integração das nove amostras.
 \subsection{Relações entre amostras, genes e compostos}
 
 A Figura~\ref{fig:networks} reúne as representações relacionais aplicadas aos
-dados demonstrativos. O painel A apresenta um diagrama de cordas entre as
-amostras e as classes químicas associadas aos seus KOs. Os segmentos
-identificam as entidades e a largura das faixas representa a frequência das
+dados demonstrativos. Em A, o diagrama de cordas relaciona as amostras às
+classes químicas associadas aos respectivos KOs. Os segmentos identificam as
+entidades, enquanto a largura das faixas representa a frequência das
 associações.
 
-O painel B apresenta uma rede de coanotação no nível dos símbolos gênicos. Os
-nós correspondem aos símbolos recuperados, as arestas representam relações
-compartilhadas e a escala visual indica o número de conexões de cada nó.
+Em B, a rede de coanotação organiza as relações entre os símbolos gênicos
+recuperados. Os nós representam os símbolos, as arestas indicam relações
+compartilhadas e a escala visual expressa o número de conexões de cada nó.
 
-O painel C apresenta um diagrama de Sankey organizado em três níveis. As
-colunas correspondem às amostras, às classes químicas e aos descritores de
-atividade enzimática. A largura dos fluxos representa a frequência das
-relações entre os níveis adjacentes.
+Em C, o diagrama de Sankey organiza as relações em três níveis correspondentes
+às amostras, às classes químicas e aos descritores de atividade enzimática. A
+largura dos fluxos representa a frequência das associações entre os níveis
+adjacentes.
 
 \begin{figure}[p]
 \centering
@@ -862,23 +890,24 @@ bioquímicas adicionais.
 \subsection{Contextualização toxicológica e combinações candidatas}
 
 A Figura~\ref{fig:toxicity} reúne saídas dos módulos de contextualização
-toxicológica e seleção de combinações candidatas. O painel A apresenta os
-valores preditos do ToxCSM por composto e endpoint. As colunas estão agrupadas
-nas categorias de resposta nuclear, resposta ao estresse, toxicidade genômica,
-ambiental e em órgãos.
+toxicológica e seleção de combinações candidatas. Em A, os valores preditos
+pelo ToxCSM são organizados por composto e endpoint. As colunas agrupam os
+endpoints nas categorias de resposta nuclear, resposta ao estresse,
+genotoxicidade, toxicidade ambiental e toxicidade em órgãos.
 
-O painel B relaciona os compostos priorizados pelos valores toxicológicos
-preditos às anotações funcionais das amostras. Cada célula apresenta a
-quantidade de símbolos gênicos distintos associada ao par
+Em B, os compostos priorizados com base nas predições toxicológicas são
+relacionados às anotações funcionais das amostras. Cada célula indica a
+quantidade de símbolos gênicos distintos associada a uma combinação
 amostra--composto.
 
-O painel C apresenta as combinações de amostras selecionadas pelo procedimento
-de cobertura mínima. As colunas identificam os grupos candidatos, enquanto os
-pontos representam os compostos e a quantidade de KOs distintos associados.
+Em C, são apresentadas as combinações de amostras selecionadas pelo
+procedimento de cobertura mínima. As colunas identificam os grupos candidatos,
+enquanto os pontos representam os compostos e expressam a quantidade de KOs
+distintos associados.
 
-O painel D apresenta a cobertura contextual por amostra e classe química. Cada
+Em D, a cobertura contextual é representada por amostra e classe química. Cada
 célula corresponde à proporção dos KOs de referência representada no perfil
-funcional da amostra.
+funcional da respectiva amostra.
 
 \begin{figure}[p]
 \centering
@@ -961,11 +990,6 @@ Normalização e transformação dos dados
 O maior tempo ocorreu na etapa de normalização e transformação, com
 4,367~s. O carregamento das fontes registrou 2,884~s e o maior pico de memória,
 38,4~MB. As operações centrais registraram o menor tempo, com 0,270~s.
-
-Os valores da Tabela~\ref{tab:c3-computational-profile} correspondem ao
-ambiente e aos alvos definidos para o perfil de referência. A avaliação não
-incluiu submissões concorrentes, variação da latência de rede ou ensaios
-prolongados de carga.
 
 % -----------------------------------------------------------------------------
 \section{Status editorial}
